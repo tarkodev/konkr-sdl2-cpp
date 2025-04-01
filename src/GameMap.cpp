@@ -10,15 +10,15 @@ namespace {
     const SDL_Color YELLOW = {252, 242, 0, 255};
 }
 
-GameMap::GameMap(SDL_Renderer *renderer, const std::pair<int, int>& gridSize, const std::pair<int, int>& size, const std::pair<int, int>& position, double hexagonRadius, double zoom)
+GameMap::GameMap(SDL_Renderer *renderer, const std::pair<int, int>& gridSize, const SDL_Rect& size, const SDL_Point& position, double hexagonRadius, double zoom)
     : renderer_(renderer), HexagonGrid<int>(gridSize, hexagonRadius, 0),
-      width_(size.first), height_(size.second), x_(position.first), y_(position.second), 
+      width_(size.w), height_(size.h), x_(position.x), y_(position.y), 
       hexagonRadius_(hexagonRadius), zoom_(zoom), sprite_(nullptr), hexagonSprite_(nullptr) {}
 
 
-GameMap::GameMap(SDL_Renderer *renderer, const std::string mapFile, const std::pair<int, int>& size, const std::pair<int, int>& position, double hexagonRadius, double zoom)
+GameMap::GameMap(SDL_Renderer *renderer, const std::string mapFile, const SDL_Rect& size, const SDL_Point& position, double hexagonRadius, double zoom)
     : renderer_(renderer), HexagonGrid<int>(mapFile, hexagonRadius),
-      width_(size.first), height_(size.second), x_(position.first), y_(position.second), 
+      width_(size.w), height_(size.h), x_(position.x), y_(position.y), 
       hexagonRadius_(hexagonRadius), zoom_(zoom), sprite_(nullptr), hexagonSprite_(nullptr) {}
 
 void GameMap::createSprite()
@@ -31,7 +31,7 @@ void GameMap::createSprite()
 
     // Créer la texture du sprite (dimensions basées sur la grille)
     sprite_ = SDL_CreateTexture(renderer_, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width_, height_);
-    this->createHexagonSprite();
+    createHexagonSprite();
 }
 
 void GameMap::createHexagonSprite()
@@ -177,7 +177,7 @@ void GameMap::handleEvent(SDL_Event &event) {
         }
     } else if (event.type == SDL_MOUSEWHEEL) {
         // Ajuste le rayon et recrée la grille si besoin
-        this->zoom((event.wheel.preciseY > 0) ? 1.1 : 0.9);
+        zoom((event.wheel.preciseY > 0) ? 1.1 : 0.9);
     }
     else if (event.type == SDL_KEYDOWN) {
         if (event.key.keysym.sym == SDLK_LEFT)

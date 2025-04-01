@@ -23,7 +23,7 @@ public:
      * @param hexagonRadius Rayon des hexagones (pour la conversion et le dessin).
      * @param zoom Facteur de zoom initial.
      */
-    GameMap(SDL_Renderer *renderer, const std::pair<int, int>& gridSize, const std::pair<int, int>& size, const std::pair<int, int>& position, double hexagonRadius, double zoom = 1.0);
+    GameMap(SDL_Renderer *renderer, const std::pair<int, int>& gridSize, const SDL_Rect& size, const SDL_Point& position, double hexagonRadius, double zoom = 1.0);
     
     /**
      * @brief Constructeur de la GameMap.
@@ -34,7 +34,7 @@ public:
      * @param hexagonRadius Rayon des hexagones (pour la conversion et le dessin).
      * @param zoom Facteur de zoom initial.
      */
-    GameMap(SDL_Renderer *renderer, const std::string mapFile, const std::pair<int, int>& size, const std::pair<int, int>& position, double hexagonRadius, double zoom = 1.0);
+    GameMap(SDL_Renderer *renderer, const std::string mapFile, const SDL_Rect& size, const SDL_Point& position, double hexagonRadius, double zoom = 1.0);
 
     /**
      * @brief Modifie le rayon des hexagones et invalide le sprite.

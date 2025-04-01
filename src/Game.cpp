@@ -33,7 +33,7 @@ void Game::handleEvents() {
 
 void Game::draw() {
     // Fill background
-    SDL_SetRenderDrawColor(renderer_, 50, 125, 160, 255);
+    SDL_SetRenderDrawColor(renderer_, bgColor.r, bgColor.g, bgColor.b, bgColor.a);
     SDL_RenderClear(renderer_);
 
     map_->draw();
