@@ -11,6 +11,7 @@ public:
     Game();
     ~Game();
 
+    void handleEvents();
     void run();
 
 private:
@@ -35,6 +36,8 @@ private:
 
     // Zoom du contenu
     double zoom_ = 1.0;
+
+    bool loop_ = true;
 };
 
 #endif

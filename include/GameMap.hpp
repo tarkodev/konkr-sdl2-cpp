@@ -47,6 +47,11 @@ public:
     void setZoom(double zoom);
 
     /**
+     * @brief Modifie le zoom et invalide le sprite.
+     */
+    void zoom(double coef);
+
+    /**
      * @brief Dessine la GameMap.
      */
     void draw();
@@ -80,6 +85,7 @@ private:
     double hexagonRadius_;
     double zoom_;
     std::pair<int,int> selectedHexagone_ = {0, 0};
+    std::pair<int,int> *moveOrigin_ = nullptr;
     bool hasSelection_ = false;
 
     SDL_Texture* sprite_;

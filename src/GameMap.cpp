@@ -37,7 +37,7 @@ void GameMap::createSprite()
 void GameMap::createHexagonSprite()
 {
     // Calculer la taille du sprite d'hexagone
-    const int hexagonSize = 2 * static_cast<int>(std::floor(hexagonRadius_)) + 2;
+    const int hexagonSize = 2 * static_cast<int>(std::floor(hexagonRadius_ * zoom_)) + 2;
 
     if (hexagonSprite_) {
         SDL_DestroyTexture(hexagonSprite_);
@@ -58,8 +58,8 @@ void GameMap::createHexagonSprite()
     for (int i = 0; i < 6; ++i)
     {
         double angle = M_PI_2 + (i / 6.0) * (2 * M_PI);
-        vx[i] = static_cast<Sint16>(center + std::cos(angle) * hexagonRadius_);
-        vy[i] = static_cast<Sint16>(center + std::sin(angle) * hexagonRadius_);
+        vx[i] = static_cast<Sint16>(center + std::cos(angle) * hexagonRadius_ * zoom_);
+        vy[i] = static_cast<Sint16>(center + std::sin(angle) * hexagonRadius_ * zoom_);
     }
     filledPolygonRGBA(renderer_, vx.data(), vy.data(), 6, 255, 255, 255, 255);
 
@@ -79,6 +79,15 @@ void GameMap::setHexagonRadius(double hexagonRadius)
 void GameMap::setZoom(double zoom)
 {
     zoom_ = zoom;
+    if (sprite_) {
+        SDL_DestroyTexture(sprite_);
+        sprite_ = nullptr;
+    }
+}
+
+void GameMap::zoom(double coef = 1.1)
+{
+    zoom_ *= coef;
     if (sprite_) {
         SDL_DestroyTexture(sprite_);
         sprite_ = nullptr;
@@ -110,7 +119,7 @@ void GameMap::draw()
     SDL_SetTextureAlphaMod(hexagonSprite_, BROWN.a);
 
     // Calculer le rectangle source du sprite (taille basée sur le rayon)
-    const int spriteSize = 2 * static_cast<int>(std::floor(hexagonRadius_)) + 2;
+    const int spriteSize = 2 * static_cast<int>(std::floor(hexagonRadius_ * zoom_)) + 2;
     const SDL_Rect srcRect = {0, 0, spriteSize, spriteSize};
 
     // Dessiner chaque hexagone de la grille
@@ -120,13 +129,13 @@ void GameMap::draw()
         {
             // Conversion des coordonnées offset en coordonnées axiales via la méthode statique héritée
             auto [q, r] = HexagonUtils::offsetToAxial(col, row);
-            auto [x, y] = HexagonUtils::hexToPixel(q, r, hexagonRadius_);
+            auto [x, y] = HexagonUtils::hexToPixel(q, r, hexagonRadius_ * zoom_);
             x += x_;
             y += y_;
 
             SDL_Rect destRect = {
-                static_cast<int>(x - hexagonRadius_ - 1),
-                static_cast<int>(y - hexagonRadius_ - 1),
+                static_cast<int>(x - hexagonRadius_ * zoom_ - 1),
+                static_cast<int>(y - hexagonRadius_ * zoom_ - 1),
                 srcRect.w,
                 srcRect.h
             };
@@ -137,24 +146,49 @@ void GameMap::draw()
     // Dessin de la sélection, si présente
     if (hasSelection_)
     {
-        auto [x, y] = HexagonUtils::hexToPixel(selectedHexagone_.first, selectedHexagone_.second, hexagonRadius_);
+        auto [x, y] = HexagonUtils::hexToPixel(selectedHexagone_.first, selectedHexagone_.second, hexagonRadius_ * zoom_);
         x += x_;
         y += y_;
 
         // Dessiner un contour épais en jaune
-        drawNgon(YELLOW, 6, hexagonRadius_, {x, y}, 3);
+        drawNgon(YELLOW, 6, hexagonRadius_ * zoom_, {x, y}, 3);
     }
 }
 
 void GameMap::handleEvent(SDL_Event &event) {
-    if (event.type == SDL_MOUSEMOTION) {
-        int mouseX = event.motion.x;
-        int mouseY = event.motion.y;
-        
-        // Coordonnées relatives
-        double relX = mouseX - x_;
-        double relY = mouseY - y_;
-        selectedHexagone_ = HexagonUtils::pixelToHex(relX, relY, hexagonRadius_ * zoom_);
-        hasSelection_ = true;
+    if (event.type == SDL_MOUSEBUTTONDOWN)
+        moveOrigin_ = new std::pair<int, int>(event.motion.x, event.motion.y);
+    else if (event.type == SDL_MOUSEBUTTONUP)
+        moveOrigin_ = nullptr;
+    else if (event.type == SDL_MOUSEMOTION) {
+        if (moveOrigin_) {
+            x_ += event.motion.x - moveOrigin_->first;
+            y_ += event.motion.y - moveOrigin_->second;
+            moveOrigin_ = new std::pair<int, int>(event.motion.x, event.motion.y);
+        } else {
+            int mouseX = event.motion.x;
+            int mouseY = event.motion.y;
+            
+            // Coordonnées relatives
+            double relX = mouseX - x_;
+            double relY = mouseY - y_;
+            selectedHexagone_ = HexagonUtils::pixelToHex(relX, relY, hexagonRadius_ * zoom_);
+            hasSelection_ = true;
+        }
+    } else if (event.type == SDL_MOUSEWHEEL) {
+        // Ajuste le rayon et recrée la grille si besoin
+        this->zoom((event.wheel.preciseY > 0) ? 1.1 : 0.9);
+    }
+    else if (event.type == SDL_KEYDOWN) {
+        if (event.key.keysym.sym == SDLK_LEFT)
+            x_ += 10;
+        else if (event.key.keysym.sym == SDLK_RIGHT)
+            x_ -= 10;
+        else if (event.key.keysym.sym == SDLK_UP)
+            y_ += 10;
+        else if (event.key.keysym.sym == SDLK_DOWN) {
+            y_ -= 10;
+            
+        }
     }
 }

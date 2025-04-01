@@ -18,27 +18,21 @@ Game::Game()
 
 Game::~Game() = default;
 
-void Game::run() {
+void Game::handleEvents() {
     SDL_Event event;
-    bool loop = true;
-    
-    while (loop) {
-        // Traitement des événements via lambda
-        auto processEvent = [&]() {
-            while (SDL_PollEvent(&event)) {
-                if (event.type == SDL_QUIT)
-                    loop = false;
-                
-                else if (event.type == SDL_MOUSEWHEEL) {
-                    // Ajuste le rayon et recrée la grille si besoin
-                    zoom_ *= (event.wheel.preciseY > 0) ? 1.1 : 0.9;
-                    map_ = GameMap(renderer_, gridSize_, mapSize_, mapPos_, hexagonRadius_, zoom_);
-                }
 
-                map_->handleEvent(event);
-            }
-        };
-        processEvent();
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT)
+            loop_ = false;
+
+        map_->handleEvent(event);
+    }
+}
+
+void Game::run() {
+    loop_ = true;
+    while (loop_) {
+        handleEvents();
 
         // Rendu
         SDL_SetRenderDrawColor(renderer_, 50, 125, 160, 255);
