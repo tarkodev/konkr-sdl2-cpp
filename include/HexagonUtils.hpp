@@ -1,0 +1,76 @@
+#ifndef HEXUTILS_HPP
+#define HEXUTILS_HPP
+
+#include <cmath>
+#include <utility>
+#include <cstdlib>
+
+namespace HexagonUtils
+{
+    // Constantes
+    const double PI = 3.14159265358979323846;
+    const double PI2 = 2 * PI;
+    const double PI05 = PI / 2.0;
+
+    inline std::pair<int, int> hexRound(double q, double r)
+    {
+        double s = -q - r;
+        int q_round = static_cast<int>(std::round(q));
+        int r_round = static_cast<int>(std::round(r));
+        int s_round = static_cast<int>(std::round(s));
+
+        double q_diff = std::abs(q_round - q);
+        double r_diff = std::abs(r_round - r);
+        double s_diff = std::abs(s_round - s);
+
+        if (q_diff > r_diff && q_diff > s_diff)
+            q_round = -r_round - s_round;
+        else if (r_diff > s_diff)
+            r_round = -q_round - s_round;
+
+        return {q_round, r_round};
+    }
+
+    /**
+     * @brief Convertit une position en pixels vers des coordonnées hexagonales.
+     */
+    inline std::pair<int, int> pixelToHex(double x, double y, double hexSize)
+    {
+        double q = ((std::sqrt(3) / 3.0 * x) - (1.0 / 3.0 * y)) / hexSize;
+        double r = (2.0 / 3.0 * y) / hexSize;
+        return hexRound(q, r);
+    }
+
+    /**
+     * @brief Convertit des coordonnées hexagonales en position en pixels.
+     */
+    inline std::pair<double, double> hexToPixel(double q, double r, double hexSize)
+    {
+        double x = hexSize * std::sqrt(3) * (q + r / 2.0);
+        double y = hexSize * (3.0 / 2.0) * r;
+        return {x, y};
+    }
+
+    /**
+     * @brief Convertit des coordonnées offset (col, row) en coordonnées axiales (q, r).
+     */
+    inline std::pair<int, int> offsetToAxial(int col, int row)
+    {
+        int q = col - ((row - (row & 1)) / 2);
+        int r = row;
+        return {q, r};
+    }
+
+    /**
+     * @brief Convertit des coordonnées axiales (q, r) en coordonnées offset (x, y).
+     */
+    static std::pair<int, int> axialToOffset(int q, int r)
+    {
+        int col = q + ((r - (r & 1)) / 2);
+        int row = r;
+        return {col, row};
+    }
+
+}
+
+#endif
