@@ -12,31 +12,37 @@ public:
     ~Game();
 
     void handleEvents();
+    void draw();
     void run();
 
 private:
+    // Object to render drawing
     SDL_Renderer* renderer_;
 
-    // Window size
+
+    // Window
+    std::unique_ptr<Window> window_;
+
+    // Init size of window size
     const int windowWidth_ = 500;
     const int windowHeight_ = 500;
 
-    std::pair<int, int> gridSize_ = std::make_pair(6, 6);
-    std::pair<int, int> mapSize_ = std::make_pair(windowWidth_, windowHeight_);
-    std::pair<int, int> mapPos_ = std::make_pair(windowWidth_ / 2, windowHeight_ / 2);
 
-    // Rayon des hexagones (modifiable via la roulette)
-    const double hexagonRadius_ = 40.0;
-    
-    // Smart pointer vers la fenêtre
-    std::unique_ptr<Window> window_;
-
-    // La grille d'hexagones
+    // Map of game
     std::optional<GameMap> map_;
 
-    // Zoom du contenu
-    double zoom_ = 1.0;
+    // Map size and pos (in px)
+    SDL_Rect mapSize_ = {0, 0, windowWidth_, windowHeight_};
+    SDL_Point mapPos_ = {windowWidth_ / 2, windowHeight_ / 2};
 
+    
+    // Init radius of hexagones
+    const double hexagonRadius_ = 40.0;
+
+    // Grid size
+    std::pair<int, int> gridSize_ = {6, 6};
+
+    // Loop condition of game
     bool loop_ = true;
 };
 

@@ -22,23 +22,36 @@ void Game::handleEvents() {
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_QUIT)
+        if (event.type == SDL_QUIT) {
             loop_ = false;
+            break;
+        }
 
         map_->handleEvent(event);
     }
 }
 
+void Game::draw() {
+    // Fill background
+    SDL_SetRenderDrawColor(renderer_, 50, 125, 160, 255);
+    SDL_RenderClear(renderer_);
+
+    map_->draw();
+    
+    // Show rendering
+    SDL_RenderPresent(renderer_);
+}
+
 void Game::run() {
     loop_ = true;
     while (loop_) {
+        // Handle events
         handleEvents();
 
-        // Rendu
-        SDL_SetRenderDrawColor(renderer_, 50, 125, 160, 255);
-        SDL_RenderClear(renderer_);
-        map_->draw();
-        SDL_RenderPresent(renderer_);
+        // Draw elements
+        draw();
+
+        // Control loop duration
         SDL_Delay(1/60);
     }
 }
