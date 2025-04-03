@@ -10,86 +10,50 @@
  * @brief Classe représentant une carte de jeu.
  *
  * Hérite de HexagonGrid<int> pour gérer la logique de la grille d'hexagones,
- * et ajoute des fonctionnalités de rendu graphique (création de sprites, zoom, etc.).
+ * et ajoute des fonctionnalités de rendu graphique (création de sprites, etc.).
  */
 class GameMap : public HexagonGrid<int> {
 public:
-    /**
-     * @brief Constructeur de la GameMap.
-     * @param renderer renderer processor.
-     * @param gridSize Pair (width, height) de la grille.
-     * @param size Pair (width, height) de la taille de texture.
-     * @param position Pair (x, y) de la grille.
-     * @param hexagonRadius Rayon des hexagones (pour la conversion et le dessin).
-     * @param zoom Facteur de zoom initial.
-     */
-    GameMap(SDL_Renderer *renderer, const std::pair<int, int>& gridSize, const SDL_Rect& size, const SDL_Point& position, double hexagonRadius, double zoom = 1.0);
-    
-    /**
-     * @brief Constructeur de la GameMap.
-     * @param renderer renderer processor.
-     * @param mapFile File of game map.
-     * @param size Pair (width, height) de la taille de texture.
-     * @param position Pair (x, y) de la grille.
-     * @param hexagonRadius Rayon des hexagones (pour la conversion et le dessin).
-     * @param zoom Facteur de zoom initial.
-     */
-    GameMap(SDL_Renderer *renderer, const std::string mapFile, const SDL_Rect& size, const SDL_Point& position, double hexagonRadius, double zoom = 1.0);
+    GameMap(SDL_Renderer *renderer, const SDL_Point& position, const SDL_Rect& size, const std::pair<int, int>& gridSize);
+    GameMap(SDL_Renderer *renderer, const SDL_Point& position, const SDL_Rect& size, const std::string mapFile);
 
-    /**
-     * @brief Modifie le rayon des hexagones et invalide le sprite.
-     */
-    void setHexagonRadius(double hexagonRadius);
+    void addX(int x);
+    void addY(int x);
+    void setX(int x);
+    void setY(int y);
+    SDL_Point getPos() const;
+    void setPos(SDL_Point& position);
 
-    /**
-     * @brief Modifie le zoom et invalide le sprite.
-     */
-    void setZoom(double zoom);
-
-    /**
-     * @brief Modifie le zoom et invalide le sprite.
-     */
-    void zoom(double coef);
-
-    /**
-     * @brief Dessine la GameMap.
-     */
-    void draw();
-
+    SDL_Rect getSize() const;
+    void setProportionalSize(const SDL_Rect size);
 
     void handleEvent(SDL_Event &event);
+    void draw();
 
 private:
-    /**
-     * @brief Crée le sprite global de la carte.
-     */
     void createSprite();
-
-    /**
-     * @brief Crée le sprite d'un hexagone.
-     */
     void createHexagonSprite();
+    void drawSprite();
 
-    /**
-     * @brief Dessine un polygone (hexagone).
-     */
+    void selectHexagone();
+
     void drawNgon(const SDL_Color& color, int n, double rad,
                   const std::pair<double, double>& position, int width = 0) const;
     
 
     SDL_Renderer *renderer_;
-    int width_;
-    int height_;
-    int x_;
-    int y_;
+
+    SDL_Rect hexagonSize_;
     double hexagonRadius_;
-    double zoom_;
-    std::pair<int,int> selectedHexagone_ = {0, 0};
-    std::pair<int,int> *moveOrigin_ = nullptr;
+    double innerHexagonRadius_;
+
+    std::optional<std::pair<int,int>> selectedHexagone_;
     bool hasSelection_ = false;
 
-    SDL_Texture* sprite_;
-    SDL_Texture* hexagonSprite_;
+    SDL_Rect dest_;
+    SDL_Rect spriteSize_;
+    SDL_Texture* sprite_ = nullptr;
+    SDL_Texture* hexagonSprite_ = nullptr;
 };
 
 #endif

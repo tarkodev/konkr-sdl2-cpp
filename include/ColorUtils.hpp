@@ -71,6 +71,10 @@ inline bool textInWhite(const SDL_Color& c) {
     return !textInBlack(c);
 }
 
+inline SDL_Color toTransparent(const SDL_Color &c) {
+    return {c.r, c.g, c.b, 0};
+}
+
 
 /* Define Colors */
 

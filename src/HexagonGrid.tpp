@@ -8,16 +8,14 @@
 #include <utility>
 
 template<typename T>
-HexagonGrid<T>::HexagonGrid(const std::pair<int, int>& size, double hexSize, const T& defaultValue)
+HexagonGrid<T>::HexagonGrid(const std::pair<int, int>& size, const T& defaultValue)
     : width_(size.first),
       height_(size.second),
-      grid_(size.first * size.second, defaultValue),
-      hexSize_(hexSize)
+      grid_(size.first * size.second, defaultValue)
 {}
 
 template<typename T>
-HexagonGrid<T>::HexagonGrid(const std::string gridFile, double hexSize)
-    : hexSize_(hexSize)
+HexagonGrid<T>::HexagonGrid(const std::string gridFile)
 {
     width_ = 6;
     height_ = 6;

@@ -34,7 +34,7 @@ namespace HexagonUtils
     /**
      * @brief Convertit une position en pixels vers des coordonnées hexagonales.
      */
-    inline std::pair<int, int> pixelToHex(double x, double y, double hexSize)
+    inline std::pair<int, int> pixelToAxial(double x, double y, double hexSize)
     {
         double q = ((std::sqrt(3) / 3.0 * x) - (1.0 / 3.0 * y)) / hexSize;
         double r = (2.0 / 3.0 * y) / hexSize;
@@ -44,7 +44,7 @@ namespace HexagonUtils
     /**
      * @brief Convertit des coordonnées hexagonales en position en pixels.
      */
-    inline std::pair<double, double> hexToPixel(double q, double r, double hexSize)
+    inline std::pair<double, double> axialToPixel(double q, double r, double hexSize)
     {
         double x = hexSize * std::sqrt(3) * (q + r / 2.0);
         double y = hexSize * (3.0 / 2.0) * r;
@@ -56,7 +56,7 @@ namespace HexagonUtils
      */
     inline std::pair<int, int> offsetToAxial(int col, int row)
     {
-        int q = col - ((row - (row & 1)) / 2);
+        int q = col - (row - (row & 1)) / 2;
         int r = row;
         return {q, r};
     }

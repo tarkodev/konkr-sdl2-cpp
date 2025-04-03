@@ -22,17 +22,15 @@ public:
     /**
      * @brief Constructeur.
      * @param size Pair (width, height) de la grille.
-     * @param hexSize Rayon des hexagones.
      * @param defaultValue Valeur par défaut pour chaque cellule.
      */
-    HexagonGrid(const std::pair<int, int>& size, double hexSize = 40.0, const T& defaultValue = T());
+    HexagonGrid(const std::pair<int, int>& size, const T& defaultValue = T());
     
     /**
      * @brief Constructeur.
      * @param gridFile Fichier de la grille.
-     * @param hexSize Rayon des hexagones.
      */
-    HexagonGrid(const std::string gridFile, double hexSize = 40.0);
+    HexagonGrid(const std::string gridFile);
 
     int getWidth() const { return width_; }
     int getHeight() const { return height_; }
@@ -77,7 +75,6 @@ private:
     int width_;
     int height_;
     std::vector<T> grid_;
-    double hexSize_;
 };
 
 #include "HexagonGrid.tpp"

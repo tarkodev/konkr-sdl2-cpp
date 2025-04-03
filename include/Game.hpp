@@ -22,17 +22,18 @@ private:
     const int windowHeight_ = 500;
 
     // Map size and pos (in px)
-    SDL_Rect mapSize_ = {0, 0, windowWidth_, windowHeight_};
-    SDL_Point mapPos_ = {windowWidth_ / 2, windowHeight_ / 2};
+    SDL_Point mapPos_ = {0, 0};
 
     // Grid size
     std::pair<int, int> gridSize_ = {6, 6};
     
     // Init radius of hexagones
-    const double hexagonRadius_ = 40.0;
+    const SDL_Rect mapSize_ = {0, 0, windowWidth_, windowHeight_};
 
     // Loop condition of game
     bool loop_ = true;
+
+    std::optional<SDL_Point> moveOrigin_;
 
     // Background color
     const SDL_Color bgColor = CLR_SEABLUE;
