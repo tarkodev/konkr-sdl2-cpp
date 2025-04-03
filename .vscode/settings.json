@@ -58,6 +58,7 @@
         "unordered_map": "cpp",
         "variant": "cpp",
         "algorithm": "cpp",
-        "*.tpp": "cpp"
+        "*.tpp": "cpp",
+        "__config": "cpp"
     }
 }

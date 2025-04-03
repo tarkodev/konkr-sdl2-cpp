@@ -23,6 +23,16 @@ find_library(SDL2_GFX_LIBRARY
 # Ajout des headers de SDL2_gfx (ils se trouvent dans lib/SDL2_gfx/include)
 include_directories("${CMAKE_SOURCE_DIR}/lib/SDL2_gfx/include")
 
+# --- Configuration de SDL2_image ---
+# Recherche de la bibliothèque SDL2_image dans lib/SDL2_image/lib
+find_library(SDL2_IMAGE_LIBRARY 
+    NAMES SDL2_image
+    PATHS "${CMAKE_SOURCE_DIR}/lib/SDL2_image/lib"
+    NO_DEFAULT_PATH
+)
+# Ajout des headers de SDL2_image (ils se trouvent dans lib/SDL2_image/include)
+include_directories("${CMAKE_SOURCE_DIR}/lib/SDL2_image/include")
+
 # --- Ajout des headers du projet ---
 include_directories("${CMAKE_SOURCE_DIR}/include")
 include_directories("${CMAKE_SOURCE_DIR}/src")
@@ -39,6 +49,7 @@ function(compilation)
             PRIVATE 
             ${SDL2_LIBRARIES} 
             ${SDL2_GFX_LIBRARY}
+            ${SDL2_IMAGE_LIBRARY}
         )
     endif()
 endfunction()
