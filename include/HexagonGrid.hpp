@@ -7,7 +7,7 @@
 #include <stdexcept>
 
 /**
- * @brief Classe représentant une grille d'hexagones générique.
+ * @brief Classe représentant une grille d'hexagons générique.
  *
  * La classe gère à la fois les dimensions et le stockage de la grille (dans un conteneur STL)
  * et fournit des fonctions de conversion entre les coordonnées hexagonales et les coordonnées en pixels.

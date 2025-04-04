@@ -57,11 +57,13 @@ endfunction()
 # --- Définition des fichiers sources ---
 # Les fichiers sources se trouvent dans le dossier src
 set(SRC_FILES 
-    "${CMAKE_SOURCE_DIR}/src/main.cpp" 
+    "${CMAKE_SOURCE_DIR}/src/Player.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Cell.cpp"
     "${CMAKE_SOURCE_DIR}/src/HexagonGrid.tpp"
-    "${CMAKE_SOURCE_DIR}/src/Game.cpp"
     "${CMAKE_SOURCE_DIR}/src/GameMap.cpp"
     "${CMAKE_SOURCE_DIR}/src/Window.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Game.cpp"
+    "${CMAKE_SOURCE_DIR}/src/main.cpp" 
 )
 
 # Compilation de l'exécutable en activant SDL

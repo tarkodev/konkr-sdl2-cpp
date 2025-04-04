@@ -2,7 +2,7 @@
 #define GAME_HPP
 
 #include <memory>
-#include <SDL.h>
+#include "SDL.h"
 #include "ColorUtils.hpp"
 #include "GameMap.hpp"
 #include "Window.hpp"
@@ -18,17 +18,13 @@ public:
 
 private:
     // Init size of window size
-    const int windowWidth_ = 500;
-    const int windowHeight_ = 500;
+    SDL_Rect windowSize_ = {0, 0, 500, 500};
 
     // Map size and pos (in px)
     SDL_Point mapPos_ = {0, 0};
 
     // Grid size
-    std::pair<int, int> gridSize_ = {6, 6};
-    
-    // Init radius of hexagones
-    const SDL_Rect mapSize_ = {0, 0, windowWidth_, windowHeight_};
+    std::pair<int, int> gridSize_ = {20, 20};
 
     // Loop condition of game
     bool loop_ = true;
@@ -36,7 +32,7 @@ private:
     std::optional<SDL_Point> moveOrigin_;
 
     // Background color
-    const SDL_Color bgColor = CLR_SEABLUE;
+    const SDL_Color bgColor = ColorUtils::SEABLUE;
 
 
     // Object to render drawing

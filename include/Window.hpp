@@ -29,10 +29,13 @@ public:
     ~Window();
     
     SDL_Renderer* getRenderer() const { return renderer_.get(); }
+    SDL_Rect getSize() const { return size_; }
     bool isInitialized() const { return initialized_; }
     
 private:
     bool initialized_;
+
+    SDL_Rect size_ = {0, 0, 0, 0};
     SDLWindowPtr SDLWindow_;
     SDLRendererPtr renderer_;
 };
