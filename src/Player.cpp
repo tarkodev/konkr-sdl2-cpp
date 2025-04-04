@@ -1,6 +1,7 @@
 #include "Player.hpp"
 #include "ColorUtils.hpp"
 #include "DrawUtils.hpp"
+#include <stdexcept>
 
 SDL_Texture* Player::defaultHexagonSprite_ = nullptr;
 SDL_Rect Player::hexagonSize_ = {0, 0, 0, 0};

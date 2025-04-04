@@ -2,6 +2,7 @@
 #define DRAWUTILS_HPP
 
 #include <SDL.h>
+#include <stdexcept>
 
 namespace DrawUtils
 {

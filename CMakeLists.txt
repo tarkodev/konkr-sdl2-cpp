@@ -5,35 +5,46 @@ project(PROJECT LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# --- Configuration de SDL2 ---
-# Le fichier de configuration de SDL2 se trouve dans lib/SDL2/lib/cmake/SDL2
-set(SDL2_DIR "${CMAKE_SOURCE_DIR}/lib/SDL2/lib/cmake/SDL2")
-find_package(SDL2 REQUIRED)
-# Ajout des headers de SDL2 (ils se trouvent dans lib/SDL2/include)
-include_directories(${SDL2_INCLUDE_DIRS})
-include_directories("${CMAKE_SOURCE_DIR}/lib/SDL2/include")
+if(APPLE)
+    # Sur macOS, on utilise les bibliothèques locales dans lib/
+    set(SDL2_DIR "${CMAKE_SOURCE_DIR}/lib/SDL2/lib/cmake/SDL2")
+    find_package(SDL2 REQUIRED)
+    set(SDL2_LIBRARIES ${SDL2_LIBRARIES})
+    include_directories(${SDL2_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/lib/SDL2/include")
+    
+    # SDL2_gfx
+    find_library(SDL2_GFX_LIBRARY 
+        NAMES SDL2_gfx
+        PATHS "${CMAKE_SOURCE_DIR}/lib/SDL2_gfx/lib"
+        NO_DEFAULT_PATH
+    )
+    include_directories("${CMAKE_SOURCE_DIR}/lib/SDL2_gfx/include")
+    
+    # SDL2_image
+    find_library(SDL2_IMAGE_LIBRARY 
+        NAMES SDL2_image
+        PATHS "${CMAKE_SOURCE_DIR}/lib/SDL2_image/lib"
+        NO_DEFAULT_PATH
+    )
+    include_directories("${CMAKE_SOURCE_DIR}/lib/SDL2_image/include")
+else()
+    # Sur Linux (Ubuntu), on utilise les bibliothèques système via pkg-config
+    find_package(SDL2 REQUIRED)
+    include_directories(${SDL2_INCLUDE_DIRS})
+    
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(SDL2GFX REQUIRED SDL2_gfx)
+    pkg_check_modules(SDL2IMAGE REQUIRED SDL2_image)
+    
+    include_directories(${SDL2GFX_INCLUDE_DIRS} ${SDL2IMAGE_INCLUDE_DIRS})
+    
+    # Les bibliothèques seront celles fournies par pkg-config
+    set(SDL2_LIBRARIES SDL2::SDL2)
+    set(SDL2_GFX_LIBRARY ${SDL2GFX_LIBRARIES})
+    set(SDL2_IMAGE_LIBRARY ${SDL2IMAGE_LIBRARIES})
+endif()
 
-# --- Configuration de SDL2_gfx ---
-# Recherche de la bibliothèque SDL2_gfx dans lib/SDL2_gfx/lib
-find_library(SDL2_GFX_LIBRARY 
-    NAMES SDL2_gfx
-    PATHS "${CMAKE_SOURCE_DIR}/lib/SDL2_gfx/lib"
-    NO_DEFAULT_PATH
-)
-# Ajout des headers de SDL2_gfx (ils se trouvent dans lib/SDL2_gfx/include)
-include_directories("${CMAKE_SOURCE_DIR}/lib/SDL2_gfx/include")
-
-# --- Configuration de SDL2_image ---
-# Recherche de la bibliothèque SDL2_image dans lib/SDL2_image/lib
-find_library(SDL2_IMAGE_LIBRARY 
-    NAMES SDL2_image
-    PATHS "${CMAKE_SOURCE_DIR}/lib/SDL2_image/lib"
-    NO_DEFAULT_PATH
-)
-# Ajout des headers de SDL2_image (ils se trouvent dans lib/SDL2_image/include)
-include_directories("${CMAKE_SOURCE_DIR}/lib/SDL2_image/include")
-
-# --- Ajout des headers du projet ---
+# Ajout des headers du projet
 include_directories("${CMAKE_SOURCE_DIR}/include")
 include_directories("${CMAKE_SOURCE_DIR}/src")
 
@@ -55,7 +66,6 @@ function(compilation)
 endfunction()
 
 # --- Définition des fichiers sources ---
-# Les fichiers sources se trouvent dans le dossier src
 set(SRC_FILES 
     "${CMAKE_SOURCE_DIR}/src/Player.cpp"
     "${CMAKE_SOURCE_DIR}/src/Cell.cpp"

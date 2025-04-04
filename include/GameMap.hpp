@@ -4,6 +4,7 @@
 #include "SDL.h"
 #include <memory>
 #include <utility>
+#include <optional>
 #include "HexagonGrid.hpp"
 #include "Cell.hpp"
 
