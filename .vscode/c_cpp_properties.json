@@ -4,9 +4,9 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/lib/SDL2/include/SDL2",
-                "${workspaceFolder}/lib/SDL2_gfx/include",
-                "${workspaceFolder}/lib/SDL2_image/include",
+                "${workspaceFolder}/lib_macos/SDL2/include/SDL2",
+                "${workspaceFolder}/lib_macos/SDL2_gfx/include",
+                "${workspaceFolder}/lib_macos/SDL2_image/include",
                 "${workspaceFolder}/src"
             ],
             "defines": [
