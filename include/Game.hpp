@@ -18,7 +18,7 @@ public:
     
 
 private:
-    double hexSize_ = 60;
+    double hexSize_ = 100;
 
     // Init size of window size
     Size windowSize_ = {500, 500};

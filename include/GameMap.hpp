@@ -32,12 +32,15 @@ public:
     void draw(const Point& pos);
     bool isTerritory(Cell *cell) const;
 
-    static void init(SDL_Renderer* renderer, Texture* selectSprite, Texture* islandSprite, double islandSpriteRadius);
+    static void init(SDL_Renderer* renderer);
 
 private:
     static SDL_Renderer* renderer_;
+
     static Texture* selectSprite_;
     static Texture* islandSprite_;
+    static Texture* islandLinkSprite_;
+
     static double islandSpriteRadius_;
     static double islandSpriteInnerRadius_;
 

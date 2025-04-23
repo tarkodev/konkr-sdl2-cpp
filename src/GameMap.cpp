@@ -15,8 +15,11 @@
 
 
 SDL_Renderer* GameMap::renderer_ = nullptr;
+
 Texture* GameMap::selectSprite_ = nullptr;
 Texture* GameMap::islandSprite_ = nullptr;
+Texture* GameMap::islandLinkSprite_ = nullptr;
+
 double GameMap::islandSpriteRadius_ = 0;
 double GameMap::islandSpriteInnerRadius_ = 0;
 
@@ -33,11 +36,19 @@ GameMap::GameMap(const Size size, const std::string mapFile)
     refresh();
 }
 
-void GameMap::init(SDL_Renderer *renderer, Texture* selectSprite, Texture* islandSprite, double islandSpriteRadius) {
+void GameMap::init(SDL_Renderer *renderer) {
     renderer_ = renderer;
-    selectSprite_ = selectSprite;
-    islandSprite_ = islandSprite;
-    islandSpriteRadius_ = islandSpriteRadius;
+
+    islandSprite_ = new Texture(renderer_, "../assets/img/hexagon.png");
+    islandSprite_->convertAlpha();
+
+    islandLinkSprite_ = new Texture(renderer_, "../assets/img/hexagon_star.png");
+    islandLinkSprite_->convertAlpha();
+
+    selectSprite_ = new Texture(renderer_, 90, 90);
+    selectSprite_->convertAlpha();
+
+    islandSpriteRadius_ = islandSprite_->getHeight() / 2;
     islandSpriteInnerRadius_ = std::sqrt(3) * islandSpriteRadius_ / 2.0;
 }
 
@@ -46,8 +57,8 @@ void GameMap::createSprite() {
     if (sprite_) return;
 
     spriteSize_ = {
-        static_cast<int>(2 * islandSpriteInnerRadius_ * (getWidth() + 0.5)), //! + (spriteWidth - innerHexagonSize)
-        static_cast<int>(islandSpriteRadius_ * (1.5 * getHeight() + 0.5)), //! + (spriteHeight - hexagonRadius*2)
+        static_cast<int>(2 * islandSpriteInnerRadius_ * (getWidth() + 0.5)),
+        static_cast<int>(islandSpriteRadius_ * (1.5 * getHeight() + 0.5)),
     };
     setProportionalSize(size_);
 
@@ -70,14 +81,55 @@ void GameMap::refresh()
             // Calcul de la position de blit
             auto [q, r] = HexagonUtils::offsetToAxial(col, row);
             auto [cx, cy] = HexagonUtils::axialToPixel(q, r, islandSpriteRadius_);
-            Point dest{
-                int(cx + islandSpriteInnerRadius_ - islandSprite_->getWidth()/2.0),
-                int(cy + islandSpriteRadius_    - islandSprite_->getHeight()/2.0)
-            };
 
-            sprite_->blit(islandSprite_, dest);
+            sprite_->blit(islandSprite_, Point{
+                static_cast<int>(cx + islandSpriteInnerRadius_ - islandSprite_->getWidth() / 2.0),
+                static_cast<int>(cy + islandSpriteRadius_ - islandSprite_->getHeight() / 2.0)
+            });
+
+            if (row & 1) {
+                if (row > 0 && isTerritory(get(row-1, col))) {
+                    sprite_->blit(islandLinkSprite_, Point{
+                        static_cast<int>(cx + islandSpriteInnerRadius_ / 2 - islandLinkSprite_->getWidth() / 2.0),
+                        static_cast<int>(cy + islandSpriteRadius_ * 0.25 - islandLinkSprite_->getHeight() / 2.0)
+                    });
+                }
+                if (col > 0 && isTerritory(get(row, col-1))) {
+                    sprite_->blit(islandLinkSprite_, Point{
+                        static_cast<int>(cx - islandLinkSprite_->getWidth() / 2.0),
+                        static_cast<int>(cy + islandSpriteRadius_ - islandLinkSprite_->getHeight() / 2.0)
+                    });
+                }
+                if (row+1 < getHeight() && isTerritory(get(row+1, col))) {
+                    sprite_->blit(islandLinkSprite_, Point{
+                        static_cast<int>(cx + islandSpriteInnerRadius_ / 2 - islandLinkSprite_->getWidth() / 2.0),
+                        static_cast<int>(cy + islandSpriteRadius_ * 1.75 - islandLinkSprite_->getHeight() / 2.0)
+                    });
+                }
+            } else {
+                if (row > 0 && col > 0 && isTerritory(get(row-1, col-1))) {
+                    sprite_->blit(islandLinkSprite_, Point{
+                        static_cast<int>(cx + islandSpriteInnerRadius_ / 2 - islandLinkSprite_->getWidth() / 2.0),
+                        static_cast<int>(cy + islandSpriteRadius_ * 0.25 - islandLinkSprite_->getHeight() / 2.0)
+                    });
+                }
+                if (col > 0 && isTerritory(get(row, col-1))) {
+                    sprite_->blit(islandLinkSprite_, Point{
+                        static_cast<int>(cx - islandLinkSprite_->getWidth() / 2.0),
+                        static_cast<int>(cy + islandSpriteRadius_ - islandLinkSprite_->getHeight() / 2.0)
+                    });
+                }
+                if (row+1 < getHeight() && col > 0 && isTerritory(get(row+1, col-1))) {
+                    sprite_->blit(islandLinkSprite_, Point{
+                        static_cast<int>(cx + islandSpriteInnerRadius_ / 2 - islandLinkSprite_->getWidth() / 2.0),
+                        static_cast<int>(cy + islandSpriteRadius_ * 1.75 - islandLinkSprite_->getHeight() / 2.0)
+                    });
+                }
+            }
         }
     }
+
+    //sprite_->recolor(ColorUtils::BROWN2, ColorUtils::RED);
 }
 
 bool GameMap::isTerritory(Cell *cell) const {

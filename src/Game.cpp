@@ -22,16 +22,6 @@ Game::Game()
     //! unique pointer
     Texture *sprites = new Texture(renderer_, "../assets/img/sprites.png");
 
-    //! Créer Texture::createFrom
-    Texture* islandSprite = new Texture(renderer_, 146, 146);
-    islandSprite->convertAlpha();
-    islandSprite->blit(sprites, Rect{210, 18, 146, 146}, islandSprite->getSize());
-
-    Texture* selectSprite = new Texture(renderer_, 146, 146);
-    selectSprite->convertAlpha();
-    selectSprite->blit(sprites, Rect{25, 162, 100, 100}, selectSprite->getSize());
-    
-
     Texture* plateSprite = new Texture(renderer_, 146, 146);
     plateSprite->convertAlpha();
     plateSprite->blit(sprites, Rect{0, 725, 146, 146}, plateSprite->getSize());
@@ -41,11 +31,9 @@ Game::Game()
 
 
     // Set texture in Cell
-    GameMap::init(renderer_, selectSprite, islandSprite, hexSize_);
+    GameMap::init(renderer_);
     Cell::init(renderer_, plateSprite);
     Territory::init(renderer_, plateSprite);
-
-
 
     // Create map
     map_.emplace(windowSize_ * 0.75, gridSize_);
@@ -63,6 +51,7 @@ Game::Game()
     map_->set(1, 2, new Sea());
     map_->set(3, 3, new Sea());
     map_->refresh();
+
 }
 
 Game::~Game() = default;

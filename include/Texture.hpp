@@ -24,6 +24,7 @@ public:
      * Lève une std::runtime_error si le chargement échoue.
      */
     Texture(SDL_Renderer* renderer, const std::string& file);
+    Texture(SDL_Renderer *renderer, SDL_Texture* texture);
     Texture(SDL_Renderer *renderer, int w, int h);
     Texture(SDL_Renderer *renderer, const Size& size);
 
@@ -51,6 +52,17 @@ public:
      * Lève une std::runtime_error en cas d'erreur.
      */
     void colorize(const SDL_Color& color);
+
+    /**
+     * @brief ecolorize la texture.
+     *
+     * La méthode modifie les canaux R, G, et B de la texture.
+     * @param replace La couleur à remplacer.
+     * @param replace La nouvelle couleur à appliquer.
+     *
+     * Lève une std::runtime_error en cas d'erreur.
+     */
+    void recolor(const SDL_Color& hold, const SDL_Color& replace);
 
     /**
      * @brief Retourne les dimensions de la texture sous la forme d'un Point (width, height).
