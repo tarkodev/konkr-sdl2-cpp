@@ -3,6 +3,7 @@
 #include "HexagonUtils.hpp"
 #include "SDL2/SDL2_gfxPrimitives.h"
 #include "SDL2/SDL_image.h"
+#include "Sea.hpp"
 #include "Territory.hpp"
 #include "RenderTargetGuard.hpp"
 #include "Rect.hpp"
@@ -18,7 +19,10 @@ SDL_Renderer* GameMap::renderer_ = nullptr;
 
 Texture* GameMap::selectSprite_ = nullptr;
 Texture* GameMap::islandSprite_ = nullptr;
-Texture* GameMap::islandLinkSprite_ = nullptr;
+Texture* GameMap::islandLink1Sprite_ = nullptr;
+Texture* GameMap::islandLink2Sprite_ = nullptr;
+Texture* GameMap::islandLink3Sprite_ = nullptr;
+Texture* GameMap::islandLink4Sprite_ = nullptr;
 
 double GameMap::islandSpriteRadius_ = 0;
 double GameMap::islandSpriteInnerRadius_ = 0;
@@ -42,23 +46,39 @@ void GameMap::init(SDL_Renderer *renderer) {
     islandSprite_ = new Texture(renderer_, "../assets/img/hexagon.png");
     islandSprite_->convertAlpha();
 
-    islandLinkSprite_ = new Texture(renderer_, "../assets/img/hexagon_star.png");
-    islandLinkSprite_->convertAlpha();
+    islandLink1Sprite_ = new Texture(renderer_, "../assets/img/hexagon_star1.png");
+    islandLink1Sprite_->convertAlpha();
+
+    islandLink2Sprite_ = new Texture(renderer_, "../assets/img/hexagon_star2.png");
+    islandLink2Sprite_->convertAlpha();
+
+    islandLink3Sprite_ = new Texture(renderer_, "../assets/img/hexagon_star3.png");
+    islandLink3Sprite_->convertAlpha();
+
+    islandLink4Sprite_ = new Texture(renderer_, "../assets/img/hexagon_star4.png");
+    islandLink4Sprite_->convertAlpha();
 
     selectSprite_ = new Texture(renderer_, 90, 90);
     selectSprite_->convertAlpha();
+    selectSprite_->fill(ColorUtils::GREEN);
 
-    islandSpriteRadius_ = islandSprite_->getHeight() / 2;
-    islandSpriteInnerRadius_ = std::sqrt(3) * islandSpriteRadius_ / 2.0;
+    islandSpriteInnerRadius_ = islandSprite_->getWidth() / 2;
+    islandSpriteRadius_ = islandSpriteInnerRadius_ * 2 / std::sqrt(3);
 }
 
 
 void GameMap::createSprite() {
     if (sprite_) return;
 
+    auto [q, r] = HexagonUtils::offsetToAxial(getWidth()-1, getHeight()-1);
+    auto [cx, cy] = HexagonUtils::axialToPixel(q, r, islandSpriteRadius_);
+
+    cx += islandSpriteInnerRadius_ + islandSprite_->getWidth() / 2.0;
+    cy += islandSpriteRadius_ + islandSprite_->getHeight() / 2.0;
+
     spriteSize_ = {
-        static_cast<int>(2 * islandSpriteInnerRadius_ * (getWidth() + 0.5)),
-        static_cast<int>(islandSpriteRadius_ * (1.5 * getHeight() + 0.5)),
+        static_cast<int>(cx),
+        static_cast<int>(cy),
     };
     setProportionalSize(size_);
 
@@ -87,44 +107,43 @@ void GameMap::refresh()
                 static_cast<int>(cy + islandSpriteRadius_ - islandSprite_->getHeight() / 2.0)
             });
 
+            std::vector<bool> neighbors(4);
             if (row & 1) {
-                if (row > 0 && isTerritory(get(row-1, col))) {
-                    sprite_->blit(islandLinkSprite_, Point{
-                        static_cast<int>(cx + islandSpriteInnerRadius_ / 2 - islandLinkSprite_->getWidth() / 2.0),
-                        static_cast<int>(cy + islandSpriteRadius_ * 0.25 - islandLinkSprite_->getHeight() / 2.0)
-                    });
-                }
-                if (col > 0 && isTerritory(get(row, col-1))) {
-                    sprite_->blit(islandLinkSprite_, Point{
-                        static_cast<int>(cx - islandLinkSprite_->getWidth() / 2.0),
-                        static_cast<int>(cy + islandSpriteRadius_ - islandLinkSprite_->getHeight() / 2.0)
-                    });
-                }
-                if (row+1 < getHeight() && isTerritory(get(row+1, col))) {
-                    sprite_->blit(islandLinkSprite_, Point{
-                        static_cast<int>(cx + islandSpriteInnerRadius_ / 2 - islandLinkSprite_->getWidth() / 2.0),
-                        static_cast<int>(cy + islandSpriteRadius_ * 1.75 - islandLinkSprite_->getHeight() / 2.0)
-                    });
-                }
+                neighbors = {
+                    row > 0 && isTerritory(get(row-1, col)),
+                    col > 0 && isTerritory(get(row, col-1)),
+                    row+1 < getHeight() && isTerritory(get(row+1, col)),
+                    row+1 < getHeight() && col+1 < getWidth() && isTerritory(get(row+1, col+1))
+                };
             } else {
-                if (row > 0 && col > 0 && isTerritory(get(row-1, col-1))) {
-                    sprite_->blit(islandLinkSprite_, Point{
-                        static_cast<int>(cx + islandSpriteInnerRadius_ / 2 - islandLinkSprite_->getWidth() / 2.0),
-                        static_cast<int>(cy + islandSpriteRadius_ * 0.25 - islandLinkSprite_->getHeight() / 2.0)
-                    });
-                }
-                if (col > 0 && isTerritory(get(row, col-1))) {
-                    sprite_->blit(islandLinkSprite_, Point{
-                        static_cast<int>(cx - islandLinkSprite_->getWidth() / 2.0),
-                        static_cast<int>(cy + islandSpriteRadius_ - islandLinkSprite_->getHeight() / 2.0)
-                    });
-                }
-                if (row+1 < getHeight() && col > 0 && isTerritory(get(row+1, col-1))) {
-                    sprite_->blit(islandLinkSprite_, Point{
-                        static_cast<int>(cx + islandSpriteInnerRadius_ / 2 - islandLinkSprite_->getWidth() / 2.0),
-                        static_cast<int>(cy + islandSpriteRadius_ * 1.75 - islandLinkSprite_->getHeight() / 2.0)
-                    });
-                }
+                neighbors = {
+                    row > 0 && col > 0 && isTerritory(get(row-1, col-1)),
+                    col > 0 && isTerritory(get(row, col-1)),
+                    row+1 < getHeight() && col > 0 && isTerritory(get(row+1, col-1)),
+                    row+1 < getHeight() && isTerritory(get(row+1, col))
+                };
+            }
+
+            if (neighbors[0]) {
+                Texture* linkSprite = neighbors[1] ? islandLink1Sprite_ : islandLink2Sprite_;
+                sprite_->blit(linkSprite, Point{
+                    static_cast<int>(cx + islandSpriteInnerRadius_ / 2 - linkSprite->getWidth() / 2.0),
+                    static_cast<int>(cy + islandSpriteRadius_ * 0.25 - linkSprite->getHeight() / 2.0)
+                });
+            }
+            if (neighbors[1]) {
+                Texture* linkSprite = neighbors[2] ? islandLink1Sprite_ : islandLink3Sprite_;
+                sprite_->blit(linkSprite, Point{
+                    static_cast<int>(cx - linkSprite->getWidth() / 2.0),
+                    static_cast<int>(cy + islandSpriteRadius_ - linkSprite->getHeight() / 2.0)
+                });
+            }
+            if (neighbors[2]) {
+                Texture* linkSprite = neighbors[3] ? islandLink1Sprite_ : islandLink4Sprite_;
+                sprite_->blit(linkSprite, Point{
+                    static_cast<int>(cx + islandSpriteInnerRadius_ / 2 - linkSprite->getWidth() / 2.0),
+                    static_cast<int>(cy + islandSpriteRadius_ * 1.75 - linkSprite->getHeight() / 2.0)
+                });
             }
         }
     }
@@ -177,7 +196,8 @@ void GameMap::draw(const Point& pos)
     SDL_RenderCopy(renderer_, sprite_->get(), nullptr, &dest.get());
 
     if (selectedHexagon_.has_value()) {
-        auto [x, y] = HexagonUtils::axialToPixel(selectedHexagon_->getX(), selectedHexagon_->getY(), hexagonRadius_);
+        auto [q, r] = HexagonUtils::offsetToAxial(selectedHexagon_->getX(), selectedHexagon_->getY());
+        auto [x, y] = HexagonUtils::axialToPixel(q, r, hexagonRadius_);
         x += pos.getX() + innerHexagonRadius_;
         y += pos.getY() + hexagonRadius_;
 
@@ -192,15 +212,24 @@ void GameMap::draw(const Point& pos)
     }
 }
 
+void GameMap::test() {
+    if (!selectedHexagon_.has_value()) return;
+
+    set(selectedHexagon_->getY(), selectedHexagon_->getX(), new Sea());
+    refresh();
+}
+
 void GameMap::selectHexagon(const Point& pos) {
     int relX = pos.getX() - innerHexagonRadius_;
     int relY = pos.getY() - hexagonRadius_;
+
     auto [q, r] = HexagonUtils::pixelToAxial(relX, relY, hexagonRadius_);
     auto [x, y] = HexagonUtils::axialToOffset(q, r);
+    
     if (x < 0 || x >= getWidth() || y < 0 || y >= getHeight())
         selectedHexagon_.reset();
     else
-        selectedHexagon_ = {q, r};
+        selectedHexagon_ = {x, y};
 }
 
 void GameMap::handleEvent(SDL_Event &event) {}

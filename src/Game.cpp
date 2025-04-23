@@ -74,6 +74,8 @@ void Game::handleEvents() {
 
         case SDL_MOUSEBUTTONUP: {
             moveOrigin_.reset();
+
+            map_->test();
             break;
         }
 
