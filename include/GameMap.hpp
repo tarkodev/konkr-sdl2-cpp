@@ -7,6 +7,9 @@
 #include <optional>
 #include "HexagonGrid.hpp"
 #include "Cell.hpp"
+#include "Rect.hpp"
+#include "Point.hpp"
+#include "Size.hpp"
 
 /**
  * @brief Classe représentant une carte de jeu.
@@ -16,38 +19,47 @@
  */
 class GameMap : public HexagonGrid<Cell*> {
 public:
-    GameMap(SDL_Renderer *renderer, const SDL_Point& position, const SDL_Rect& size, const std::pair<int, int>& gridSize, const SDL_Rect& hexagonSize);
-    GameMap(SDL_Renderer *renderer, const SDL_Point& position, const SDL_Rect& size, const std::string mapFile, const SDL_Rect& hexagonSize);
+    GameMap(const Size size, const std::pair<int, int>& gridSize);
+    GameMap(const Size size, const std::string mapFile);
 
 
-    SDL_Rect getSize() const;
-    void setProportionalSize(const SDL_Rect size);
-    void selectHexagon(SDL_Point pos);
+    Size getSize() const;
+    void setProportionalSize(const Size size);
+    void selectHexagon(const Point& pos);
     void refresh();
 
     void handleEvent(SDL_Event &event);
-    void draw(SDL_Point& pos);
+    void draw(const Point& pos);
+    bool isTerritory(Cell *cell) const;
+
+    static void init(SDL_Renderer* renderer, Texture* islandSprite, double islandSpriteRadius);
 
 private:
+    static SDL_Renderer* renderer_;
+    static Texture* islandSprite_;
+    static double islandSpriteRadius_;
+    static double islandSpriteInnerRadius_;
+
     void createSprite();
 
     void drawNgon(const SDL_Color& color, int n, double rad,
                   const std::pair<double, double>& position, int width = 0) const;
-    
 
-    SDL_Renderer *renderer_;
+    void drawQuarters(const SDL_Color &color, double rad,
+                               const std::pair<double, double> &position,
+                               const std::vector<bool>& sectors) const;
 
-    SDL_Rect hexagonSize_;
-    double hexagonSpriteRadius_;
+
     double hexagonRadius_;
     double innerHexagonRadius_;
 
-    std::optional<std::pair<int,int>> selectedHexagon_;
+    std::optional<Point> selectedHexagon_;
     bool hasSelection_ = false;
 
-    SDL_Rect size_;
-    SDL_Rect spriteSize_;
-    SDL_Texture* sprite_ = nullptr;
+    Size size_;
+    Size spriteSize_;
+    Texture* sprite_ = nullptr;
+    
 };
 
 #endif

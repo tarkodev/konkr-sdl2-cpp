@@ -2,31 +2,20 @@
 #define CELL_HPP
 
 #include <SDL.h>
+#include "Texture.hpp"
 #include "Player.hpp"
 
 class Cell {
 public:
-    Cell(SDL_Renderer *renderer, Player* owner);
-    
-    void setOwner(Player* owner);
+    virtual void handleEvents(SDL_Event &event) = 0;
+    virtual void draw(Point& pos) = 0;
 
-    void handleEvents();
-    void draw(SDL_Point& pos);
-
-    static void setDefaultSprite(SDL_Texture* defaultSprite, SDL_Rect& size) {
-        defaultSprite_ = defaultSprite;
-        spriteSize_ = size;
-    }
+    static void init(SDL_Renderer *renderer, Texture* plate);
+    static Texture* getSprite();
 
 private:
-    static SDL_Texture* defaultSprite_;
-    static SDL_Rect spriteSize_;
-
-    SDL_Renderer *renderer_;
-
-    Player *owner_ = nullptr;
-    SDL_Texture* sprite_ = nullptr;
-    SDL_Rect size_;
+    static SDL_Renderer* renderer_;
+    static Texture* sprite_;
 };
 
 #endif

@@ -201,6 +201,7 @@ namespace ColorUtils
     const SDL_Color SIENNA                  = {160, 82, 45, 255};
     const SDL_Color BROWN                   = {165, 42, 42, 255};
     const SDL_Color MAROON                  = {128, 0, 0, 255};
+    const SDL_Color BROWN2                  = {81, 62, 62, 255};
 
     const SDL_Color WHITE                   = {255, 255, 255, 255};
     const SDL_Color SNOW                    = {255, 250, 250, 255};

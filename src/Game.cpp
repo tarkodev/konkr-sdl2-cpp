@@ -1,7 +1,9 @@
 #include "Game.hpp"
 #include "HexagonUtils.hpp"
 #include "HexagonGrid.hpp"
-#include "DrawUtils.hpp"
+#include "Texture.hpp"
+#include "Sea.hpp"
+#include "Territory.hpp"
 #include <iostream>
 #include <stdexcept>
 
@@ -9,53 +11,69 @@
 #include <vector>
 
 Game::Game() 
-    : window_(std::make_unique<Window>("Konkr", windowSize_.w, windowSize_.h)) {
+    : window_(std::make_unique<Window>("Konkr", windowSize_.getWidth(), windowSize_.getHeight())) {
     if (!window_ || !window_->isInitialized())
         throw std::runtime_error("Échec de l'initialisation de SDL: " + std::string(SDL_GetError()));
 
     // Get renderer and window size
     renderer_ = window_->getRenderer();
     windowSize_ = window_->getSize();
-
-    // Load hexagon sprite
-    SDL_Texture *hexagonSprite = IMG_LoadTexture(renderer_, "../assets/img/hexagon.png");
-    if (!hexagonSprite) throw std::runtime_error("Échec du chargement de la texture des hexagones: " + std::string(SDL_GetError()));
-
-    // Get Size
-    SDL_Rect hexagonSpriteSize = DrawUtils::getSize(hexagonSprite);
-
-    // Set default texture
-    Player::setDefaultHexagonSprite(hexagonSprite, hexagonSpriteSize);
-
-    SDL_Texture* brownHexagonSprite = DrawUtils::copyTexture(renderer_, hexagonSprite);
     
-    SDL_Texture* currentTarget = SDL_GetRenderTarget(renderer_);
-    SDL_SetRenderTarget(renderer_, brownHexagonSprite);
-    SDL_SetTextureColorMod(brownHexagonSprite, ColorUtils::BROWN.r, ColorUtils::BROWN.g, ColorUtils::BROWN.b);
-    SDL_SetRenderTarget(renderer_, currentTarget);
+    //! unique pointer
+    Texture *sprites = new Texture(renderer_, "../assets/img/sprites.png");
 
-    Cell::setDefaultSprite(brownHexagonSprite, hexagonSpriteSize);
+    //! Créer Texture::createFrom
+    Texture* islandSprite = new Texture(renderer_, 146, 146);
+    islandSprite->convertAlpha();
+    islandSprite->blit(sprites, Rect{210, 18, 146, 146}, islandSprite->getSize());
+
+    Texture* plateSprite = new Texture(renderer_, 146, 146);
+    plateSprite->convertAlpha();
+    plateSprite->blit(sprites, Rect{0, 725, 146, 146}, plateSprite->getSize());
+
+    Texture* plainSprite = plateSprite->copy();
+    plainSprite->colorize(ColorUtils::GREEN);
+
+
+    // Set texture in Cell
+    GameMap::init(renderer_, islandSprite, hexSize_);
+    Cell::init(renderer_, plateSprite);
+    Territory::init(renderer_, plateSprite);
+
+
 
     // Create map
-    SDL_Rect mapSize = {
-        0, 0, 
-        static_cast<int>(windowSize_.w * 0.25), 
-        static_cast<int>(windowSize_.h * 0.25)
-    };
-    map_.emplace(renderer_, mapPos_, mapSize, gridSize_, hexagonSpriteSize);
+    map_.emplace(windowSize_ * 0.75, gridSize_);
 
-    SDL_Rect mapRealSize = map_->getSize();
-    mapPos_ = {(windowSize_.w - mapRealSize.w) / 2, (windowSize_.h - mapRealSize.h) / 2};
+    Size mapRealSize = map_->getSize();
+    mapPos_ = {(windowSize_.getWidth() - mapRealSize.getWidth()) / 2, (windowSize_.getHeight() - mapRealSize.getHeight()) / 2};
+
 
     // Create Players
-    Player p1(renderer_, ColorUtils::RED);
-    Player p2(renderer_, ColorUtils::BLUE);
+    //Player p1(renderer_, ColorUtils::RED);
+    //Player p2(renderer_, ColorUtils::BLUE);
 
-    map_->set(2, 2, new Cell(renderer_, &p1));
+    map_->set(2, 2, new Sea());
+    map_->set(2, 3, new Sea());
+    map_->set(1, 2, new Sea());
+    map_->set(3, 3, new Sea());
     map_->refresh();
 }
 
 Game::~Game() = default;
+
+void Game::test() {
+    //! unique pointer
+    Texture *sprites = new Texture(renderer_, "../assets/img/sprites.png");
+
+    //! Créer Texture::createFrom
+    Texture* islandSprite = new Texture(renderer_, 146, 146);
+    islandSprite->convertAlpha();
+    islandSprite->blit(sprites, Rect{210, 18, 146, 146}, islandSprite->getSize());
+
+    GameMap::init(renderer_, islandSprite, hexSize_);
+    map_->refresh();
+}
 
 void Game::handleEvents() {
     SDL_Event event;
@@ -81,38 +99,48 @@ void Game::handleEvents() {
         case SDL_MOUSEMOTION: {
             if (moveOrigin_.has_value()) {
                 SDL_Point origin = moveOrigin_.value();
-                mapPos_.x += (event.motion.x - origin.x);
-                mapPos_.y += (event.motion.y - origin.y);
+                mapPos_ += Point{(event.motion.x - origin.x), (event.motion.y - origin.y)};
                 moveOrigin_ = {event.motion.x, event.motion.y};
             } else {
-                map_->selectHexagon({event.motion.x - mapPos_.x, event.motion.y - mapPos_.y});
+                map_->selectHexagon({event.motion.x - mapPos_.getX(), event.motion.y - mapPos_.getY()});
             }
             break;
         }
 
         case SDL_MOUSEWHEEL: {
-            SDL_Rect mapSize = map_->getSize();
+            Size mapSize = map_->getSize();
             double zoom = (event.wheel.preciseY > 0) ? 1.1 : 0.9;
 
-            mapSize.w *= zoom;
-            mapSize.h *= zoom;
+            mapSize *= zoom;
             map_->setProportionalSize(mapSize);
 
-            mapPos_.x -= (mapPos_.x - windowSize_.w / 2.0) * (1 - zoom);
-            mapPos_.y -= (mapPos_.y - windowSize_.h / 2.0) * (1 - zoom);
-            map_->selectHexagon({event.wheel.mouseX - mapPos_.x, event.wheel.mouseY - mapPos_.y});
+            mapPos_ -= Point{
+                static_cast<int>((mapPos_.getX() - windowSize_.getWidth() / 2.0) * (1 - zoom)),
+                static_cast<int>((mapPos_.getY() - windowSize_.getHeight() / 2.0) * (1 - zoom))
+            };
+
+            map_->selectHexagon({
+                event.wheel.mouseX - mapPos_.getX(), 
+                event.wheel.mouseY - mapPos_.getY()
+            });
             break;
         }
 
         case SDL_KEYDOWN: {
             if (event.key.keysym.sym == SDLK_LEFT)
-                mapPos_.x += 10;
+                mapPos_.addX(10);
             else if (event.key.keysym.sym == SDLK_RIGHT)
-                mapPos_.x -= 10;
-            else if (event.key.keysym.sym == SDLK_UP)
-                mapPos_.y += 10;
-            else if (event.key.keysym.sym == SDLK_DOWN)
-                mapPos_.y -= 10;
+                mapPos_.addX(-10);
+            else if (event.key.keysym.sym == SDLK_UP) {
+                hexSize_ += 0.5;
+                test();
+                //mapPos_.addY(10);
+            }
+            else if (event.key.keysym.sym == SDLK_DOWN) {
+                hexSize_ -= 0.5;
+                test();
+                //mapPos_.addY(-10);
+            }
             break;
         }
         }

@@ -15,13 +15,17 @@ public:
     void handleEvents();
     void draw();
     void run();
+    void test();
+    
 
 private:
+    double hexSize_ = 65;
+
     // Init size of window size
-    SDL_Rect windowSize_ = {0, 0, 500, 500};
+    Size windowSize_ = {500, 500};
 
     // Map size and pos (in px)
-    SDL_Point mapPos_ = {0, 0};
+    Point mapPos_ = {0, 0};
 
     // Grid size
     std::pair<int, int> gridSize_ = {20, 20};

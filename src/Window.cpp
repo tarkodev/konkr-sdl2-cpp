@@ -16,7 +16,9 @@ Window::Window(const char* title, int width, int height) : initialized_(false) {
 
     // Set full screen and get size
     SDL_SetWindowFullscreen(SDLWindow_.get(), SDL_WINDOW_FULLSCREEN_DESKTOP);
-    SDL_GetWindowSize(SDLWindow_.get(), &size_.w, &size_.h);
+    SDL_GetWindowSize(SDLWindow_.get(), &width, &height);
+    size_ = {width, height};
+    
 
     // Init Renderer
     renderer_.reset(SDL_CreateRenderer(SDLWindow_.get(), -1, SDL_RENDERER_ACCELERATED));

@@ -2,7 +2,8 @@
 #define WINDOW_HPP
 
 #include <memory>
-#include <SDL.h>
+#include "SDL.h"
+#include "Size.hpp"
 
 // To free window memory on closing
 struct SDLWindowDeleter {
@@ -29,13 +30,13 @@ public:
     ~Window();
     
     SDL_Renderer* getRenderer() const { return renderer_.get(); }
-    SDL_Rect getSize() const { return size_; }
+    Size getSize() const { return size_; }
     bool isInitialized() const { return initialized_; }
     
 private:
     bool initialized_;
 
-    SDL_Rect size_ = {0, 0, 0, 0};
+    Size size_ = {0, 0};
     SDLWindowPtr SDLWindow_;
     SDLRendererPtr renderer_;
 };

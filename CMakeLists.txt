@@ -67,8 +67,11 @@ endfunction()
 
 # --- Définition des fichiers sources ---
 set(SRC_FILES 
+    "${CMAKE_SOURCE_DIR}/src/Texture.cpp"
     "${CMAKE_SOURCE_DIR}/src/Player.cpp"
     "${CMAKE_SOURCE_DIR}/src/Cell.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Sea.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Territory.cpp"
     "${CMAKE_SOURCE_DIR}/src/HexagonGrid.tpp"
     "${CMAKE_SOURCE_DIR}/src/GameMap.cpp"
     "${CMAKE_SOURCE_DIR}/src/Window.cpp"
