@@ -6,27 +6,27 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(APPLE)
-    # Sur macOS, on utilise les bibliothèques locales dans lib/
-    set(SDL2_DIR "${CMAKE_SOURCE_DIR}/lib/SDL2/lib/cmake/SDL2")
+    # Sur macOS, on utilise les bibliothèques locales dans lib_macos/
+    set(SDL2_DIR "${CMAKE_SOURCE_DIR}/lib_macos/SDL2/lib/cmake/SDL2")
     find_package(SDL2 REQUIRED)
     set(SDL2_LIBRARIES ${SDL2_LIBRARIES})
-    include_directories(${SDL2_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/lib/SDL2/include")
+    include_directories(${SDL2_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/lib_macos/SDL2/include")
     
     # SDL2_gfx
     find_library(SDL2_GFX_LIBRARY 
         NAMES SDL2_gfx
-        PATHS "${CMAKE_SOURCE_DIR}/lib/SDL2_gfx/lib"
+        PATHS "${CMAKE_SOURCE_DIR}/lib_macos/SDL2_gfx/lib"
         NO_DEFAULT_PATH
     )
-    include_directories("${CMAKE_SOURCE_DIR}/lib/SDL2_gfx/include")
+    include_directories("${CMAKE_SOURCE_DIR}/lib_macos/SDL2_gfx/include")
     
     # SDL2_image
     find_library(SDL2_IMAGE_LIBRARY 
         NAMES SDL2_image
-        PATHS "${CMAKE_SOURCE_DIR}/lib/SDL2_image/lib"
+        PATHS "${CMAKE_SOURCE_DIR}/lib_macos/SDL2_image/lib"
         NO_DEFAULT_PATH
     )
-    include_directories("${CMAKE_SOURCE_DIR}/lib/SDL2_image/include")
+    include_directories("${CMAKE_SOURCE_DIR}/lib_macos/SDL2_image/include")
 else()
     # Sur Linux (Ubuntu), on utilise les bibliothèques système via pkg-config
     find_package(SDL2 REQUIRED)

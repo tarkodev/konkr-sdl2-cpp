@@ -15,6 +15,7 @@
 
 
 SDL_Renderer* GameMap::renderer_ = nullptr;
+Texture* GameMap::selectSprite_ = nullptr;
 Texture* GameMap::islandSprite_ = nullptr;
 double GameMap::islandSpriteRadius_ = 0;
 double GameMap::islandSpriteInnerRadius_ = 0;
@@ -32,8 +33,9 @@ GameMap::GameMap(const Size size, const std::string mapFile)
     refresh();
 }
 
-void GameMap::init(SDL_Renderer *renderer, Texture* islandSprite, double islandSpriteRadius) {
+void GameMap::init(SDL_Renderer *renderer, Texture* selectSprite, Texture* islandSprite, double islandSpriteRadius) {
     renderer_ = renderer;
+    selectSprite_ = selectSprite;
     islandSprite_ = islandSprite;
     islandSpriteRadius_ = islandSpriteRadius;
     islandSpriteInnerRadius_ = std::sqrt(3) * islandSpriteRadius_ / 2.0;
@@ -60,61 +62,20 @@ void GameMap::refresh()
     // Fond uniforme
     sprite_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
 
-    for (int row = 0; row < getHeight(); ++row) {
-        for (int col = 0; col < getWidth(); ++col) {
+    for (int row = 0; row < getHeight(); row++) {
+        for (int col = 0; col < getWidth(); col++) {
             Cell* cell = get(row, col);
             if (!isTerritory(cell)) continue;
 
             // Calcul de la position de blit
             auto [q, r] = HexagonUtils::offsetToAxial(col, row);
             auto [cx, cy] = HexagonUtils::axialToPixel(q, r, islandSpriteRadius_);
-            Rect dest{
-                Point{
-                    int(cx + islandSpriteInnerRadius_ - islandSprite_->getWidth()/2.0),
-                    int(cy + islandSpriteRadius_    - islandSprite_->getHeight()/2.0)
-                },
-                islandSprite_->getSize()
+            Point dest{
+                int(cx + islandSpriteInnerRadius_ - islandSprite_->getWidth()/2.0),
+                int(cy + islandSpriteRadius_    - islandSprite_->getHeight()/2.0)
             };
 
-            // --- Préparer la liste "neighbors" Commune ---
-            std::vector<bool> neighbors(6);
-            if (row & 1) {
-                neighbors = {
-                    row+1<getHeight()                     && isTerritory(get(row+1, col)),
-                    col>0                                 && isTerritory(get(row,   col-1)),
-                    row>0                                 && isTerritory(get(row-1, col)),
-                    row>0 && col+1<getWidth()             && isTerritory(get(row-1, col+1)),
-                    col+1<getWidth()                      && isTerritory(get(row,   col+1)),
-                    row+1<getHeight() && col+1<getWidth() && isTerritory(get(row+1, col+1))
-                };
-            } else {
-                neighbors = {
-                    row+1<getHeight() && col>0       && isTerritory(get(row+1, col-1)),
-                    col>0                            && isTerritory(get(row,   col-1)),
-                    row>0 && col>0                   && isTerritory(get(row-1, col-1)),
-                    row>0                            && isTerritory(get(row-1, col)),
-                    col+1<getWidth()                 && isTerritory(get(row,   col+1)),
-                    row+1<getHeight()                && isTerritory(get(row+1, col))
-                };
-            }
-
-
-            {
-                Texture* tempTex = islandSprite_->copy();
-                RenderTargetGuard tg(renderer_, tempTex);
-                double rad = std::sqrt(std::pow(islandSprite_->getWidth(), 2) + std::pow(islandSprite_->getHeight(), 2)) / 2.0;
-
-                // Quartiers jaunes
-                /*drawQuarters(
-                    ColorUtils::BROWN2,
-                    rad,
-                    { tempTex->getWidth()/2.0, tempTex->getHeight()/2.0 },
-                    neighbors
-                );*/
-
-                // Blit de tempTex dans la texture finale
-                sprite_->blit(tempTex, dest);
-            }
+            sprite_->blit(islandSprite_, dest);
         }
     }
 }
@@ -155,45 +116,6 @@ void GameMap::drawNgon(const SDL_Color &color, int n, double rad,
         polygonRGBA(renderer_, vx.data(), vy.data(), n, color.r, color.g, color.b, color.a);
 }
 
-
-void GameMap::drawQuarters(const SDL_Color &color, double rad,
-    const std::pair<double, double> &position,
-    const std::vector<bool>& sectors) const
-{
-    //! temp
-    SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_NONE);
-    int n = sectors.size();
-
-    // Calcul des coordonnées des sommets du polygone.
-    std::vector<Sint16> vx(n), vy(n);
-    for (int i = 0; i < n; ++i) {
-        double angle = M_PI_2 + (static_cast<double>(i) / n) * (2 * M_PI);
-        vx[i] = static_cast<Sint16>(std::round(std::cos(angle) * rad + position.first));
-        vy[i] = static_cast<Sint16>(std::round(std::sin(angle) * rad + position.second));
-    }
-
-    // Calcul des coordonnées du centre
-    Sint16 centerX = static_cast<Sint16>(std::round(position.first));
-    Sint16 centerY = static_cast<Sint16>(std::round(position.second));
-
-    // Pour chaque secteur à remplir (indiqué par un booléen true)
-    for (int i = 0; i < n; ++i)
-    {
-        if (!sectors[i]) continue;
-
-        int next = (i + 1) % n; // Le sommet suivant, avec wrap-around
-        DrawUtils::fillTriangle(renderer_, SDL_Point{centerX, centerY},
-            SDL_Point{vx[i], vy[i]},
-            SDL_Point{vx[next], vy[next]},
-                color);
-    }
-
-    SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_BLEND);
-}
-
-
-
-
 void GameMap::draw(const Point& pos)
 {
     if (!sprite_)
@@ -202,18 +124,20 @@ void GameMap::draw(const Point& pos)
     Rect dest = {pos, size_};
     SDL_RenderCopy(renderer_, sprite_->get(), nullptr, &dest.get());
 
-
-    /*
     if (selectedHexagon_.has_value()) {
-        std::pair<int,int> hexagon = selectedHexagon_.value();
-        auto [x, y] = HexagonUtils::axialToPixel(hexagon.first, hexagon.second, hexagonRadius_);
-        x += pos.x + innerHexagonRadius_;
-        y += pos.y + hexagonRadius_;
+        auto [x, y] = HexagonUtils::axialToPixel(selectedHexagon_->getX(), selectedHexagon_->getY(), hexagonRadius_);
+        x += pos.getX() + innerHexagonRadius_;
+        y += pos.getY() + hexagonRadius_;
+
+        double ratio = static_cast<double>(dest.getWidth()) / sprite_->getWidth();
+        int w = static_cast<int>(ratio * selectSprite_->getWidth());
+        int h = static_cast<int>(ratio * selectSprite_->getHeight());
+
+        SDL_RenderCopy(renderer_, selectSprite_->get(), nullptr, new SDL_Rect{static_cast<int>(x -  w/2), static_cast<int>(y - h/2), w, h});
 
         // Dessiner un contour épais en jaune
-        drawNgon(ColorUtils::YELLOW, 6, hexagonRadius_, {x, y}, 3);
+        //!drawNgon(ColorUtils::YELLOW, 6, hexagonRadius_, {x, y}, 3);
     }
-    */
 }
 
 void GameMap::selectHexagon(const Point& pos) {

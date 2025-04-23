@@ -32,10 +32,11 @@ public:
     void draw(const Point& pos);
     bool isTerritory(Cell *cell) const;
 
-    static void init(SDL_Renderer* renderer, Texture* islandSprite, double islandSpriteRadius);
+    static void init(SDL_Renderer* renderer, Texture* selectSprite, Texture* islandSprite, double islandSpriteRadius);
 
 private:
     static SDL_Renderer* renderer_;
+    static Texture* selectSprite_;
     static Texture* islandSprite_;
     static double islandSpriteRadius_;
     static double islandSpriteInnerRadius_;
@@ -44,11 +45,6 @@ private:
 
     void drawNgon(const SDL_Color& color, int n, double rad,
                   const std::pair<double, double>& position, int width = 0) const;
-
-    void drawQuarters(const SDL_Color &color, double rad,
-                               const std::pair<double, double> &position,
-                               const std::vector<bool>& sectors) const;
-
 
     double hexagonRadius_;
     double innerHexagonRadius_;

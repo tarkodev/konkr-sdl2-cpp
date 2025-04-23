@@ -27,6 +27,11 @@ Game::Game()
     islandSprite->convertAlpha();
     islandSprite->blit(sprites, Rect{210, 18, 146, 146}, islandSprite->getSize());
 
+    Texture* selectSprite = new Texture(renderer_, 146, 146);
+    selectSprite->convertAlpha();
+    selectSprite->blit(sprites, Rect{25, 162, 100, 100}, selectSprite->getSize());
+    
+
     Texture* plateSprite = new Texture(renderer_, 146, 146);
     plateSprite->convertAlpha();
     plateSprite->blit(sprites, Rect{0, 725, 146, 146}, plateSprite->getSize());
@@ -36,7 +41,7 @@ Game::Game()
 
 
     // Set texture in Cell
-    GameMap::init(renderer_, islandSprite, hexSize_);
+    GameMap::init(renderer_, selectSprite, islandSprite, hexSize_);
     Cell::init(renderer_, plateSprite);
     Territory::init(renderer_, plateSprite);
 
@@ -61,19 +66,6 @@ Game::Game()
 }
 
 Game::~Game() = default;
-
-void Game::test() {
-    //! unique pointer
-    Texture *sprites = new Texture(renderer_, "../assets/img/sprites.png");
-
-    //! Créer Texture::createFrom
-    Texture* islandSprite = new Texture(renderer_, 146, 146);
-    islandSprite->convertAlpha();
-    islandSprite->blit(sprites, Rect{210, 18, 146, 146}, islandSprite->getSize());
-
-    GameMap::init(renderer_, islandSprite, hexSize_);
-    map_->refresh();
-}
 
 void Game::handleEvents() {
     SDL_Event event;
@@ -120,8 +112,8 @@ void Game::handleEvents() {
             };
 
             map_->selectHexagon({
-                event.wheel.mouseX - mapPos_.getX(), 
-                event.wheel.mouseY - mapPos_.getY()
+                event.wheel.x - mapPos_.getX(), 
+                event.wheel.y - mapPos_.getY()
             });
             break;
         }
@@ -131,16 +123,10 @@ void Game::handleEvents() {
                 mapPos_.addX(10);
             else if (event.key.keysym.sym == SDLK_RIGHT)
                 mapPos_.addX(-10);
-            else if (event.key.keysym.sym == SDLK_UP) {
-                hexSize_ += 0.5;
-                test();
-                //mapPos_.addY(10);
-            }
-            else if (event.key.keysym.sym == SDLK_DOWN) {
-                hexSize_ -= 0.5;
-                test();
-                //mapPos_.addY(-10);
-            }
+            else if (event.key.keysym.sym == SDLK_UP)
+                mapPos_.addY(10);
+            else if (event.key.keysym.sym == SDLK_DOWN)
+                mapPos_.addY(-10);
             break;
         }
         }

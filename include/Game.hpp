@@ -15,11 +15,10 @@ public:
     void handleEvents();
     void draw();
     void run();
-    void test();
     
 
 private:
-    double hexSize_ = 65;
+    double hexSize_ = 60;
 
     // Init size of window size
     Size windowSize_ = {500, 500};
