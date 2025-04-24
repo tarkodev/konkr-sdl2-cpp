@@ -1,15 +1,15 @@
-#ifndef UNIT_VILLAGER_HPP
-#define UNIT_VILLAGER_HPP
+#ifndef UNIT_HERO_HPP
+#define UNIT_HERO_HPP
 
 #include "logic/Troop.hpp"
 
-class Villager : public Troop {
+class Hero : public Troop {
 public:
-    static constexpr int STRENGTH = 1;
-    static constexpr int COST     = 10;
-    static constexpr int UPKEEP   = 2;
+    static constexpr int STRENGTH = 4;
+    static constexpr int COST     = 80;
+    static constexpr int UPKEEP   = 54;
 
-    explicit Villager(Player* owner = nullptr);
+    explicit Hero(Player* owner = nullptr);
 
     void display(const Texture* target, const Point& pos) override;
     const Size getSize() const override { return spriteSize_; }

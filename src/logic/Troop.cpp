@@ -1,12 +1,11 @@
 #include "logic/Troop.hpp"
 
-Troupe::Troupe(int strength, int cost, int upkeep, Player* owner)
-    : GameElement(strength, cost, owner),
-      upkeep_(upkeep) {}
+Troop::Troop(int strength, int cost, int upkeep, Player* owner)
+    : GameElement(strength, cost, upkeep, owner) {}
 
-bool Troupe::moveTo(const Point& dest)
+bool Troop::moveTo(const Point& dest)
 {
-    // TODO : vérifier la validité du déplacement (coût, obstacles…)
+    // TODO : valider le déplacement (portée, obstacles, etc.)
     position_ = dest;
     return true;
 }
