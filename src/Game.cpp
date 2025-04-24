@@ -4,6 +4,7 @@
 #include "Texture.hpp"
 #include "Sea.hpp"
 #include "Territory.hpp"
+#include "Plain.hpp"
 #include <iostream>
 #include <stdexcept>
 
@@ -18,22 +19,12 @@ Game::Game()
     // Get renderer and window size
     renderer_ = window_->getRenderer();
     windowSize_ = window_->getSize();
-    
-    //! unique pointer
-    Texture *sprites = new Texture(renderer_, "../assets/img/sprites.png");
-
-    Texture* plateSprite = new Texture(renderer_, 146, 146);
-    plateSprite->convertAlpha();
-    plateSprite->blit(sprites, Rect{0, 725, 146, 146}, plateSprite->getSize());
-
-    Texture* plainSprite = plateSprite->copy();
-    plainSprite->colorize(ColorUtils::GREEN);
-
 
     // Set texture in Cell
     GameMap::init(renderer_);
-    Cell::init(renderer_, plateSprite);
-    Territory::init(renderer_, plateSprite);
+    Cell::init(renderer_);
+    Territory::init();
+    Plain::init();
 
     // Create map
     map_.emplace(windowSize_ * 0.75, gridSize_);
@@ -50,6 +41,21 @@ Game::Game()
     map_->set(2, 3, new Sea());
     map_->set(1, 2, new Sea());
     map_->set(3, 3, new Sea());
+
+
+    map_->set(12, 8, new Plain());
+    map_->set(12, 9, new Plain());
+    map_->set(11, 8, new Plain());
+    map_->set(11, 9, new Plain());
+    map_->set(13, 8, new Plain());
+    map_->set(14, 7, new Plain());
+    map_->set(14, 8, new Plain());
+    map_->set(15, 9, new Plain());
+    map_->set(12, 7, new Plain());
+    map_->set(11, 10, new Plain());
+    map_->set(13, 10, new Plain());
+    map_->set(13, 11, new Plain());
+
     map_->refresh();
 
 }
@@ -69,21 +75,24 @@ void Game::handleEvents() {
 
         case SDL_MOUSEBUTTONDOWN: {
             moveOrigin_ = {event.motion.x, event.motion.y};
+            moved_ = false;
             break;
         }
 
         case SDL_MOUSEBUTTONUP: {
             moveOrigin_.reset();
-
-            map_->test();
+            if (!moved_)
+                map_->test();
             break;
         }
 
         case SDL_MOUSEMOTION: {
             if (moveOrigin_.has_value()) {
+                moved_ = true;
                 SDL_Point origin = moveOrigin_.value();
                 mapPos_ += Point{(event.motion.x - origin.x), (event.motion.y - origin.y)};
                 moveOrigin_ = {event.motion.x, event.motion.y};
+
             } else {
                 map_->selectHexagon({event.motion.x - mapPos_.getX(), event.motion.y - mapPos_.getY()});
             }

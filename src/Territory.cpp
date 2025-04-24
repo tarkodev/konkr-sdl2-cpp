@@ -2,33 +2,23 @@
 #include "Cell.hpp"
 #include "ColorUtils.hpp"
 
-SDL_Renderer* Territory::renderer_ = nullptr;
 Texture* Territory::sprite_ = nullptr;
 
 Territory::Territory() {}
 
-void Territory::init(SDL_Renderer* renderer, Texture* plate) {
-    renderer_ = renderer;
-    sprite_ = plate;
-}
+void Territory::init() {
+    if (!renderer_)
+        std::runtime_error("Cell not initialized");
 
-Texture* Territory::getSprite() {
-    if (sprite_ == nullptr)
-        throw std::runtime_error("Territory not initialized");
-
-    return sprite_;
+    sprite_ = new Texture(renderer_, "../assets/img/plate.png");
+    sprite_->convertAlpha();
 }
 
 void Territory::handleEvents(SDL_Event &event) {
 
 }
 
-void Territory::draw(Point& pos) {
-    Size spriteSize = sprite_->getSize();
-    Rect dest = {pos, spriteSize};
-
-    SDL_RenderCopy(renderer_, sprite_->get(), nullptr, &dest.get());
-}
+void Territory::draw(Texture* texture, const Point& pos) {}
 
 
 //! A voir si garder (gardé pour mettre dans les sous-classes)

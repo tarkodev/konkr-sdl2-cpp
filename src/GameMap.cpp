@@ -58,9 +58,8 @@ void GameMap::init(SDL_Renderer *renderer) {
     islandLink4Sprite_ = new Texture(renderer_, "../assets/img/hexagon_star4.png");
     islandLink4Sprite_->convertAlpha();
 
-    selectSprite_ = new Texture(renderer_, 90, 90);
+    selectSprite_ = new Texture(renderer_, "../assets/img/plate.png");
     selectSprite_->convertAlpha();
-    selectSprite_->fill(ColorUtils::GREEN);
 
     islandSpriteInnerRadius_ = islandSprite_->getWidth() / 2;
     islandSpriteRadius_ = islandSpriteInnerRadius_ * 2 / std::sqrt(3);
@@ -68,8 +67,6 @@ void GameMap::init(SDL_Renderer *renderer) {
 
 
 void GameMap::createSprite() {
-    if (sprite_) return;
-
     auto [q, r] = HexagonUtils::offsetToAxial(getWidth()-1, getHeight()-1);
     auto [cx, cy] = HexagonUtils::axialToPixel(q, r, islandSpriteRadius_);
 
@@ -82,27 +79,48 @@ void GameMap::createSprite() {
     };
     setProportionalSize(size_);
 
-    sprite_ = new Texture(renderer_, spriteSize_);
-    sprite_->convertAlpha();
+    if (islands_) {
+        delete islands_;
+        islands_ = nullptr;
+    }
+
+    islands_ = new Texture(renderer_, spriteSize_);
+    islands_->convertAlpha();
+
+    if (cells_) {
+        delete cells_;
+        cells_ = nullptr;
+    }
+
+    cells_ = new Texture(renderer_, spriteSize_);
+    cells_->convertAlpha();
 }
 
 void GameMap::refresh()
 {
-    createSprite();
+    if (!islands_ || !cells_)
+        createSprite();
 
     // Fond uniforme
-    sprite_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
+    islands_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
 
     for (int row = 0; row < getHeight(); row++) {
         for (int col = 0; col < getWidth(); col++) {
             Cell* cell = get(row, col);
-            if (!isTerritory(cell)) continue;
 
             // Calcul de la position de blit
             auto [q, r] = HexagonUtils::offsetToAxial(col, row);
             auto [cx, cy] = HexagonUtils::axialToPixel(q, r, islandSpriteRadius_);
 
-            sprite_->blit(islandSprite_, Point{
+            cell->draw(cells_, Point{
+                static_cast<int>(cx + islandSpriteInnerRadius_),
+                static_cast<int>(cy + islandSpriteRadius_)
+            });
+
+            // Dessine ile
+            if (!isTerritory(cell)) continue;
+
+            islands_->blit(islandSprite_, Point{
                 static_cast<int>(cx + islandSpriteInnerRadius_ - islandSprite_->getWidth() / 2.0),
                 static_cast<int>(cy + islandSpriteRadius_ - islandSprite_->getHeight() / 2.0)
             });
@@ -126,29 +144,27 @@ void GameMap::refresh()
 
             if (neighbors[0]) {
                 Texture* linkSprite = neighbors[1] ? islandLink1Sprite_ : islandLink2Sprite_;
-                sprite_->blit(linkSprite, Point{
+                islands_->blit(linkSprite, Point{
                     static_cast<int>(cx + islandSpriteInnerRadius_ / 2 - linkSprite->getWidth() / 2.0),
                     static_cast<int>(cy + islandSpriteRadius_ * 0.25 - linkSprite->getHeight() / 2.0)
                 });
             }
             if (neighbors[1]) {
                 Texture* linkSprite = neighbors[2] ? islandLink1Sprite_ : islandLink3Sprite_;
-                sprite_->blit(linkSprite, Point{
+                islands_->blit(linkSprite, Point{
                     static_cast<int>(cx - linkSprite->getWidth() / 2.0),
                     static_cast<int>(cy + islandSpriteRadius_ - linkSprite->getHeight() / 2.0)
                 });
             }
             if (neighbors[2]) {
                 Texture* linkSprite = neighbors[3] ? islandLink1Sprite_ : islandLink4Sprite_;
-                sprite_->blit(linkSprite, Point{
+                islands_->blit(linkSprite, Point{
                     static_cast<int>(cx + islandSpriteInnerRadius_ / 2 - linkSprite->getWidth() / 2.0),
                     static_cast<int>(cy + islandSpriteRadius_ * 1.75 - linkSprite->getHeight() / 2.0)
                 });
             }
         }
     }
-
-    //sprite_->recolor(ColorUtils::BROWN2, ColorUtils::RED);
 }
 
 bool GameMap::isTerritory(Cell *cell) const {
@@ -189,11 +205,12 @@ void GameMap::drawNgon(const SDL_Color &color, int n, double rad,
 
 void GameMap::draw(const Point& pos)
 {
-    if (!sprite_)
+    if (!islands_)
         refresh();
 
     Rect dest = {pos, size_};
-    SDL_RenderCopy(renderer_, sprite_->get(), nullptr, &dest.get());
+    SDL_RenderCopy(renderer_, islands_->get(), nullptr, &dest.get());
+    SDL_RenderCopy(renderer_, cells_->get(), nullptr, &dest.get());
 
     if (selectedHexagon_.has_value()) {
         auto [q, r] = HexagonUtils::offsetToAxial(selectedHexagon_->getX(), selectedHexagon_->getY());
@@ -201,7 +218,7 @@ void GameMap::draw(const Point& pos)
         x += pos.getX() + innerHexagonRadius_;
         y += pos.getY() + hexagonRadius_;
 
-        double ratio = static_cast<double>(dest.getWidth()) / sprite_->getWidth();
+        double ratio = static_cast<double>(dest.getWidth()) / islands_->getWidth();
         int w = static_cast<int>(ratio * selectSprite_->getWidth());
         int h = static_cast<int>(ratio * selectSprite_->getHeight());
 

@@ -54,17 +54,6 @@ public:
     void colorize(const SDL_Color& color);
 
     /**
-     * @brief ecolorize la texture.
-     *
-     * La méthode modifie les canaux R, G, et B de la texture.
-     * @param replace La couleur à remplacer.
-     * @param replace La nouvelle couleur à appliquer.
-     *
-     * Lève une std::runtime_error en cas d'erreur.
-     */
-    void recolor(const SDL_Color& hold, const SDL_Color& replace);
-
-    /**
      * @brief Retourne les dimensions de la texture sous la forme d'un Point (width, height).
      *
      */

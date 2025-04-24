@@ -8,14 +8,12 @@
 class Cell {
 public:
     virtual void handleEvents(SDL_Event &event) = 0;
-    virtual void draw(Point& pos) = 0;
+    virtual void draw(Texture* texture, const Point& pos) = 0;
 
-    static void init(SDL_Renderer *renderer, Texture* plate);
-    static Texture* getSprite();
+    static void init(SDL_Renderer *renderer);
 
-private:
+protected:
     static SDL_Renderer* renderer_;
-    static Texture* sprite_;
 };
 
 #endif

@@ -1,14 +1,14 @@
-#ifndef TERRITORY_HPP
-#define TERRITORY_HPP
+#ifndef PLAIN_HPP
+#define PLAIN_HPP
 
 #include <SDL.h>
 #include "Texture.hpp"
 #include "Player.hpp"
-#include "Cell.hpp"
+#include "Territory.hpp"
 
-class Territory: public Cell {
+class Plain: public Territory {
 public:
-    Territory();
+    Plain();
 
     void handleEvents(SDL_Event &event) override;
     void draw(Texture* texture, const Point& pos) override;

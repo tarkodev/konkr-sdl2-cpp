@@ -19,16 +19,9 @@ Texture* Sea::getSprite() {
     return sprite_;
 }
 
-void Sea::handleEvents(SDL_Event &event) {
+void Sea::handleEvents(SDL_Event &event) {}
 
-}
-
-void Sea::draw(Point& pos) {
-    Size spriteSize = sprite_->getSize();
-    Rect dest = {pos, spriteSize};
-
-    SDL_RenderCopy(renderer_, sprite_->get(), nullptr, &dest.get());
-}
+void Sea::draw(Texture* texture, const Point& pos) {}
 
 
 //! A voir si garder (gardé pour mettre dans les sous-classes)

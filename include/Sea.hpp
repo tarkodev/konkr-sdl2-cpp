@@ -11,7 +11,7 @@ public:
     Sea();
 
     void handleEvents(SDL_Event &event) override;
-    void draw(Point& pos) override;
+    void draw(Texture* texture, const Point& pos) override;
 
     static void init(SDL_Renderer* renderer, Texture* plate);
     static Texture* getSprite();
