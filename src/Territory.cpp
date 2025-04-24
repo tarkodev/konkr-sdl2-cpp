@@ -1,41 +1,71 @@
 #include "Territory.hpp"
-#include "Cell.hpp"
 #include "ColorUtils.hpp"
 
-Texture* Territory::sprite_ = nullptr;
+HexagonDisplayer Territory::islandDisplayer_ = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
+HexagonDisplayer Territory::plateDisplayer = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
+double Territory::islandRadius_ = 0;
+double Territory::islandInnerRadius_ = 0;
 
-Territory::Territory() {}
+const std::string Territory::TYPE = "Territory";
+const std::string Territory::getType() {
+    return Territory::TYPE;
+}
 
 void Territory::init() {
     if (!renderer_)
         std::runtime_error("Cell not initialized");
 
-    sprite_ = new Texture(renderer_, "../assets/img/plate.png");
-    sprite_->convertAlpha();
+    // Load island
+    Texture* island = (new Texture(renderer_, "../assets/img/hexagon.png"))->convertAlpha();
+    Texture* link = (new Texture(renderer_, "../assets/img/hexagon_link.png"))->convertAlpha();
+    Texture* linkBottomLeft = (new Texture(renderer_, "../assets/img/hexagon_link_bottom_left.png"))->convertAlpha();
+    Texture* linkBottom = (new Texture(renderer_, "../assets/img/hexagon_link_bottom.png"))->convertAlpha();
+    Texture* linkBottomRight = (new Texture(renderer_, "../assets/img/hexagon_link_bottom_right.png"))->convertAlpha();
+
+    // Get radius of hexagon of island
+    islandInnerRadius_ = island->getWidth() / 2;
+    islandRadius_ = islandInnerRadius_ * 2 / std::sqrt(3);
+
+    // Set displayer of territory
+    islandDisplayer_ = HexagonDisplayer{renderer_, islandRadius_, island, link, linkBottomLeft, linkBottom, linkBottomRight};
+
+
+    // Load plate
+    Texture* plate = (new Texture(renderer_, "../assets/img/plate.png"))->convertAlpha();
+    Texture* plateLink = (new Texture(renderer_, "../assets/img/plate_link.png"))->convertAlpha();
+    Texture* plateLinkBottomLeft = (new Texture(renderer_, "../assets/img/plate_link_bottom_left.png"))->convertAlpha();
+    Texture* plateLinkBottom = (new Texture(renderer_, "../assets/img/plate_link_bottom.png"))->convertAlpha();
+    Texture* plateLinkBottomRight = (new Texture(renderer_, "../assets/img/plate_link_bottom_right.png"))->convertAlpha();
+    
+    plateDisplayer = HexagonDisplayer{renderer_, islandRadius_, plate, plateLink, plateLinkBottomLeft, plateLinkBottom, plateLinkBottomRight};
 }
 
-void Territory::handleEvents(SDL_Event &event) {
-
+const Size& Territory::getSpriteSize() {
+    return islandDisplayer_.getSize();
 }
 
-void Territory::draw(Texture* texture, const Point& pos) {}
+const int Territory::getRadius() {
+    return islandRadius_;
+}
+
+const int Territory::getInnerRadius() {
+    return islandInnerRadius_;
+}
 
 
-//! A voir si garder (gardé pour mettre dans les sous-classes)
-/*
-void Territory::handleEvents() {}
+Territory::Territory() {}
 
-void Territory::draw(SDL_Point& pos) {
-    SDL_Texture* sprite = owner_ ? owner_->getHexagonSprite() : sprite_;
-    SDL_Rect size = owner_ ? owner_->getHexagonSize() : spriteSize_;
-
-    SDL_Rect dest = {
-        pos.x,
-        pos.y,
-        size.w,
-        size.h
+void Territory::display(const Texture* target, const Point& pos) {
+    std::vector<bool> TerritoryNeighbors{
+        static_cast<bool>(dynamic_cast<Territory*>(neighbors[0])),
+        static_cast<bool>(dynamic_cast<Territory*>(neighbors[1])),
+        static_cast<bool>(dynamic_cast<Territory*>(neighbors[2])),
+        static_cast<bool>(dynamic_cast<Territory*>(neighbors[3]))
     };
 
-    SDL_RenderCopy(renderer_, sprite, &size, &dest);
+    islandDisplayer_.display(target, pos, TerritoryNeighbors);
 }
-*/
+
+const Size& Territory::getSize() const {
+    return getSpriteSize();
+}

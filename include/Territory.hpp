@@ -3,20 +3,33 @@
 
 #include <SDL.h>
 #include "Texture.hpp"
+#include "HexagonDisplayer.hpp"
 #include "Player.hpp"
 #include "Cell.hpp"
 
-class Territory: public Cell {
+class Territory: public Cell, public Displayer {
 public:
-    Territory();
-
-    void handleEvents(SDL_Event &event) override;
-    void draw(Texture* texture, const Point& pos) override;
+    static const std::string TYPE;
 
     static void init();
+    static const Size& getSpriteSize();
+    static const int getRadius();
+    static const int getInnerRadius();
+
+
+    Territory();
+
+    const std::string getType() override;
+    void display(const Texture* target, const Point& pos) override;
+    const Size& getSize() const override;
 
 protected:
-    static Texture* sprite_;
+    static HexagonDisplayer plateDisplayer;
+
+private:
+    static HexagonDisplayer islandDisplayer_;
+    static double islandRadius_;
+    static double islandInnerRadius_;
 };
 
 #endif

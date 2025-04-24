@@ -5,6 +5,7 @@
 #include "SDL2/SDL_image.h"
 #include "Sea.hpp"
 #include "Territory.hpp"
+#include "Plain.hpp"
 #include "RenderTargetGuard.hpp"
 #include "Rect.hpp"
 #include "Point.hpp"
@@ -15,22 +16,26 @@
 #include <iostream>
 
 
+//! ? Renomer GameMap en CellGrid ?
+
 SDL_Renderer* GameMap::renderer_ = nullptr;
-
 Texture* GameMap::selectSprite_ = nullptr;
-Texture* GameMap::islandSprite_ = nullptr;
-Texture* GameMap::islandLink1Sprite_ = nullptr;
-Texture* GameMap::islandLink2Sprite_ = nullptr;
-Texture* GameMap::islandLink3Sprite_ = nullptr;
-Texture* GameMap::islandLink4Sprite_ = nullptr;
-
-double GameMap::islandSpriteRadius_ = 0;
-double GameMap::islandSpriteInnerRadius_ = 0;
 
 
 GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize)
-    : size_{size}, HexagonGrid<Cell*>(gridSize, new Territory())
+    : size_{size}, HexagonGrid<Cell*>(gridSize, nullptr)
 {
+    for (int row = 0; row < getHeight(); row++) {
+        for (int col = 0; col < getWidth(); col++) {
+            int v = std::rand() % 3;
+            if (v == 0)
+                set(col, row, new Territory());
+            else if (v == 1)
+                set(col, row, new Sea());
+            else if (v == 2)
+                set(col, row, new Plain());
+        }
+    }
     refresh();
 }
 
@@ -43,41 +48,49 @@ GameMap::GameMap(const Size size, const std::string mapFile)
 void GameMap::init(SDL_Renderer *renderer) {
     renderer_ = renderer;
 
-    islandSprite_ = new Texture(renderer_, "../assets/img/hexagon.png");
-    islandSprite_->convertAlpha();
-
-    islandLink1Sprite_ = new Texture(renderer_, "../assets/img/hexagon_star1.png");
-    islandLink1Sprite_->convertAlpha();
-
-    islandLink2Sprite_ = new Texture(renderer_, "../assets/img/hexagon_star2.png");
-    islandLink2Sprite_->convertAlpha();
-
-    islandLink3Sprite_ = new Texture(renderer_, "../assets/img/hexagon_star3.png");
-    islandLink3Sprite_->convertAlpha();
-
-    islandLink4Sprite_ = new Texture(renderer_, "../assets/img/hexagon_star4.png");
-    islandLink4Sprite_->convertAlpha();
-
-    selectSprite_ = new Texture(renderer_, "../assets/img/plate.png");
-    selectSprite_->convertAlpha();
-
-    islandSpriteInnerRadius_ = islandSprite_->getWidth() / 2;
-    islandSpriteRadius_ = islandSpriteInnerRadius_ * 2 / std::sqrt(3);
+    selectSprite_ = (new Texture(renderer_, "../assets/img/plate.png"))->convertAlpha();
 }
 
 
+void GameMap::updateNeighbors() {
+    for (int row = 0; row < getHeight(); row++) {
+        for (int col = 0; col < getWidth(); col++) {
+            if (row & 1) {
+                get(row, col)->setNeighbors({
+                    row > 0                                   ? get(row-1, col)   : nullptr,
+                    col > 0                                   ? get(row, col-1)   : nullptr,
+                    row+1 < getHeight()                       ? get(row+1, col)   : nullptr,
+                    col+1 < getWidth() && row+1 < getHeight() ? get(row+1, col+1) : nullptr,
+                    col+1 < getWidth()                        ? get(row, col+1)   : nullptr,
+                    col+1 < getWidth() && row > 0             ? get(row-1, col+1) : nullptr,
+                });
+            } else {
+                get(row, col)->setNeighbors({
+                    col > 0 && row > 0                        ? get(row-1, col-1) : nullptr,
+                    col > 0                                   ? get(row, col-1)   : nullptr,
+                    col > 0 && row+1 < getHeight()            ? get(row+1, col-1) : nullptr,
+                    row+1 < getHeight()                       ? get(row+1, col)   : nullptr,
+                    col+1 < getWidth()                        ? get(row, col+1)   : nullptr,
+                    row > 0                                   ? get(row-1, col)   : nullptr,
+                });
+            }
+        }
+    }
+}
+
 void GameMap::createSprite() {
+    Size islandSize = Territory::getSpriteSize();
+    double islandInnerRadius = Territory::getInnerRadius();
+    double islandRadius = Territory::getRadius();
+
     auto [q, r] = HexagonUtils::offsetToAxial(getWidth()-1, getHeight()-1);
-    auto [cx, cy] = HexagonUtils::axialToPixel(q, r, islandSpriteRadius_);
+    auto [cx, cy] = HexagonUtils::axialToPixel(q, r, islandRadius);
 
-    cx += islandSpriteInnerRadius_ + islandSprite_->getWidth() / 2.0;
-    cy += islandSpriteRadius_ + islandSprite_->getHeight() / 2.0;
+    cx += islandInnerRadius + islandSize.getWidth() / 2.0;
+    cy += islandRadius + islandSize.getHeight() / 2.0;
 
-    spriteSize_ = {
-        static_cast<int>(cx),
-        static_cast<int>(cy),
-    };
-    setProportionalSize(size_);
+    spriteSize_ = {static_cast<int>(cx), static_cast<int>(cy)};
+    setProportionalSize(spriteSize_);
 
     if (islands_) {
         delete islands_;
@@ -98,33 +111,43 @@ void GameMap::createSprite() {
 
 void GameMap::refresh()
 {
+    updateNeighbors();
     if (!islands_ || !cells_)
         createSprite();
 
     // Fond uniforme
     islands_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
 
+
+    Size islandSize = Territory::getSpriteSize();
+    double islandInnerRadius = Territory::getInnerRadius();
+    double islandRadius = Territory::getRadius();
     for (int row = 0; row < getHeight(); row++) {
         for (int col = 0; col < getWidth(); col++) {
             Cell* cell = get(row, col);
 
             // Calcul de la position de blit
             auto [q, r] = HexagonUtils::offsetToAxial(col, row);
-            auto [cx, cy] = HexagonUtils::axialToPixel(q, r, islandSpriteRadius_);
+            auto [cx, cy] = HexagonUtils::axialToPixel(q, r, islandRadius);
+            auto pos = Point{
+                static_cast<int>(cx + islandInnerRadius),
+                static_cast<int>(cy + islandRadius)
+            };
 
-            cell->draw(cells_, Point{
-                static_cast<int>(cx + islandSpriteInnerRadius_),
-                static_cast<int>(cy + islandSpriteRadius_)
-            });
+            if (auto* t = dynamic_cast<Territory*>(cell))
+                t->Territory::display(islands_, pos);
 
+            if (cell->getType() == Territory::TYPE) continue;
+
+            if (auto* disp = dynamic_cast<Displayer*>(cell))
+                disp->display(cells_, pos);
+
+
+            /*
             // Dessine ile
             if (!isTerritory(cell)) continue;
 
-            islands_->blit(islandSprite_, Point{
-                static_cast<int>(cx + islandSpriteInnerRadius_ - islandSprite_->getWidth() / 2.0),
-                static_cast<int>(cy + islandSpriteRadius_ - islandSprite_->getHeight() / 2.0)
-            });
-
+            //! set les voisins dans Cell et getNeighbors;
             std::vector<bool> neighbors(4);
             if (row & 1) {
                 neighbors = {
@@ -142,41 +165,21 @@ void GameMap::refresh()
                 };
             }
 
-            if (neighbors[0]) {
-                Texture* linkSprite = neighbors[1] ? islandLink1Sprite_ : islandLink2Sprite_;
-                islands_->blit(linkSprite, Point{
-                    static_cast<int>(cx + islandSpriteInnerRadius_ / 2 - linkSprite->getWidth() / 2.0),
-                    static_cast<int>(cy + islandSpriteRadius_ * 0.25 - linkSprite->getHeight() / 2.0)
-                });
-            }
-            if (neighbors[1]) {
-                Texture* linkSprite = neighbors[2] ? islandLink1Sprite_ : islandLink3Sprite_;
-                islands_->blit(linkSprite, Point{
-                    static_cast<int>(cx - linkSprite->getWidth() / 2.0),
-                    static_cast<int>(cy + islandSpriteRadius_ - linkSprite->getHeight() / 2.0)
-                });
-            }
-            if (neighbors[2]) {
-                Texture* linkSprite = neighbors[3] ? islandLink1Sprite_ : islandLink4Sprite_;
-                islands_->blit(linkSprite, Point{
-                    static_cast<int>(cx + islandSpriteInnerRadius_ / 2 - linkSprite->getWidth() / 2.0),
-                    static_cast<int>(cy + islandSpriteRadius_ * 1.75 - linkSprite->getHeight() / 2.0)
-                });
-            }
+            islandDisplayer_.display(islands_, Point{
+                static_cast<int>(cx + islandInnerRadius_),
+                static_cast<int>(cy + islandRadius_)
+            }, neighbors);*/
         }
     }
 }
-
-bool GameMap::isTerritory(Cell *cell) const {
-    return dynamic_cast<Territory*>(cell);
-}
-
 
 Size GameMap::getSize() const {
     return size_;
 }
 
 void GameMap::setProportionalSize(const Size size) {
+    double islandRadius = Territory::getRadius();
+
     // Get ratio
     double ratioW = static_cast<double>(size.getWidth()) / spriteSize_.getWidth();
     double ratioH = static_cast<double>(size.getHeight()) / spriteSize_.getHeight();
@@ -184,23 +187,8 @@ void GameMap::setProportionalSize(const Size size) {
 
     // Calculate proportionnal destination
     size_ = spriteSize_ * ratio;
-    hexagonRadius_ = islandSpriteRadius_ * ratio;
+    hexagonRadius_ = islandRadius * ratio;
     innerHexagonRadius_ = std::sqrt(3) * hexagonRadius_ / 2.0;
-}
-
-void GameMap::drawNgon(const SDL_Color &color, int n, double rad,
-                       const std::pair<double, double> &position, int width) const
-{
-    std::vector<Sint16> vx(n), vy(n);
-    for (int i = 0; i < n; ++i) {
-        double angle = M_PI_2 + (static_cast<double>(i) / n) * (2 * M_PI);
-        vx[i] = static_cast<Sint16>(std::round(std::cos(angle) * rad + position.first));
-        vy[i] = static_cast<Sint16>(std::round(std::sin(angle) * rad + position.second));
-    }
-
-    polygonRGBA(renderer_, vx.data(), vy.data(), n, color.r, color.g, color.b, color.a);
-    for (int w = 1; w < width; ++w)
-        polygonRGBA(renderer_, vx.data(), vy.data(), n, color.r, color.g, color.b, color.a);
 }
 
 void GameMap::draw(const Point& pos)
@@ -223,9 +211,6 @@ void GameMap::draw(const Point& pos)
         int h = static_cast<int>(ratio * selectSprite_->getHeight());
 
         SDL_RenderCopy(renderer_, selectSprite_->get(), nullptr, new SDL_Rect{static_cast<int>(x -  w/2), static_cast<int>(y - h/2), w, h});
-
-        // Dessiner un contour épais en jaune
-        //!drawNgon(ColorUtils::YELLOW, 6, hexagonRadius_, {x, y}, 3);
     }
 }
 

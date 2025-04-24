@@ -21,7 +21,7 @@ Window::Window(const char* title, int width, int height) : initialized_(false) {
     
 
     // Init Renderer
-    renderer_.reset(SDL_CreateRenderer(SDLWindow_.get(), -1, SDL_RENDERER_ACCELERATED));
+    renderer_.reset(SDL_CreateRenderer(SDLWindow_.get(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC));
     if (!renderer_) {
         SDL_DestroyWindow(SDLWindow_.get());
         SDL_Quit();

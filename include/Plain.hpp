@@ -8,15 +8,17 @@
 
 class Plain: public Territory {
 public:
+    static const std::string TYPE;
+
     Plain();
 
-    void handleEvents(SDL_Event &event) override;
-    void draw(Texture* texture, const Point& pos) override;
+    const std::string getType() override;
+    void display(const Texture* target, const Point& pos) override;
 
     static void init();
 
 protected:
-    static Texture* sprite_;
+    static HexagonDisplayer displayer_;
 };
 
 #endif

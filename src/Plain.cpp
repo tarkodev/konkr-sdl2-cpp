@@ -2,45 +2,27 @@
 #include "Cell.hpp"
 #include "ColorUtils.hpp"
 
-Texture* Plain::sprite_ = nullptr;
+HexagonDisplayer Plain::displayer_ = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
+
+const std::string Plain::TYPE = "Plain";
+const std::string Plain::getType() {
+    return Plain::TYPE;
+}
 
 Plain::Plain() {}
 
 void Plain::init() {
-    if (!Territory::sprite_)
-        std::runtime_error("Territory not initialized");
-        
-    sprite_ = Territory::sprite_->copy();
-    sprite_->colorize(ColorUtils::GREEN);
+    displayer_ = plateDisplayer.copy();
+    displayer_.colorize(ColorUtils::GREEN);
 }
 
-void Plain::handleEvents(SDL_Event &event) {
-
-}
-
-void Plain::draw(Texture* texture, const Point& pos) {
-    texture->blit(sprite_, Point{
-        static_cast<int>(pos.getX() - sprite_->getWidth() / 2.0),
-        static_cast<int>(pos.getY() - sprite_->getHeight() / 2.0)
-    });
-}
-
-
-//! A voir si garder (gardé pour mettre dans les sous-classes)
-/*
-void Plain::handleEvents() {}
-
-void Plain::draw(SDL_Point& pos) {
-    SDL_Texture* sprite = owner_ ? owner_->getHexagonSprite() : sprite_;
-    SDL_Rect size = owner_ ? owner_->getHexagonSize() : spriteSize_;
-
-    SDL_Rect dest = {
-        pos.x,
-        pos.y,
-        size.w,
-        size.h
+void Plain::display(const Texture* target, const Point& pos) {
+    std::vector<bool> PlainNeighbors{
+        neighbors[0] && neighbors[0]->getType() == Plain::TYPE,
+        neighbors[1] && neighbors[1]->getType() == Plain::TYPE,
+        neighbors[2] && neighbors[2]->getType() == Plain::TYPE,
+        neighbors[3] && neighbors[3]->getType() == Plain::TYPE
     };
 
-    SDL_RenderCopy(renderer_, sprite, &size, &dest);
+    displayer_.display(target, pos, PlainNeighbors);
 }
-*/

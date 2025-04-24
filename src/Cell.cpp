@@ -2,25 +2,15 @@
 
 SDL_Renderer* Cell::renderer_ = nullptr;
 
+const std::string Cell::TYPE = "Cell";
+const std::string Cell::getType() {
+    return Cell::TYPE;
+}
+
 void Cell::init(SDL_Renderer *renderer) {
     renderer_ = renderer;
 }
 
-//! A voir si garder (gardé pour mettre dans les sous-classes)
-/*
-void Cell::handleEvents() {}
-
-void Cell::draw(SDL_Point& pos) {
-    SDL_Texture* sprite = owner_ ? owner_->getHexagonSprite() : sprite_;
-    SDL_Rect size = owner_ ? owner_->getHexagonSize() : spriteSize_;
-
-    SDL_Rect dest = {
-        pos.x,
-        pos.y,
-        size.w,
-        size.h
-    };
-
-    SDL_RenderCopy(renderer_, sprite, &size, &dest);
+void Cell::setNeighbors(std::vector<Cell*> cellNeighbors) {
+    neighbors = cellNeighbors;
 }
-*/

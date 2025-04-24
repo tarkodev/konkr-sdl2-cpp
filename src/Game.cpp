@@ -55,7 +55,7 @@ Game::Game()
     map_->set(11, 10, new Plain());
     map_->set(13, 10, new Plain());
     map_->set(13, 11, new Plain());
-
+    
     map_->refresh();
 
 }
