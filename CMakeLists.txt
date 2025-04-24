@@ -74,6 +74,7 @@ set(SRC_FILES
     "${CMAKE_SOURCE_DIR}/src/Territory.cpp"
     "${CMAKE_SOURCE_DIR}/src/PlayerTerritory.cpp"
     "${CMAKE_SOURCE_DIR}/src/Plain.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Forest.cpp"
     "${CMAKE_SOURCE_DIR}/src/HexagonDisplayer.cpp"
     "${CMAKE_SOURCE_DIR}/src/HexagonGrid.tpp"
     "${CMAKE_SOURCE_DIR}/src/GameMap.cpp"

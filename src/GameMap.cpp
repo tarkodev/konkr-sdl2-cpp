@@ -6,6 +6,7 @@
 #include "Sea.hpp"
 #include "Territory.hpp"
 #include "Plain.hpp"
+#include "Forest.hpp"
 #include "RenderTargetGuard.hpp"
 #include "Rect.hpp"
 #include "Point.hpp"
@@ -14,9 +15,10 @@
 #include <cmath>
 #include <vector>
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <cctype>
 
-
-//! ? Renomer GameMap en CellGrid ?
 
 SDL_Renderer* GameMap::renderer_ = nullptr;
 Texture* GameMap::selectSprite_ = nullptr;
@@ -27,23 +29,119 @@ GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize)
 {
     for (int row = 0; row < getHeight(); row++) {
         for (int col = 0; col < getWidth(); col++) {
-            int v = std::rand() % 3;
+            int v = std::rand() % 4;
             if (v == 0)
                 set(col, row, new Territory());
             else if (v == 1)
                 set(col, row, new Sea());
             else if (v == 2)
                 set(col, row, new Plain());
+            else if (v == 3)
+                set(col, row, new Forest());
         }
     }
     refresh();
 }
 
 GameMap::GameMap(const Size size, const std::string mapFile)
-    : size_{size}, HexagonGrid<Cell*>(mapFile)
+  : GameMap(size, detectMapSize(mapFile), mapFile)
+{}
+
+GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize, const std::string mapFile)
+    : size_{size}, HexagonGrid<Cell*>(gridSize, nullptr)
 {
+    std::ifstream in(mapFile);
+    if (!in)
+        throw std::runtime_error("Impossible d'ouvrir le fichier de map: " + mapFile);
+
+    int row = 0;
+    std::string line;
+    while (std::getline(in, line) && row < getHeight()) {
+        if (line.empty()) continue;
+
+        std::istringstream iss(line);
+        std::string token;
+        int col = 0;
+
+        while (iss >> token && col < getWidth()) {
+            Cell* cell = nullptr;
+            char sym = token[0];
+
+            switch (sym) {
+                case 'T':
+                    cell = new Territory();
+                    break;
+                case 'P':
+                    cell = new Plain();
+                    break;
+                case 'F':
+                    cell = new Forest();
+                    break;
+                case 'S':
+                    cell = new Sea();
+                    break;
+                default:
+                    if (std::isdigit(sym)) {
+                        // ex: "1H", "2V", etc.
+                        int playerId = sym - '0';
+                        char unitType = token.size() > 1 ? token[1] : '.';
+                        // Pour l'instant, on place une Territory et on pourrait y attacher l'unité
+                        cell = new Territory();
+                        // TODO : créer et associer l'unité (playerId, unitType) à cette cell
+                    }
+                    break;
+            }
+
+            if (!cell) {
+                // Jeton inconnu -> par défaut Sea
+                cell = new Sea();
+            }
+
+            set(row, col, cell);
+            ++col;
+        }
+        ++row;
+    }
+
+    if (row != getHeight()) {
+        throw std::runtime_error("Le fichier de map n'a pas assez de lignes (attendu " +
+                                 std::to_string(getHeight()) + ")");
+    }
+
+    // Une fois la grille initialisée, on crée les textures / voisins / etc.
     refresh();
 }
+
+std::pair<int,int> GameMap::detectMapSize(const std::string& mapFile) {
+    std::ifstream in(mapFile);
+    if (!in)
+        throw std::runtime_error("Impossible d'ouvrir le fichier de map: " + mapFile);
+
+    int maxWidth = 0;
+    int height   = 0;
+    std::string line;
+
+    while (std::getline(in, line)) {
+        // Supprime les espaces en début/fin
+        auto first = line.find_first_not_of(" \t\r\n");
+        if (first == std::string::npos) continue;  // ligne vide ou que des espaces
+        auto last  = line.find_last_not_of(" \t\r\n");
+        std::string trimmed = line.substr(first, last - first + 1);
+
+        // Compte les jetons séparés par des espaces
+        std::istringstream iss(trimmed);
+        int tokens = 0;
+        std::string tok;
+        while (iss >> tok) {
+            ++tokens;
+        }
+        maxWidth = std::max(maxWidth, tokens);
+        ++height;
+    }
+
+    return { maxWidth, height };
+}
+
 
 void GameMap::init(SDL_Renderer *renderer) {
     renderer_ = renderer;

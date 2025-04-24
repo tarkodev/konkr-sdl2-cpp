@@ -6,6 +6,7 @@
 #include "Territory.hpp"
 #include "PlayerTerritory.hpp"
 #include "Plain.hpp"
+#include "Forest.hpp"
 #include <iostream>
 #include <stdexcept>
 
@@ -25,19 +26,21 @@ Game::Game()
     Cell::init(renderer_);
     Territory::init();
     Plain::init();
+    Forest::init();
 
     GameMap::init(renderer_);
 
     // Create map
-    map_.emplace(windowSize_ * 0.75, gridSize_);
+    //map_.emplace(windowSize_ * 0.75, gridSize_);
+    map_.emplace(windowSize_ * 0.75, "../assets/map/map1");
 
     Size mapRealSize = map_->getSize();
     mapPos_ = {(windowSize_.getWidth() - mapRealSize.getWidth()) / 2, (windowSize_.getHeight() - mapRealSize.getHeight()) / 2};
 
+    //map_->set(0, 19, new Forest());
 
-    // Create Players
-    //Player p2(renderer_, ColorUtils::BLUE);
 
+    /*
     map_->set(2, 2, new Sea());
     map_->set(2, 3, new Sea());
     map_->set(1, 2, new Sea());
@@ -56,6 +59,7 @@ Game::Game()
     map_->set(3, 11, new PlayerTerritory(&p2_));
 
     map_->refresh();
+    */
 
 }
 
