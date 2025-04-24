@@ -1,6 +1,7 @@
 #ifndef HEXAGONDISPLAYER_HPP
 #define HEXAGONDISPLAYER_HPP
 
+#include <vector>
 #include "SDL.h"
 #include "Texture.hpp"
 #include "Displayer.hpp"
