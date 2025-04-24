@@ -4,6 +4,7 @@
 #include "Texture.hpp"
 #include "Sea.hpp"
 #include "Territory.hpp"
+#include "PlayerTerritory.hpp"
 #include "Plain.hpp"
 #include <iostream>
 #include <stdexcept>
@@ -21,10 +22,11 @@ Game::Game()
     windowSize_ = window_->getSize();
 
     // Set texture in Cell
-    GameMap::init(renderer_);
     Cell::init(renderer_);
     Territory::init();
     Plain::init();
+
+    GameMap::init(renderer_);
 
     // Create map
     map_.emplace(windowSize_ * 0.75, gridSize_);
@@ -34,7 +36,6 @@ Game::Game()
 
 
     // Create Players
-    //Player p1(renderer_, ColorUtils::RED);
     //Player p2(renderer_, ColorUtils::BLUE);
 
     map_->set(2, 2, new Sea());
@@ -42,20 +43,18 @@ Game::Game()
     map_->set(1, 2, new Sea());
     map_->set(3, 3, new Sea());
 
+    map_->set(12, 8, new PlayerTerritory(&p1_));
+    map_->set(12, 9, new PlayerTerritory(&p1_));
+    map_->set(11, 8, new PlayerTerritory(&p1_));
+    map_->set(11, 9, new PlayerTerritory(&p1_));
+    map_->set(13, 8, new PlayerTerritory(&p1_));
 
-    map_->set(12, 8, new Plain());
-    map_->set(12, 9, new Plain());
-    map_->set(11, 8, new Plain());
-    map_->set(11, 9, new Plain());
-    map_->set(13, 8, new Plain());
-    map_->set(14, 7, new Plain());
-    map_->set(14, 8, new Plain());
-    map_->set(15, 9, new Plain());
-    map_->set(12, 7, new Plain());
-    map_->set(11, 10, new Plain());
-    map_->set(13, 10, new Plain());
-    map_->set(13, 11, new Plain());
-    
+    map_->set(3, 14, new PlayerTerritory(&p2_));
+    map_->set(3, 15, new PlayerTerritory(&p2_));
+    map_->set(2, 13, new PlayerTerritory(&p2_));
+    map_->set(3, 12, new PlayerTerritory(&p2_));
+    map_->set(3, 11, new PlayerTerritory(&p2_));
+
     map_->refresh();
 
 }
@@ -112,8 +111,8 @@ void Game::handleEvents() {
             };
 
             map_->selectHexagon({
-                event.wheel.x - mapPos_.getX(), 
-                event.wheel.y - mapPos_.getY()
+                event.wheel.mouseX - mapPos_.getX(), 
+                event.wheel.mouseY - mapPos_.getY()
             });
             break;
         }

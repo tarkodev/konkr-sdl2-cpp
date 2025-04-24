@@ -5,23 +5,24 @@
 #include <memory>
 #include "Texture.hpp"
 #include "SDL2/SDL_image.h"
+#include "HexagonDisplayer.hpp"
 
 class Player {
 public:
-    Player(SDL_Color color);
+    Player(const std::string& name_, const SDL_Color& color);
     ~Player();
 
-    Texture* getHexagonSprite() const;
+    SDL_Color& getColor();
 
-    static void init(SDL_Renderer* renderer, Texture* plate);
+    HexagonDisplayer& getPlateDisplayer();
+    void setPlateDisplayer(HexagonDisplayer& plateDisplayer);
+    bool hasPlate() const;
 
 private:
-    static SDL_Renderer *renderer_;
-    static Texture* sprite_;
-
-    std::string name = "Joueur"; //! temp
+    HexagonDisplayer plateDisplayer_ = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
+    std::string name_;
     SDL_Color color_;
-    Texture* plate_;
+    bool hasPlate_ = false;
 };
 
 #endif

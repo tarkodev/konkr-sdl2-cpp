@@ -6,6 +6,7 @@
 #include "ColorUtils.hpp"
 #include "GameMap.hpp"
 #include "Window.hpp"
+#include "Player.hpp"
 
 class Game {
 public:
@@ -47,6 +48,10 @@ private:
 
     // Map of game
     std::optional<GameMap> map_;
+
+    Player p1_{"Jean", ColorUtils::RED};
+    Player p2_{"Théo", ColorUtils::BLUE};
+    Player p3_{"Kevin", ColorUtils::LIGHT_GOLDENROD_YELLOW};
 };
 
 #endif

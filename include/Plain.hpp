@@ -1,7 +1,7 @@
 #ifndef PLAIN_HPP
 #define PLAIN_HPP
 
-#include <SDL.h>
+#include "SDL.h"
 #include "Texture.hpp"
 #include "Player.hpp"
 #include "Territory.hpp"
@@ -18,7 +18,7 @@ public:
     static void init();
 
 protected:
-    static HexagonDisplayer displayer_;
+    static HexagonDisplayer displayer;
 };
 
 #endif

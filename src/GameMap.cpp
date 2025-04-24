@@ -117,6 +117,7 @@ void GameMap::refresh()
 
     // Fond uniforme
     islands_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
+    cells_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
 
 
     Size islandSize = Territory::getSpriteSize();
@@ -141,34 +142,6 @@ void GameMap::refresh()
 
             if (auto* disp = dynamic_cast<Displayer*>(cell))
                 disp->display(cells_, pos);
-
-
-            /*
-            // Dessine ile
-            if (!isTerritory(cell)) continue;
-
-            //! set les voisins dans Cell et getNeighbors;
-            std::vector<bool> neighbors(4);
-            if (row & 1) {
-                neighbors = {
-                    row > 0 && isTerritory(get(row-1, col)),
-                    col > 0 && isTerritory(get(row, col-1)),
-                    row+1 < getHeight() && isTerritory(get(row+1, col)),
-                    row+1 < getHeight() && col+1 < getWidth() && isTerritory(get(row+1, col+1))
-                };
-            } else {
-                neighbors = {
-                    row > 0 && col > 0 && isTerritory(get(row-1, col-1)),
-                    col > 0 && isTerritory(get(row, col-1)),
-                    row+1 < getHeight() && col > 0 && isTerritory(get(row+1, col-1)),
-                    row+1 < getHeight() && isTerritory(get(row+1, col))
-                };
-            }
-
-            islandDisplayer_.display(islands_, Point{
-                static_cast<int>(cx + islandInnerRadius_),
-                static_cast<int>(cy + islandRadius_)
-            }, neighbors);*/
         }
     }
 }

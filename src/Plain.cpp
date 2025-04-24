@@ -2,7 +2,7 @@
 #include "Cell.hpp"
 #include "ColorUtils.hpp"
 
-HexagonDisplayer Plain::displayer_ = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
+HexagonDisplayer Plain::displayer = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
 
 const std::string Plain::TYPE = "Plain";
 const std::string Plain::getType() {
@@ -12,8 +12,8 @@ const std::string Plain::getType() {
 Plain::Plain() {}
 
 void Plain::init() {
-    displayer_ = plateDisplayer.copy();
-    displayer_.colorize(ColorUtils::GREEN);
+    displayer = plateDisplayer.copy();
+    displayer.colorize(ColorUtils::GREEN);
 }
 
 void Plain::display(const Texture* target, const Point& pos) {
@@ -24,5 +24,5 @@ void Plain::display(const Texture* target, const Point& pos) {
         neighbors[3] && neighbors[3]->getType() == Plain::TYPE
     };
 
-    displayer_.display(target, pos, PlainNeighbors);
+    displayer.display(target, pos, PlainNeighbors);
 }
