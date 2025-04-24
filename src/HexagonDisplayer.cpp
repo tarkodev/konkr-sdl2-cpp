@@ -17,7 +17,7 @@ HexagonDisplayer::~HexagonDisplayer()
 {}
 
 
-const Size& HexagonDisplayer::getSize() const {
+const Size HexagonDisplayer::getSize() const {
     return hexagon_->getSize();
 }
 

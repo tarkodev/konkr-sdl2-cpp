@@ -18,7 +18,7 @@ public:
 
     ~HexagonDisplayer();
 
-    const Size& getSize() const override;
+    const Size getSize() const override;
     void display(const Texture* target, const Point& pos) override;
 
     void display(const Texture* target, const Point& pos, const std::vector<bool>& neighbors);

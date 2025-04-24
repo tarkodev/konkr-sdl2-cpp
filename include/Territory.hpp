@@ -12,7 +12,7 @@ public:
     static const std::string TYPE;
 
     static void init();
-    static const Size& getSpriteSize();
+    static const Size getSpriteSize();
     static const int getRadius();
     static const int getInnerRadius();
 
@@ -21,7 +21,7 @@ public:
 
     const std::string getType() override;
     void display(const Texture* target, const Point& pos) override;
-    const Size& getSize() const override;
+    const Size getSize() const override;
 
 protected:
     static HexagonDisplayer plateDisplayer;

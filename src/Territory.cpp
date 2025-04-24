@@ -40,7 +40,7 @@ void Territory::init() {
     plateDisplayer = HexagonDisplayer{renderer_, islandRadius_, plate, plateLink, plateLinkBottomLeft, plateLinkBottom, plateLinkBottomRight};
 }
 
-const Size& Territory::getSpriteSize() {
+const Size Territory::getSpriteSize() {
     return islandDisplayer_.getSize();
 }
 
@@ -66,6 +66,6 @@ void Territory::display(const Texture* target, const Point& pos) {
     islandDisplayer_.display(target, pos, TerritoryNeighbors);
 }
 
-const Size& Territory::getSize() const {
+const Size Territory::getSize() const {
     return getSpriteSize();
 }
