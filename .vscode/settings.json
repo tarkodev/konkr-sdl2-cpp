@@ -59,6 +59,8 @@
         "variant": "cpp",
         "algorithm": "cpp",
         "*.tpp": "cpp",
-        "__config": "cpp"
+        "__config": "cpp",
+        "fstream": "cpp",
+        "iomanip": "cpp"
     }
 }

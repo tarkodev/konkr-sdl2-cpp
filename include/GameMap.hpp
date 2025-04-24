@@ -22,6 +22,7 @@ class GameMap : public HexagonGrid<Cell*> {
 public:
     GameMap(const Size size, const std::pair<int, int>& gridSize);
     GameMap(const Size size, const std::string mapFile);
+    GameMap(const Size size, const std::pair<int, int>& gridSize, const std::string mapFile);
 
 
     Size getSize() const;
@@ -40,6 +41,7 @@ private:
     static SDL_Renderer* renderer_;
     static Texture* selectSprite_;
 
+    std::pair<int,int> detectMapSize(const std::string& mapFile);
     void updateNeighbors();
     void createSprite();
 

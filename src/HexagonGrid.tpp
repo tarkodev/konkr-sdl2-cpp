@@ -15,15 +15,6 @@ HexagonGrid<T>::HexagonGrid(const std::pair<int, int>& size, const T& defaultVal
 {}
 
 template<typename T>
-HexagonGrid<T>::HexagonGrid(const std::string gridFile)
-{
-    width_ = 6;
-    height_ = 6;
-    grid_ = std::vector<T>(width_ * height_, T());
-    //! A écrire
-}
-
-template<typename T>
 T HexagonGrid<T>::get(int x, int y) const {
     if (x < 0 || x >= width_ || y < 0 || y >= height_)
         throw std::out_of_range("Indice de cellule hors limite");

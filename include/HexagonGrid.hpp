@@ -25,12 +25,6 @@ public:
      * @param defaultValue Valeur par défaut pour chaque cellule.
      */
     HexagonGrid(const std::pair<int, int>& size, const T& defaultValue = T());
-    
-    /**
-     * @brief Constructeur.
-     * @param gridFile Fichier de la grille.
-     */
-    HexagonGrid(const std::string gridFile);
 
     int getWidth() const { return width_; }
     int getHeight() const { return height_; }
