@@ -48,8 +48,4 @@ void PlayerTerritory::display(const Texture* target, const Point& pos) {
 
         owner_->getPlateDisplayer().display(target, pos, PlayerTerritoryNeighbors);
     }
-
-    //! blit sur une autre surface: faire (dans GameMap) "if (cell->hasElement) cell->getElement()->display(target, pos)"
-    if (element)
-        element->display(target, pos);
 }

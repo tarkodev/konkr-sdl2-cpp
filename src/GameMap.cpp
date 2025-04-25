@@ -185,8 +185,7 @@ void GameMap::loadMap(const std::string& mapFile) {
                 case 'A': {
                     gameElt = new Camp();
                     PlayableTerritory* t = dynamic_cast<PlayableTerritory*>(cell);
-                    if (t && cellType == 'T')
-                        t->setElement(gameElt);
+                    if (t && cellType == 'T') t->setElement(gameElt);
                     break;
                 }
 
@@ -287,15 +286,27 @@ void GameMap::createSprite() {
     islands_ = new Texture(renderer_, spriteSize_);
     islands_->convertAlpha();
 
+
     // Delete cells sprite if already exists
     if (cells_) {
         delete cells_;
         cells_ = nullptr;
     }
 
-    // Create sprite for cells
+    // Create sprite for elements
     cells_ = new Texture(renderer_, spriteSize_);
     cells_->convertAlpha();
+
+
+    // Delete elements sprite if already exists
+    if (elements_) {
+        delete elements_;
+        elements_ = nullptr;
+    }
+
+    // Create sprite for elements
+    elements_ = new Texture(renderer_, spriteSize_);
+    elements_->convertAlpha();
 }
 
 void GameMap::refresh()
@@ -304,12 +315,14 @@ void GameMap::refresh()
     updateNeighbors();
 
     // Create sprite of map if isn't exists
-    if (!islands_ || !cells_)
+    if (!islands_ || !cells_ || !elements_)
         createSprite();
 
     // Draw transparent background
+    //! faire un calc général qui est refresh à chaque changement d'un de ces troiq calques et qui est blit directement (cela permettra de diviser par 3 le nombre de blit)
     islands_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
     cells_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
+    elements_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
 
     // Get utils dimensions
     Size islandSize = Territory::getIslandSize();
@@ -335,6 +348,11 @@ void GameMap::refresh()
 
             if (auto* disp = dynamic_cast<Displayer*>(cell))
                 disp->display(cells_, pos);
+
+            if (auto* pt = dynamic_cast<PlayableTerritory*>(cell)) {
+                if (auto* elt = pt->getElement())
+                    elt->display(elements_, pos);
+            }
         }
     }
 }
@@ -365,6 +383,7 @@ void GameMap::draw(const Point& pos)
     Rect dest = {pos, size_};
     SDL_RenderCopy(renderer_, islands_->get(), nullptr, &dest.get());
     SDL_RenderCopy(renderer_, cells_->get(), nullptr, &dest.get());
+    SDL_RenderCopy(renderer_, elements_->get(), nullptr, &dest.get());
 
     if (selectedHexagon_.has_value()) {
         auto [q, r] = HexagonUtils::offsetToAxial(selectedHexagon_->getX(), selectedHexagon_->getY());
