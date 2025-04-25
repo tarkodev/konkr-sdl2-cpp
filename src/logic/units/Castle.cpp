@@ -1,27 +1,27 @@
-#include "logic/units/Town.hpp"
+#include "logic/units/Castle.hpp"
 #include "Texture.hpp"
 
-Texture* Town::sprite_ = nullptr;
-Size     Town::spriteSize_{12,12};
+Texture* Castle::sprite_ = nullptr;
+Size     Castle::spriteSize_{12,12};
 
-Town::Town(Player* owner)
+Castle::Castle(Player* owner)
     : Building(STRENGTH, COST, UPKEEP, owner) {}
 
-void Town::onTurnStart()
+void Castle::onTurnStart()
 {
     // TODO : ajouter les pièces à la province
 }
 
-void Town::display(const Texture* target, const Point& pos)
+void Castle::display(const Texture* target, const Point& pos)
 {
     if (!sprite_) return;
     target->blit(sprite_, Point{pos.getX()-sprite_->getWidth()/2,
                                 pos.getY()-sprite_->getHeight()/2});
 }
 
-void Town::init(SDL_Renderer* renderer)
+void Castle::init(SDL_Renderer* renderer)
 {
     if (sprite_) return;
-    sprite_ = new Texture(renderer, "../assets/img/town.png");
+    sprite_ = new Texture(renderer, "../assets/img/castle.png");
     spriteSize_ = sprite_->getSize();
 }

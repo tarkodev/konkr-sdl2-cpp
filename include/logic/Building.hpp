@@ -1,8 +1,7 @@
-// logic/Building.hpp
-#ifndef BUILDING_HPP
-#define BUILDING_HPP
+#ifndef LOGIC_BUILDING_HPP
+#define LOGIC_BUILDING_HPP
 
-#include "GameElement.hpp"
+#include "logic/GameElement.hpp"
 
 /**
  * @brief Bâtiment statique (Town, Castle, Camp…).
@@ -12,8 +11,7 @@ public:
     using GameElement::GameElement;
     ~Building() override = default;
 
-    /* Les bâtiments ne bougent pas */
-    void display(const Texture* target, const Point& pos) override = 0;
+    /* Les bâtiments ne bougent pas → ne dérivent pas de Movable. */
 };
 
 #endif

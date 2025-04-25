@@ -1,15 +1,15 @@
-#ifndef UNIT_VILLAGER_HPP
-#define UNIT_VILLAGER_HPP
+#ifndef UNIT_KNIGHT_HPP
+#define UNIT_KNIGHT_HPP
 
 #include "logic/Troop.hpp"
 
-class Villager : public Troop {
+class Knight : public Troop {
 public:
-    static constexpr int STRENGTH = 1;
-    static constexpr int COST     = 10;
-    static constexpr int UPKEEP   = 2;
+    static constexpr int STRENGTH = 3;
+    static constexpr int COST     = 40;
+    static constexpr int UPKEEP   = 18;
 
-    explicit Villager(Player* owner = nullptr);
+    explicit Knight(Player* owner = nullptr);
 
     void display(const Texture* target, const Point& pos) override;
     const Size getSize() const override { return spriteSize_; }

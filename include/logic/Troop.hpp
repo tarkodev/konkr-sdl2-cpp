@@ -1,28 +1,22 @@
-#ifndef TROOP_HPP
-#define TROOP_HPP
+#ifndef LOGIC_TROOP_HPP
+#define LOGIC_TROOP_HPP
 
-#include "GameElement.hpp"
-#include "Movable.hpp"
+#include "logic/GameElement.hpp"
+#include "logic/Movable.hpp"
 
 /**
- * @brief Unité mobile (Villager, Pikeman, Knight, Hero, Bandit).
+ * @brief Unité mobile contrôlée (ou non) par le joueur.
  */
 class Troop : public GameElement, public Movable {
 public:
-    Troop(int strength,
-           int cost,
-           int upkeep,
-           Player* owner = nullptr);
+    Troop(int strength, int cost, int upkeep, Player* owner = nullptr);
 
-    int  getUpkeep() const { return upkeep_; }
-
-    /* --- Implémentation Movable minimale --- */
+    /* --- Movable --- */
     Point getPosition() const override { return position_; }
-    bool  moveTo(const Point& dest) override;   ///< déplacement “brut” pour l’instant
+    bool  moveTo(const Point& dest) override;
 
 protected:
-    int upkeep_;
-    Point position_{-1,-1};   ///< position courante
+    Point position_{-1, -1};   ///< position (col,row) offset
 };
 
 #endif
