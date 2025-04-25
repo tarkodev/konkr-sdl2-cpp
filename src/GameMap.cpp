@@ -13,6 +13,14 @@
 #include "Rect.hpp"
 #include "Point.hpp"
 #include "DrawUtils.hpp"
+#include "logic/units/Bandit.hpp"
+#include "logic/units/Town.hpp"
+#include "logic/units/Castle.hpp"
+#include "logic/units/Camp.hpp"
+#include "logic/units/Villager.hpp"
+#include "logic/units/Pikeman.hpp"
+#include "logic/units/Knight.hpp"
+#include "logic/units/Hero.hpp"
 
 #include <cmath>
 #include <vector>
@@ -115,19 +123,27 @@ void GameMap::loadMap(const std::string& mapFile) {
             char cellType = token[0];
             Cell* cell = nullptr;
             switch (cellType) {
-                case 'T':
+                case 'T': {
                     cell = new PlayerTerritory();
                     break;
-                case 'P':
+                }
+
+                case 'P': {
                     cell = new Plain();
                     break;
-                case 'F':
+                }
+
+                case 'F': {
                     cell = new Forest();
                     break;
-                case 'S':
+                }
+
+                case 'S': {
                     cell = new Sea();
                     break;
-                default:
+                }
+
+                default: {
                     if (!std::isdigit(cellType))
                         throw std::runtime_error("Caractère inattendu: " + std::to_string(cellType));
 
@@ -138,52 +154,69 @@ void GameMap::loadMap(const std::string& mapFile) {
 
                     cell = new PlayerTerritory(players[playerId]);
                     break;
+                }
             }
 
             //! décommenter une fois implémenté
             char gameEltType = token[1];
             GameElement* gameElt = nullptr;
             switch (gameEltType) {
-                case 'B':
-                    // gameElt = new Bandit();
-                    // if (cellType != 'S' && cellType != 'F')
-                    //     dynamic_cast<PlayableTerritory*>(cell)->setElement(gameElt);
+                case 'B': {
+                    gameElt = new Bandit();
+                    if (cellType != 'S' && cellType != 'F')
+                        dynamic_cast<PlayableTerritory*>(cell)->setElement(gameElt);
                     break;
-                case 'T':
-                    // gameElt = new Town();
-                    // PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
-                    // if (t) t->setElement(gameElt);
+                }
+
+                case 'T': {
+                    gameElt = new Town();
+                    PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
+                    if (t) t->setElement(gameElt);
                     break;
-                case 'C':
-                    // gameElt = new Castle();
-                    // PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
-                    // if (t) t->setElement(gameElt);
+                }
+
+                case 'C': {
+                    gameElt = new Castle();
+                    PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
+                    if (t) t->setElement(gameElt);
                     break;
-                case 'A':
-                    // gameElt = new Camp();
-                    // if (cellType == 'T')
-                    //     dynamic_cast<PlayerTerritory*>(cell)->setElement(gameElt);
+                }
+
+                case 'A': {
+                    gameElt = new Camp();
+                    if (cellType == 'T')
+                        dynamic_cast<PlayerTerritory*>(cell)->setElement(gameElt);
                     break;
-                case 'V':
-                    // gameElt = new Villager();
-                    // PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
-                    // if (t) t->setElement(gameElt);
+                }
+
+                case 'V': {
+                    gameElt = new Villager();
+                    PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
+                    if (t) t->setElement(gameElt);
                     break;
-                case 'P':
-                    // gameElt = new Pikeman();
-                    // PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
-                    // if (t) t->setElement(gameElt);
+                }
+
+                case 'P': {
+                    gameElt = new Pikeman();
+                    PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
+                    if (t) t->setElement(gameElt);
                     break;
-                case 'K':
-                    // gameElt = new Knight();
-                    // PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
-                    // if (t) t->setElement(gameElt);
+                }
+
+                case 'K': {
+                    gameElt = new Knight();
+                    PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
+                    if (t) t->setElement(gameElt);
                     break;
-                case 'H':
-                    // gameElt = new Hero();
-                    // PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
-                    // if (t) t->setElement(gameElt);
+                }
+
+                case 'H': {
+                    gameElt = new Hero();
+                    PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
+                    if (t) t->setElement(gameElt);
                     break;
+                }
+
                 default:
                     break;
             }
@@ -198,7 +231,6 @@ void GameMap::loadMap(const std::string& mapFile) {
     if (y != getHeight())
         throw std::runtime_error("Le fichier de map n'a pas assez de lignes (attendu " + std::to_string(getHeight()) + ")");
 }
-
 
 void GameMap::updateNeighbors() {
     for (int y = 0; y < getHeight(); y++) {
@@ -299,9 +331,6 @@ void GameMap::refresh()
             // Draw island
             if (auto* t = dynamic_cast<Territory*>(cell))
                 t->Territory::display(islands_, pos);
-
-            //! temp (puisque plus aucune cellule ne devrait être juste Territory)
-            if (cell->getType() == Territory::TYPE) continue;
 
             if (auto* disp = dynamic_cast<Displayer*>(cell))
                 disp->display(cells_, pos);

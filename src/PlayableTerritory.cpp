@@ -21,3 +21,11 @@ void PlayableTerritory::init() {
     
     plateDisplayer = HexagonDisplayer{renderer_, islandRadius, plate, plateLink, plateLinkBottomLeft, plateLinkBottom, plateLinkBottomRight};
 }
+
+void PlayableTerritory::setElement(GameElement* elt) {
+    element = elt;
+}
+
+GameElement* PlayableTerritory::getElement() {
+    return element;
+}
