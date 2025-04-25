@@ -12,13 +12,12 @@ public:
     explicit Bandit();
 
     void display(const Texture* target, const Point& pos) override;
-    const Size getSize() const override { return spriteSize_; }
+    const Size getSize() const override { return sprite_->getSize(); }
 
-    static void init(SDL_Renderer* renderer);
+    static void init();
 
 private:
     static Texture* sprite_;
-    static Size     spriteSize_;
 };
 
 #endif

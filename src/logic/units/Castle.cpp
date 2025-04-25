@@ -2,7 +2,6 @@
 #include "Texture.hpp"
 
 Texture* Castle::sprite_ = nullptr;
-Size     Castle::spriteSize_{12,12};
 
 Castle::Castle(Player* owner)
     : Building(STRENGTH, COST, UPKEEP, owner) {}
@@ -19,9 +18,11 @@ void Castle::display(const Texture* target, const Point& pos)
                                 pos.getY()-sprite_->getHeight()/2});
 }
 
-void Castle::init(SDL_Renderer* renderer)
+void Castle::init()
 {
+    if (!renderer)
+        std::runtime_error("GameElement not initialized");
+        
     if (sprite_) return;
     sprite_ = new Texture(renderer, "../assets/img/castle.png");
-    spriteSize_ = sprite_->getSize();
 }

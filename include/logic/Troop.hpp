@@ -15,7 +15,12 @@ public:
     Point getPosition() const override { return position_; }
     bool  moveTo(const Point& dest) override;
 
+    /** Charge le sprite commun à la classe (à appeler une seule fois). */
+    static void init();
+
 protected:
+    static Texture* shadow;
+
     Point position_{-1, -1};   ///< position (col,row) offset
 };
 

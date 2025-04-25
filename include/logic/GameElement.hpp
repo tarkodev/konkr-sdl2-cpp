@@ -42,7 +42,7 @@ protected:
     Player* owner_;
 
     /* --- Ressources graphiques partagées --- */
-    static SDL_Renderer* sRenderer_;
+    static SDL_Renderer* renderer;
 };
 
 #endif

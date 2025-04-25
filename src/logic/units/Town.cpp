@@ -2,7 +2,6 @@
 #include "Texture.hpp"
 
 Texture* Town::sprite_ = nullptr;
-Size     Town::spriteSize_{12,12};
 
 Town::Town(Player* owner)
     : Building(STRENGTH, COST, UPKEEP, owner) {}
@@ -19,9 +18,11 @@ void Town::display(const Texture* target, const Point& pos)
                                 pos.getY()-sprite_->getHeight()/2});
 }
 
-void Town::init(SDL_Renderer* renderer)
+void Town::init()
 {
+    if (!renderer)
+        std::runtime_error("GameElement not initialized");
+
     if (sprite_) return;
     sprite_ = new Texture(renderer, "../assets/img/town.png");
-    spriteSize_ = sprite_->getSize();
 }

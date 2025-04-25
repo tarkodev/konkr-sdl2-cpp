@@ -184,8 +184,9 @@ void GameMap::loadMap(const std::string& mapFile) {
 
                 case 'A': {
                     gameElt = new Camp();
-                    if (cellType == 'T')
-                        dynamic_cast<PlayerTerritory*>(cell)->setElement(gameElt);
+                    PlayableTerritory* t = dynamic_cast<PlayableTerritory*>(cell);
+                    if (t && cellType == 'T')
+                        t->setElement(gameElt);
                     break;
                 }
 

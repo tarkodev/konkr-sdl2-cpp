@@ -38,14 +38,18 @@ Player* PlayerTerritory::getOwner() {
 }
 
 void PlayerTerritory::display(const Texture* target, const Point& pos) {
-    if (!owner_) return;
+    if (owner_) {
+        std::vector<bool> PlayerTerritoryNeighbors{
+            neighbors[0] && neighbors[0]->getType() == PlayerTerritory::TYPE && dynamic_cast<PlayerTerritory*>(neighbors[0])->getOwner() == getOwner(),
+            neighbors[1] && neighbors[1]->getType() == PlayerTerritory::TYPE && dynamic_cast<PlayerTerritory*>(neighbors[1])->getOwner() == getOwner(),
+            neighbors[2] && neighbors[2]->getType() == PlayerTerritory::TYPE && dynamic_cast<PlayerTerritory*>(neighbors[2])->getOwner() == getOwner(),
+            neighbors[3] && neighbors[3]->getType() == PlayerTerritory::TYPE && dynamic_cast<PlayerTerritory*>(neighbors[3])->getOwner() == getOwner()
+        };
 
-    std::vector<bool> PlayerTerritoryNeighbors{
-        neighbors[0] && neighbors[0]->getType() == PlayerTerritory::TYPE && dynamic_cast<PlayerTerritory*>(neighbors[0])->getOwner() == getOwner(),
-        neighbors[1] && neighbors[1]->getType() == PlayerTerritory::TYPE && dynamic_cast<PlayerTerritory*>(neighbors[1])->getOwner() == getOwner(),
-        neighbors[2] && neighbors[2]->getType() == PlayerTerritory::TYPE && dynamic_cast<PlayerTerritory*>(neighbors[2])->getOwner() == getOwner(),
-        neighbors[3] && neighbors[3]->getType() == PlayerTerritory::TYPE && dynamic_cast<PlayerTerritory*>(neighbors[3])->getOwner() == getOwner()
-    };
+        owner_->getPlateDisplayer().display(target, pos, PlayerTerritoryNeighbors);
+    }
 
-    owner_->getPlateDisplayer().display(target, pos, PlayerTerritoryNeighbors);
+    //! blit sur une autre surface: faire (dans GameMap) "if (cell->hasElement) cell->getElement()->display(target, pos)"
+    if (element)
+        element->display(target, pos);
 }

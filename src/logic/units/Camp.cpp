@@ -2,7 +2,6 @@
 #include "Texture.hpp"
 
 Texture* Camp::sprite_ = nullptr;
-Size     Camp::spriteSize_{10,10};
 
 Camp::Camp()
     : Building(STRENGTH, COST, UPKEEP, nullptr) {}
@@ -14,9 +13,11 @@ void Camp::display(const Texture* target, const Point& pos)
                                 pos.getY()-sprite_->getHeight()/2});
 }
 
-void Camp::init(SDL_Renderer* renderer)
+void Camp::init()
 {
+    if (!renderer)
+        std::runtime_error("GameElement not initialized");
+        
     if (sprite_) return;
     sprite_ = new Texture(renderer, "../assets/img/camp.png");
-    spriteSize_ = sprite_->getSize();
 }

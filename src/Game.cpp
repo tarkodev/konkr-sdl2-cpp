@@ -10,6 +10,14 @@
 #include "Forest.hpp"
 #include <iostream>
 #include <stdexcept>
+#include "logic/units/Bandit.hpp"
+#include "logic/units/Town.hpp"
+#include "logic/units/Castle.hpp"
+#include "logic/units/Camp.hpp"
+#include "logic/units/Villager.hpp"
+#include "logic/units/Pikeman.hpp"
+#include "logic/units/Knight.hpp"
+#include "logic/units/Hero.hpp"
 
 #include <memory>
 #include <vector>
@@ -29,6 +37,17 @@ Game::Game()
     PlayableTerritory::init();
     Plain::init();
     Forest::init();
+
+    GameElement::init(renderer_);
+    Troop::init();
+    Bandit::init();
+    Town::init();
+    Castle::init();
+    Camp::init();
+    Villager::init();
+    Pikeman::init();
+    Knight::init();
+    Hero::init();
 
     GameMap::init(renderer_);
 
