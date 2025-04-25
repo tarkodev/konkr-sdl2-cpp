@@ -18,6 +18,7 @@ public:
 
 protected:
     Cell() = default;
+    
     static SDL_Renderer* renderer_;
     
     std::vector<Cell*> neighbors{nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};

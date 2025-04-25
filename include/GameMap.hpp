@@ -38,12 +38,13 @@ public:
     static void init(SDL_Renderer* renderer);
 
 private:
-    GameMap(const Size size, const std::pair<int, int>& gridSize, const std::string mapFile);
-
     static SDL_Renderer* renderer_;
     static Texture* selectSprite_; //!temp
 
-    std::pair<int,int> detectMapSize(const std::string& mapFile);
+    GameMap(const Size size, const std::pair<int, int>& gridSize, const std::string mapFile);
+    void loadMap(const std::string& mapFile);
+    std::pair<int,int> getSizeOfMapFile(const std::string& mapFile);
+
     void updateNeighbors();
     void createSprite();
 

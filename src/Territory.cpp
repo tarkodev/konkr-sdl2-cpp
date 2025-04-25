@@ -1,10 +1,9 @@
 #include "Territory.hpp"
 #include "ColorUtils.hpp"
 
-HexagonDisplayer Territory::islandDisplayer_ = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
-HexagonDisplayer Territory::plateDisplayer = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
-double Territory::islandRadius_ = 0;
-double Territory::islandInnerRadius_ = 0;
+HexagonDisplayer Territory::islandDisplayer = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
+double Territory::islandRadius = 0;
+double Territory::islandInnerRadius = 0;
 
 const std::string Territory::TYPE = "Territory";
 const std::string Territory::getType() {
@@ -23,37 +22,25 @@ void Territory::init() {
     Texture* linkBottomRight = (new Texture(renderer_, "../assets/img/hexagon_link_bottom_right.png"))->convertAlpha();
 
     // Get radius of hexagon of island
-    islandInnerRadius_ = island->getWidth() / 2;
-    islandRadius_ = islandInnerRadius_ * 2 / std::sqrt(3);
+    islandInnerRadius = island->getWidth() / 2;
+    islandRadius = islandInnerRadius * 2 / std::sqrt(3);
 
     // Set displayer of territory
-    islandDisplayer_ = HexagonDisplayer{renderer_, islandRadius_, island, link, linkBottomLeft, linkBottom, linkBottomRight};
-
-
-    // Load plate
-    Texture* plate = (new Texture(renderer_, "../assets/img/plate.png"))->convertAlpha();
-    Texture* plateLink = (new Texture(renderer_, "../assets/img/plate_link.png"))->convertAlpha();
-    Texture* plateLinkBottomLeft = (new Texture(renderer_, "../assets/img/plate_link_bottom_left.png"))->convertAlpha();
-    Texture* plateLinkBottom = (new Texture(renderer_, "../assets/img/plate_link_bottom.png"))->convertAlpha();
-    Texture* plateLinkBottomRight = (new Texture(renderer_, "../assets/img/plate_link_bottom_right.png"))->convertAlpha();
-    
-    plateDisplayer = HexagonDisplayer{renderer_, islandRadius_, plate, plateLink, plateLinkBottomLeft, plateLinkBottom, plateLinkBottomRight};
+    islandDisplayer = HexagonDisplayer{renderer_, islandRadius, island, link, linkBottomLeft, linkBottom, linkBottomRight};
 }
 
-const Size Territory::getSpriteSize() {
-    return islandDisplayer_.getSize();
+const Size Territory::getIslandSize() {
+    return islandDisplayer.getSize();
 }
 
 const int Territory::getRadius() {
-    return islandRadius_;
+    return islandRadius;
 }
 
 const int Territory::getInnerRadius() {
-    return islandInnerRadius_;
+    return islandInnerRadius;
 }
 
-
-Territory::Territory() {}
 
 void Territory::display(const Texture* target, const Point& pos) {
     std::vector<bool> TerritoryNeighbors{
@@ -63,9 +50,9 @@ void Territory::display(const Texture* target, const Point& pos) {
         static_cast<bool>(dynamic_cast<Territory*>(neighbors[3]))
     };
 
-    islandDisplayer_.display(target, pos, TerritoryNeighbors);
+    islandDisplayer.display(target, pos, TerritoryNeighbors);
 }
 
 const Size Territory::getSize() const {
-    return getSpriteSize();
+    return getIslandSize();
 }

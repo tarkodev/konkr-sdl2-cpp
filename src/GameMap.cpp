@@ -26,6 +26,10 @@
 SDL_Renderer* GameMap::renderer_ = nullptr;
 Texture* GameMap::selectSprite_ = nullptr;
 
+void GameMap::init(SDL_Renderer *renderer) {
+    renderer_ = renderer;
+    selectSprite_ = (new Texture(renderer_, "../assets/img/plate.png"))->convertAlpha();
+}
 
 GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize)
     : size_{size}, HexagonGrid<Cell*>(gridSize, nullptr)
@@ -37,7 +41,7 @@ GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize)
         for (int y = 0; y < getHeight(); y++) {
             int v = std::rand() % 4;
             if (v == 0)
-                set(x, y, new Territory());
+                set(x, y, new PlayerTerritory());
             else if (v == 1)
                 set(x, y, new Sea());
             else if (v == 2)
@@ -50,7 +54,7 @@ GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize)
 }
 
 GameMap::GameMap(const Size size, const std::string mapFile)
-  : GameMap(size, detectMapSize(mapFile), mapFile)
+  : GameMap(size, getSizeOfMapFile(mapFile), mapFile)
 {}
 
 GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize, const std::string mapFile)
@@ -59,38 +63,60 @@ GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize, const std
     if (getWidth() < 2 || getHeight() < 2)
         throw std::runtime_error("Une map doit au moins être de taille 2x2.");
 
+    loadMap(mapFile);
+    refresh();
+}
+
+std::pair<int,int> GameMap::getSizeOfMapFile(const std::string& mapFile) {
+    std::ifstream in(mapFile);
+    if (!in) throw std::runtime_error("Impossible d'ouvrir le fichier de map: " + mapFile);
+
+    int width = 0;
+    int height;
+    std::string line;
+
+    for (height = 0; std::getline(in, line); height++) {
+        // Trim
+        auto first = line.find_first_not_of(" \t\r\n");
+        if (first == std::string::npos) continue;
+        auto last  = line.find_last_not_of(" \t\r\n");
+        std::string trimmed = line.substr(first, last - first + 1);
+
+        // Count cells
+        int tokens = 0;
+        std::string tok;
+        std::istringstream iss(trimmed);
+        while (iss >> tok) tokens++;
+
+        width = std::max(width, tokens);
+    }
+
+    return { width, height };
+}
+
+void GameMap::loadMap(const std::string& mapFile) {
     std::ifstream in(mapFile);
     if (!in) throw std::runtime_error("Impossible d'ouvrir le fichier de map.");
 
     std::map<int, Player*> players;
 
-    int row = 0;
+    int y;
     std::string line;
-    while (std::getline(in, line) && row < getHeight()) {
+    for (y = 0; y < getHeight() && std::getline(in, line); y++) {
         if (line.empty()) continue;
 
-        std::istringstream iss(line);
+        int x;
         std::string token;
-        int col = 0;
-
-        while (iss >> token && col < getWidth()) {
+        std::istringstream iss(line);
+        for (x = 0; x < getWidth() && iss >> token; x++) {
             if (token.size() != 2)
                 throw std::runtime_error("Malformation du fichier.");
 
-            Cell* cell = nullptr;
-            GameElement* gameElt = nullptr;
             char cellType = token[0];
-            char gameEltType = token[1];
-
-            //! décommenter une fois implémenté
+            Cell* cell = nullptr;
             switch (cellType) {
                 case 'T':
                     cell = new PlayerTerritory();
-                    if (gameElt/* && gameElt->getType() == Bandit::TYPE*/)
-                        cell = new PlayerTerritory(nullptr/*, gameElt*/);
-                    else
-                        
-
                     break;
                 case 'P':
                     cell = new Plain();
@@ -110,18 +136,18 @@ GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize, const std
                     if (players.find(playerId) == players.end())
                         players[playerId] = new Player(std::string("Player ") + std::to_string(playerId), std::vector{ColorUtils::INDIAN_RED, ColorUtils::MEDIUM_VIOLET_RED, ColorUtils::DARK_ORANGE, ColorUtils::OLIVE_DRAB, ColorUtils::MEDIUM_AQUAMARINE, ColorUtils::STEEL_BLUE, ColorUtils::PLUM, ColorUtils::SADDLE_BROWN, ColorUtils::SEABLUE}[playerId]);
 
-                    if (gameElt/* && gameElt->getType() != Camp::TYPE*/)
-                        cell = new PlayerTerritory(players[playerId]/*, gameElt*/);
-                    else
-                        cell = new PlayerTerritory(players[playerId]);
+                    cell = new PlayerTerritory(players[playerId]);
                     break;
             }
 
+            //! décommenter une fois implémenté
+            char gameEltType = token[1];
+            GameElement* gameElt = nullptr;
             switch (gameEltType) {
                 case 'B':
                     // gameElt = new Bandit();
                     // if (cellType != 'S' && cellType != 'F')
-                    //     dynamic_cast<Territory*>(cell)->setElement(gameElt);
+                    //     dynamic_cast<PlayableTerritory*>(cell)->setElement(gameElt);
                     break;
                 case 'T':
                     // gameElt = new Town();
@@ -162,53 +188,15 @@ GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize, const std
                     break;
             }
 
-            set(row, col, cell);
-            ++col;
+            set(x, y, cell);
         }
-        ++row;
+        
+        for (; x < getWidth(); x++)
+            set(x, y, new Sea());
     }
 
-    if (row != getHeight())
+    if (y != getHeight())
         throw std::runtime_error("Le fichier de map n'a pas assez de lignes (attendu " + std::to_string(getHeight()) + ")");
-
-    // Une fois la grille initialisée, on crée les textures / voisins / etc.
-    refresh();
-}
-
-std::pair<int,int> GameMap::detectMapSize(const std::string& mapFile) {
-    std::ifstream in(mapFile);
-    if (!in)
-        throw std::runtime_error("Impossible d'ouvrir le fichier de map: " + mapFile);
-
-    int maxWidth = 0;
-    int height   = 0;
-    std::string line;
-
-    while (std::getline(in, line)) {
-        // Supprime les espaces en début/fin
-        auto first = line.find_first_not_of(" \t\r\n");
-        if (first == std::string::npos) continue;  // ligne vide ou que des espaces
-        auto last  = line.find_last_not_of(" \t\r\n");
-        std::string trimmed = line.substr(first, last - first + 1);
-
-        // Compte les jetons séparés par des espaces
-        std::istringstream iss(trimmed);
-        int tokens = 0;
-        std::string tok;
-        while (iss >> tok) {
-            ++tokens;
-        }
-        maxWidth = std::max(maxWidth, tokens);
-        ++height;
-    }
-
-    return { maxWidth, height };
-}
-
-
-void GameMap::init(SDL_Renderer *renderer) {
-    renderer_ = renderer;
-    selectSprite_ = (new Texture(renderer_, "../assets/img/plate.png"))->convertAlpha();
 }
 
 
@@ -242,7 +230,7 @@ void GameMap::updateNeighbors() {
 
 void GameMap::createSprite() {
     // Get utils dimensions
-    Size islandSize = Territory::getSpriteSize();
+    Size islandSize = Territory::getIslandSize();
     double islandInnerRadius = Territory::getInnerRadius();
     double islandRadius = Territory::getRadius();
 
@@ -291,7 +279,7 @@ void GameMap::refresh()
     cells_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
 
     // Get utils dimensions
-    Size islandSize = Territory::getSpriteSize();
+    Size islandSize = Territory::getIslandSize();
     double islandInnerRadius = Territory::getInnerRadius();
     double islandRadius = Territory::getRadius();
 

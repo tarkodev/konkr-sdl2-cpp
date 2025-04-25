@@ -4,6 +4,7 @@
 #include "Texture.hpp"
 #include "Sea.hpp"
 #include "Territory.hpp"
+#include "PlayableTerritory.hpp"
 #include "PlayerTerritory.hpp"
 #include "Plain.hpp"
 #include "Forest.hpp"
@@ -25,14 +26,15 @@ Game::Game()
     // Set texture in Cell
     Cell::init(renderer_);
     Territory::init();
+    PlayableTerritory::init();
     Plain::init();
     Forest::init();
 
     GameMap::init(renderer_);
 
     // Create map
-    map_.emplace(windowSize_ * 0.75, gridSize_);
-    //map_.emplace(windowSize_ * 0.75, "../assets/map/map1");
+    //map_.emplace(windowSize_ * 0.75, gridSize_);
+    map_.emplace(windowSize_ * 0.75, "../assets/map/map1");
 
     Size mapRealSize = map_->getSize();
     mapPos_ = {(windowSize_.getWidth() - mapRealSize.getWidth()) / 2, (windowSize_.getHeight() - mapRealSize.getHeight()) / 2};

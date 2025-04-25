@@ -72,6 +72,7 @@ set(SRC_FILES
     "${CMAKE_SOURCE_DIR}/src/Cell.cpp"
     "${CMAKE_SOURCE_DIR}/src/Sea.cpp"
     "${CMAKE_SOURCE_DIR}/src/Territory.cpp"
+    "${CMAKE_SOURCE_DIR}/src/PlayableTerritory.cpp"
     "${CMAKE_SOURCE_DIR}/src/PlayerTerritory.cpp"
     "${CMAKE_SOURCE_DIR}/src/Plain.cpp"
     "${CMAKE_SOURCE_DIR}/src/Forest.cpp"
