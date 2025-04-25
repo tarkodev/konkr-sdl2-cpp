@@ -11,6 +11,7 @@ public:
     static const std::string TYPE;
 
     PlayerTerritory(Player *owner);
+    PlayerTerritory();
 
     Player* getOwner();
     void setOwner(Player *owner);

@@ -17,6 +17,10 @@ PlayerTerritory::PlayerTerritory(Player *owner)
     }
 }
 
+PlayerTerritory::PlayerTerritory()
+    : PlayerTerritory(nullptr)
+{}
+
 void PlayerTerritory::init() {
 }
 

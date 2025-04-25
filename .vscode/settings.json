@@ -61,6 +61,8 @@
         "*.tpp": "cpp",
         "__config": "cpp",
         "fstream": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "__tree": "cpp",
+        "map": "cpp"
     }
 }

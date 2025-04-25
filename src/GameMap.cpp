@@ -5,8 +5,10 @@
 #include "SDL2/SDL_image.h"
 #include "Sea.hpp"
 #include "Territory.hpp"
+#include "PlayerTerritory.hpp"
 #include "Plain.hpp"
 #include "Forest.hpp"
+#include "logic/GameElement.hpp"
 #include "RenderTargetGuard.hpp"
 #include "Rect.hpp"
 #include "Point.hpp"
@@ -14,6 +16,7 @@
 
 #include <cmath>
 #include <vector>
+#include <map>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -27,17 +30,20 @@ Texture* GameMap::selectSprite_ = nullptr;
 GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize)
     : size_{size}, HexagonGrid<Cell*>(gridSize, nullptr)
 {
-    for (int row = 0; row < getHeight(); row++) {
-        for (int col = 0; col < getWidth(); col++) {
+    if (getWidth() < 2 || getHeight() < 2)
+        throw std::runtime_error("Une map doit au moins être de taille 2x2.");
+
+    for (int x=0; x < getWidth(); x++) {
+        for (int y = 0; y < getHeight(); y++) {
             int v = std::rand() % 4;
             if (v == 0)
-                set(col, row, new Territory());
+                set(x, y, new Territory());
             else if (v == 1)
-                set(col, row, new Sea());
+                set(x, y, new Sea());
             else if (v == 2)
-                set(col, row, new Plain());
+                set(x, y, new Plain());
             else if (v == 3)
-                set(col, row, new Forest());
+                set(x, y, new Forest());
         }
     }
     refresh();
@@ -50,9 +56,13 @@ GameMap::GameMap(const Size size, const std::string mapFile)
 GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize, const std::string mapFile)
     : size_{size}, HexagonGrid<Cell*>(gridSize, nullptr)
 {
+    if (getWidth() < 2 || getHeight() < 2)
+        throw std::runtime_error("Une map doit au moins être de taille 2x2.");
+
     std::ifstream in(mapFile);
-    if (!in)
-        throw std::runtime_error("Impossible d'ouvrir le fichier de map: " + mapFile);
+    if (!in) throw std::runtime_error("Impossible d'ouvrir le fichier de map.");
+
+    std::map<int, Player*> players;
 
     int row = 0;
     std::string line;
@@ -64,12 +74,23 @@ GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize, const std
         int col = 0;
 
         while (iss >> token && col < getWidth()) {
-            Cell* cell = nullptr;
-            char sym = token[0];
+            if (token.size() != 2)
+                throw std::runtime_error("Malformation du fichier.");
 
-            switch (sym) {
+            Cell* cell = nullptr;
+            GameElement* gameElt = nullptr;
+            char cellType = token[0];
+            char gameEltType = token[1];
+
+            //! décommenter une fois implémenté
+            switch (cellType) {
                 case 'T':
-                    cell = new Territory();
+                    cell = new PlayerTerritory();
+                    if (gameElt/* && gameElt->getType() == Bandit::TYPE*/)
+                        cell = new PlayerTerritory(nullptr/*, gameElt*/);
+                    else
+                        
+
                     break;
                 case 'P':
                     cell = new Plain();
@@ -81,20 +102,64 @@ GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize, const std
                     cell = new Sea();
                     break;
                 default:
-                    if (std::isdigit(sym)) {
-                        // ex: "1H", "2V", etc.
-                        int playerId = sym - '0';
-                        char unitType = token.size() > 1 ? token[1] : '.';
-                        // Pour l'instant, on place une Territory et on pourrait y attacher l'unité
-                        cell = new Territory();
-                        // TODO : créer et associer l'unité (playerId, unitType) à cette cell
-                    }
+                    if (!std::isdigit(cellType))
+                        throw std::runtime_error("Caractère inattendu: " + std::to_string(cellType));
+
+                    //! mettre au propre
+                    int playerId = cellType - '0';
+                    if (players.find(playerId) == players.end())
+                        players[playerId] = new Player(std::string("Player ") + std::to_string(playerId), std::vector{ColorUtils::INDIAN_RED, ColorUtils::MEDIUM_VIOLET_RED, ColorUtils::DARK_ORANGE, ColorUtils::OLIVE_DRAB, ColorUtils::MEDIUM_AQUAMARINE, ColorUtils::STEEL_BLUE, ColorUtils::PLUM, ColorUtils::SADDLE_BROWN, ColorUtils::SEABLUE}[playerId]);
+
+                    if (gameElt/* && gameElt->getType() != Camp::TYPE*/)
+                        cell = new PlayerTerritory(players[playerId]/*, gameElt*/);
+                    else
+                        cell = new PlayerTerritory(players[playerId]);
                     break;
             }
 
-            if (!cell) {
-                // Jeton inconnu -> par défaut Sea
-                cell = new Sea();
+            switch (gameEltType) {
+                case 'B':
+                    // gameElt = new Bandit();
+                    // if (cellType != 'S' && cellType != 'F')
+                    //     dynamic_cast<Territory*>(cell)->setElement(gameElt);
+                    break;
+                case 'T':
+                    // gameElt = new Town();
+                    // PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
+                    // if (t) t->setElement(gameElt);
+                    break;
+                case 'C':
+                    // gameElt = new Castle();
+                    // PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
+                    // if (t) t->setElement(gameElt);
+                    break;
+                case 'A':
+                    // gameElt = new Camp();
+                    // if (cellType == 'T')
+                    //     dynamic_cast<PlayerTerritory*>(cell)->setElement(gameElt);
+                    break;
+                case 'V':
+                    // gameElt = new Villager();
+                    // PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
+                    // if (t) t->setElement(gameElt);
+                    break;
+                case 'P':
+                    // gameElt = new Pikeman();
+                    // PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
+                    // if (t) t->setElement(gameElt);
+                    break;
+                case 'K':
+                    // gameElt = new Knight();
+                    // PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
+                    // if (t) t->setElement(gameElt);
+                    break;
+                case 'H':
+                    // gameElt = new Hero();
+                    // PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
+                    // if (t) t->setElement(gameElt);
+                    break;
+                default:
+                    break;
             }
 
             set(row, col, cell);
@@ -103,10 +168,8 @@ GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize, const std
         ++row;
     }
 
-    if (row != getHeight()) {
-        throw std::runtime_error("Le fichier de map n'a pas assez de lignes (attendu " +
-                                 std::to_string(getHeight()) + ")");
-    }
+    if (row != getHeight())
+        throw std::runtime_error("Le fichier de map n'a pas assez de lignes (attendu " + std::to_string(getHeight()) + ")");
 
     // Une fois la grille initialisée, on crée les textures / voisins / etc.
     refresh();
@@ -145,31 +208,32 @@ std::pair<int,int> GameMap::detectMapSize(const std::string& mapFile) {
 
 void GameMap::init(SDL_Renderer *renderer) {
     renderer_ = renderer;
-
     selectSprite_ = (new Texture(renderer_, "../assets/img/plate.png"))->convertAlpha();
 }
 
 
 void GameMap::updateNeighbors() {
-    for (int row = 0; row < getHeight(); row++) {
-        for (int col = 0; col < getWidth(); col++) {
-            if (row & 1) {
-                get(row, col)->setNeighbors({
-                    row > 0                                   ? get(row-1, col)   : nullptr,
-                    col > 0                                   ? get(row, col-1)   : nullptr,
-                    row+1 < getHeight()                       ? get(row+1, col)   : nullptr,
-                    col+1 < getWidth() && row+1 < getHeight() ? get(row+1, col+1) : nullptr,
-                    col+1 < getWidth()                        ? get(row, col+1)   : nullptr,
-                    col+1 < getWidth() && row > 0             ? get(row-1, col+1) : nullptr,
+    for (int y = 0; y < getHeight(); y++) {
+        if (y & 1) { // odd line
+            for (int x = 0; x < getWidth(); x++) {
+                get(x, y)->setNeighbors({
+                    y > 0                                 ? get(x,   y-1)   : nullptr,
+                    x > 0                                 ? get(x-1, y)   : nullptr,
+                    y+1 < getHeight()                     ? get(x,   y+1)   : nullptr,
+                    x+1 < getWidth() && y+1 < getHeight() ? get(x+1, y+1) : nullptr,
+                    x+1 < getWidth()                      ? get(x+1, y)   : nullptr,
+                    x+1 < getWidth() && y > 0             ? get(x+1, y-1) : nullptr,
                 });
-            } else {
-                get(row, col)->setNeighbors({
-                    col > 0 && row > 0                        ? get(row-1, col-1) : nullptr,
-                    col > 0                                   ? get(row, col-1)   : nullptr,
-                    col > 0 && row+1 < getHeight()            ? get(row+1, col-1) : nullptr,
-                    row+1 < getHeight()                       ? get(row+1, col)   : nullptr,
-                    col+1 < getWidth()                        ? get(row, col+1)   : nullptr,
-                    row > 0                                   ? get(row-1, col)   : nullptr,
+            }
+        } else { // even line
+            for (int x = 0; x < getWidth(); x++) {
+                get(x, y)->setNeighbors({
+                    x > 0 && y > 0                        ? get(x-1, y-1) : nullptr,
+                    x > 0                                 ? get(x-1, y)   : nullptr,
+                    x > 0 && y+1 < getHeight()            ? get(x-1, y+1) : nullptr,
+                    y+1 < getHeight()                     ? get(x,   y+1)   : nullptr,
+                    x+1 < getWidth()                      ? get(x+1, y)   : nullptr,
+                    y > 0                                 ? get(x,   y-1)   : nullptr,
                 });
             }
         }
@@ -177,75 +241,84 @@ void GameMap::updateNeighbors() {
 }
 
 void GameMap::createSprite() {
+    // Get utils dimensions
     Size islandSize = Territory::getSpriteSize();
     double islandInnerRadius = Territory::getInnerRadius();
     double islandRadius = Territory::getRadius();
 
-    auto [q, r] = HexagonUtils::offsetToAxial(getWidth()-1, getHeight()-1);
-    auto [cx, cy] = HexagonUtils::axialToPixel(q, r, islandRadius);
-
+    // Get pos of last hexagon
+    auto cx = HexagonUtils::offsetToPixel(getWidth()-1, 1, islandRadius).first;
+    auto cy = HexagonUtils::offsetToPixel(0, getHeight()-1, islandRadius).second;
     cx += islandInnerRadius + islandSize.getWidth() / 2.0;
     cy += islandRadius + islandSize.getHeight() / 2.0;
 
+    // Resize 
     spriteSize_ = {static_cast<int>(cx), static_cast<int>(cy)};
-    setProportionalSize(spriteSize_);
+    setProportionalSize(size_);
 
+    // Delete islands sprite if already exists
     if (islands_) {
         delete islands_;
         islands_ = nullptr;
     }
 
+    // Create sprite for islands
     islands_ = new Texture(renderer_, spriteSize_);
     islands_->convertAlpha();
 
+    // Delete cells sprite if already exists
     if (cells_) {
         delete cells_;
         cells_ = nullptr;
     }
 
+    // Create sprite for cells
     cells_ = new Texture(renderer_, spriteSize_);
     cells_->convertAlpha();
 }
 
 void GameMap::refresh()
 {
+    // Update Neighbors of cells
     updateNeighbors();
+
+    // Create sprite of map if isn't exists
     if (!islands_ || !cells_)
         createSprite();
 
-    // Fond uniforme
+    // Draw transparent background
     islands_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
     cells_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
 
-
+    // Get utils dimensions
     Size islandSize = Territory::getSpriteSize();
     double islandInnerRadius = Territory::getInnerRadius();
     double islandRadius = Territory::getRadius();
-    for (int row = 0; row < getHeight(); row++) {
-        for (int col = 0; col < getWidth(); col++) {
-            Cell* cell = get(row, col);
+
+    // Draw islands and cells
+    for (int y = 0; y < getHeight(); y++) {
+        for (int x = 0; x < getWidth(); x++) {
+            Cell* cell = get(x, y);
 
             // Calcul de la position de blit
-            auto [q, r] = HexagonUtils::offsetToAxial(col, row);
+            auto [q, r] = HexagonUtils::offsetToAxial(x, y);
             auto [cx, cy] = HexagonUtils::axialToPixel(q, r, islandRadius);
             auto pos = Point{
                 static_cast<int>(cx + islandInnerRadius),
                 static_cast<int>(cy + islandRadius)
             };
 
+            // Draw island
             if (auto* t = dynamic_cast<Territory*>(cell))
                 t->Territory::display(islands_, pos);
 
+            //! temp (puisque plus aucune cellule ne devrait être juste Territory)
             if (cell->getType() == Territory::TYPE) continue;
 
             if (auto* disp = dynamic_cast<Displayer*>(cell))
                 disp->display(cells_, pos);
         }
     }
-}
-
-Size GameMap::getSize() const {
-    return size_;
 }
 
 void GameMap::setProportionalSize(const Size size) {
@@ -258,8 +331,12 @@ void GameMap::setProportionalSize(const Size size) {
 
     // Calculate proportionnal destination
     size_ = spriteSize_ * ratio;
-    hexagonRadius_ = islandRadius * ratio;
-    innerHexagonRadius_ = std::sqrt(3) * hexagonRadius_ / 2.0;
+    cellRadius_ = islandRadius * ratio;
+    innerCellRadius_ = std::sqrt(3) * cellRadius_ / 2.0;
+}
+
+Size GameMap::getSize() const {
+    return size_;
 }
 
 void GameMap::draw(const Point& pos)
@@ -273,9 +350,9 @@ void GameMap::draw(const Point& pos)
 
     if (selectedHexagon_.has_value()) {
         auto [q, r] = HexagonUtils::offsetToAxial(selectedHexagon_->getX(), selectedHexagon_->getY());
-        auto [x, y] = HexagonUtils::axialToPixel(q, r, hexagonRadius_);
-        x += pos.getX() + innerHexagonRadius_;
-        y += pos.getY() + hexagonRadius_;
+        auto [x, y] = HexagonUtils::axialToPixel(q, r, cellRadius_);
+        x += pos.getX() + innerCellRadius_;
+        y += pos.getY() + cellRadius_;
 
         double ratio = static_cast<double>(dest.getWidth()) / islands_->getWidth();
         int w = static_cast<int>(ratio * selectSprite_->getWidth());
@@ -288,15 +365,15 @@ void GameMap::draw(const Point& pos)
 void GameMap::test() {
     if (!selectedHexagon_.has_value()) return;
 
-    set(selectedHexagon_->getY(), selectedHexagon_->getX(), new Sea());
+    set(selectedHexagon_->getX(), selectedHexagon_->getY(), new Sea());
     refresh();
 }
 
 void GameMap::selectHexagon(const Point& pos) {
-    int relX = pos.getX() - innerHexagonRadius_;
-    int relY = pos.getY() - hexagonRadius_;
+    int relX = pos.getX() - innerCellRadius_;
+    int relY = pos.getY() - cellRadius_;
 
-    auto [q, r] = HexagonUtils::pixelToAxial(relX, relY, hexagonRadius_);
+    auto [q, r] = HexagonUtils::pixelToAxial(relX, relY, cellRadius_);
     auto [x, y] = HexagonUtils::axialToOffset(q, r);
     
     if (x < 0 || x >= getWidth() || y < 0 || y >= getHeight())

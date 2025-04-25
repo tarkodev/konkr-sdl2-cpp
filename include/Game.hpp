@@ -29,7 +29,7 @@ private:
     Point mapPos_ = {0, 0};
 
     // Grid size
-    std::pair<int, int> gridSize_ = {20, 20};
+    std::pair<int, int> gridSize_ = {20, 19};
 
     // Loop condition of game
     bool loop_ = true;

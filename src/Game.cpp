@@ -31,8 +31,8 @@ Game::Game()
     GameMap::init(renderer_);
 
     // Create map
-    //map_.emplace(windowSize_ * 0.75, gridSize_);
-    map_.emplace(windowSize_ * 0.75, "../assets/map/map1");
+    map_.emplace(windowSize_ * 0.75, gridSize_);
+    //map_.emplace(windowSize_ * 0.75, "../assets/map/map1");
 
     Size mapRealSize = map_->getSize();
     mapPos_ = {(windowSize_.getWidth() - mapRealSize.getWidth()) / 2, (windowSize_.getHeight() - mapRealSize.getHeight()) / 2};
@@ -41,8 +41,14 @@ Game::Game()
 
 
     /*
-    map_->set(2, 2, new Sea());
-    map_->set(2, 3, new Sea());
+    map_->set(0, 0, new PlayerTerritory(&p1_));
+    map_->set(0, 1, new PlayerTerritory(&p1_));
+    map_->set(0, 2, new PlayerTerritory(&p1_));
+    map_->set(0, 3, new PlayerTerritory(&p1_));
+    map_->refresh();
+    */
+    
+    /*
     map_->set(1, 2, new Sea());
     map_->set(3, 3, new Sea());
 

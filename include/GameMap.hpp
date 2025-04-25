@@ -5,12 +5,14 @@
 #include <memory>
 #include <utility>
 #include <optional>
+#include <vector>
 #include "HexagonGrid.hpp"
 #include "Texture.hpp"
 #include "Cell.hpp"
 #include "Rect.hpp"
 #include "Point.hpp"
 #include "Size.hpp"
+#include "Player.hpp"
 
 /**
  * @brief Classe représentant une carte de jeu.
@@ -22,8 +24,6 @@ class GameMap : public HexagonGrid<Cell*> {
 public:
     GameMap(const Size size, const std::pair<int, int>& gridSize);
     GameMap(const Size size, const std::string mapFile);
-    GameMap(const Size size, const std::pair<int, int>& gridSize, const std::string mapFile);
-
 
     Size getSize() const;
     void setProportionalSize(const Size size);
@@ -38,24 +38,27 @@ public:
     static void init(SDL_Renderer* renderer);
 
 private:
+    GameMap(const Size size, const std::pair<int, int>& gridSize, const std::string mapFile);
+
     static SDL_Renderer* renderer_;
-    static Texture* selectSprite_;
+    static Texture* selectSprite_; //!temp
 
     std::pair<int,int> detectMapSize(const std::string& mapFile);
     void updateNeighbors();
     void createSprite();
 
-    double hexagonRadius_;
-    double innerHexagonRadius_;
+    double cellRadius_; //! Peut être pas garder et enregistrer un ratio (taille_sprite/taille_reelle)
+    double innerCellRadius_;
 
     std::optional<Point> selectedHexagon_;
     bool hasSelection_ = false;
+
+    std::vector<Player *> players_;
 
     Size size_;
     Size spriteSize_;
     Texture* islands_ = nullptr;
     Texture* cells_ = nullptr;
-    
 };
 
 #endif
