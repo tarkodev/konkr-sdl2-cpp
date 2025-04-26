@@ -138,7 +138,7 @@ void GameMap::loadMap(const std::string& mapFile) {
                     break;
                 }
 
-                case 'S': {
+                case 'W': {
                     cell = new Water();
                     break;
                 }
@@ -163,7 +163,7 @@ void GameMap::loadMap(const std::string& mapFile) {
             switch (gameEltType) {
                 case 'B': {
                     gameElt = new Bandit();
-                    if (cellType != 'S' && cellType != 'F')
+                    if (cellType != 'W' && cellType != 'F')
                         dynamic_cast<PlayableTerritory*>(cell)->setElement(gameElt);
                     break;
                 }
