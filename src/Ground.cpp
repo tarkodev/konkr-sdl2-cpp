@@ -1,16 +1,16 @@
-#include "Territory.hpp"
+#include "Ground.hpp"
 #include "ColorUtils.hpp"
 
-HexagonDisplayer Territory::islandDisplayer = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
-double Territory::islandRadius = 0;
-double Territory::islandInnerRadius = 0;
+HexagonDisplayer Ground::islandDisplayer = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
+double Ground::islandRadius = 0;
+double Ground::islandInnerRadius = 0;
 
-const std::string Territory::TYPE = "Territory";
-const std::string Territory::getType() {
-    return Territory::TYPE;
+const std::string Ground::TYPE = "Ground";
+const std::string Ground::getType() {
+    return Ground::TYPE;
 }
 
-void Territory::init() {
+void Ground::init() {
     if (!renderer_)
         std::runtime_error("Cell not initialized");
 
@@ -29,30 +29,30 @@ void Territory::init() {
     islandDisplayer = HexagonDisplayer{renderer_, islandRadius, island, link, linkBottomLeft, linkBottom, linkBottomRight};
 }
 
-const Size Territory::getIslandSize() {
+const Size Ground::getIslandSize() {
     return islandDisplayer.getSize();
 }
 
-const int Territory::getRadius() {
+const double Ground::getRadius() {
     return islandRadius;
 }
 
-const int Territory::getInnerRadius() {
+const double Ground::getInnerRadius() {
     return islandInnerRadius;
 }
 
 
-void Territory::display(const Texture* target, const Point& pos) {
-    std::vector<bool> TerritoryNeighbors{
-        static_cast<bool>(dynamic_cast<Territory*>(neighbors[0])),
-        static_cast<bool>(dynamic_cast<Territory*>(neighbors[1])),
-        static_cast<bool>(dynamic_cast<Territory*>(neighbors[2])),
-        static_cast<bool>(dynamic_cast<Territory*>(neighbors[3]))
+void Ground::display(const Texture* target, const Point& pos) {
+    std::vector<bool> GroundNeighbors{
+        static_cast<bool>(dynamic_cast<Ground*>(neighbors[0])),
+        static_cast<bool>(dynamic_cast<Ground*>(neighbors[1])),
+        static_cast<bool>(dynamic_cast<Ground*>(neighbors[2])),
+        static_cast<bool>(dynamic_cast<Ground*>(neighbors[3]))
     };
 
-    islandDisplayer.display(target, pos, TerritoryNeighbors);
+    islandDisplayer.display(target, pos, GroundNeighbors);
 }
 
-const Size Territory::getSize() const {
+const Size Ground::getSize() const {
     return getIslandSize();
 }

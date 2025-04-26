@@ -53,9 +53,9 @@ private:
     // Overlay
     Overlay overlay_;
 
-    Player p1_{"Jean", ColorUtils::RED};
-    Player p2_{"Théo", ColorUtils::BLUE};
-    Player p3_{"Kevin", ColorUtils::LIGHT_GOLDENROD_YELLOW};
+    std::optional<Player> p1_;
+    std::optional<Player> p2_;
+    std::optional<Player> p3_;
 };
 
 #endif

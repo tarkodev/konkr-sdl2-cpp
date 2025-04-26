@@ -266,22 +266,22 @@ namespace ColorUtils
         return color;
     }
     
-    struct TerritoryColor {
+    struct GroundColor {
         SDL_Color owned;
         SDL_Color available;
     };
 
-    namespace TerritoryPalette {
-        const TerritoryColor GROUND  = { fromHtml("#886347"), fromHtml("#886347") };
-        const TerritoryColor GREEN   = { fromHtml("#148000"), fromHtml("#106600") };
-        const TerritoryColor ORANGE  = { fromHtml("#f3835d"), fromHtml("#da7553") };
-        const TerritoryColor YELLOW  = { fromHtml("#f2b65d"), fromHtml("#d8a353") };
-        const TerritoryColor BROWN   = { fromHtml("#a27654"), fromHtml("#886347") };
-        const TerritoryColor GREY    = { fromHtml("#6a747c"), fromHtml("#545c62") };
-        const TerritoryColor LIME    = { fromHtml("#7fc83a"), fromHtml("#6fae33") };
+    namespace GroundPalette {
+        const GroundColor GROUND  = { fromHtml("#886347"), fromHtml("#886347") };
+        const GroundColor GREEN   = { fromHtml("#148000"), fromHtml("#106600") };
+        const GroundColor ORANGE  = { fromHtml("#f3835d"), fromHtml("#da7553") };
+        const GroundColor YELLOW  = { fromHtml("#f2b65d"), fromHtml("#d8a353") };
+        const GroundColor BROWN   = { fromHtml("#a27654"), fromHtml("#886347") };
+        const GroundColor GREY    = { fromHtml("#6a747c"), fromHtml("#545c62") };
+        const GroundColor LIME    = { fromHtml("#7fc83a"), fromHtml("#6fae33") };
 
         // An array or vector to access by index
-        const TerritoryColor Palette[] = { GROUND, GREEN, ORANGE, YELLOW, BROWN, GREY, LIME };
+        const GroundColor Palette[] = { GROUND, GREEN, ORANGE, YELLOW, BROWN, GREY, LIME };
     }
 
     /**
@@ -293,15 +293,15 @@ namespace ColorUtils
      *
      * @return SDL_Color La couleur correspondante.
      */
-    inline SDL_Color getTerritoryColor(int index, bool owned) {
+    inline SDL_Color getGroundColor(int index, bool owned) {
         // Vérifie que l'index est dans les bornes valides
         if (index < 0 || index >= 6) {
             // Retourne Gris comme couleur par défaut si l'index est invalide
-            return owned ? TerritoryPalette::GREY.owned : TerritoryPalette::GREY.available;
+            return owned ? GroundPalette::GREY.owned : GroundPalette::GREY.available;
         }
 
         // Récupère le duo de couleurs (owned / available) selon l'index
-        const TerritoryColor& color = TerritoryPalette::Palette[index];
+        const GroundColor& color = GroundPalette::Palette[index];
 
         // Retourne la bonne couleur selon la possession du territoire
         return owned ? color.owned : color.available;

@@ -9,20 +9,23 @@
 
 class Player {
 public:
+    static void init(SDL_Renderer *renderer);
+
     Player(const std::string& name_, const SDL_Color& color);
     ~Player();
 
     SDL_Color& getColor();
 
-    HexagonDisplayer& getPlateDisplayer();
-    void setPlateDisplayer(HexagonDisplayer& plateDisplayer);
-    bool hasPlate() const;
+    HexagonDisplayer& getPlate();
 
 private:
-    HexagonDisplayer plateDisplayer_ = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
+    static SDL_Renderer *renderer_;
+    static HexagonDisplayer plateDisplayer;
+    
     std::string name_;
     SDL_Color color_;
-    bool hasPlate_ = false;
+
+    HexagonDisplayer plate_;
 };
 
 #endif

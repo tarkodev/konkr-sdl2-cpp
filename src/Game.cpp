@@ -3,10 +3,9 @@
 #include "HexagonGrid.hpp"
 #include "Texture.hpp"
 #include "Water.hpp"
-#include "Territory.hpp"
-#include "PlayableTerritory.hpp"
-#include "PlayerTerritory.hpp"
-#include "Plain.hpp"
+#include "Ground.hpp"
+#include "PlayableGround.hpp"
+#include "PlayableGround.hpp"
 #include "Forest.hpp"
 #include <iostream>
 #include <stdexcept>
@@ -36,9 +35,7 @@ Game::Game()
 
     // Set texture in Cell
     Cell::init(renderer_);
-    Territory::init();
-    PlayableTerritory::init();
-    Plain::init();
+    Ground::init();
     Forest::init();
 
     GameElement::init(renderer_);
@@ -52,10 +49,21 @@ Game::Game()
     Knight::init();
     Hero::init();
 
+    Player::init(renderer_);
+
     GameMap::init(renderer_);
+
+    p3_.emplace("Théo", ColorUtils::BLUE);
+    p3_.emplace("Kevin", ColorUtils::LIGHT_GOLDENROD_YELLOW);
+    p3_.emplace("Jean", ColorUtils::RED);
+
+    p3_.emplace("Théo", ColorUtils::BLUE);
+    p3_.emplace("Kevin", ColorUtils::LIGHT_GOLDENROD_YELLOW);
+    p3_.emplace("Jean", ColorUtils::RED);
 
     // Create map;
     map_.emplace(windowSize_ * 0.75, "../assets/map/map1");
+    SDL_Log("B");
 
     Size mapRealSize = map_->getSize();
     mapPos_ = {(windowSize_.getWidth() - mapRealSize.getWidth()) / 2, (windowSize_.getHeight() - mapRealSize.getHeight()) / 2};
@@ -91,6 +99,35 @@ Game::Game()
     overlay_.addButton(turnBtn);
     overlay_.addButton(nextBtn);
     overlay_.addButton(skipBtn);
+    //map_->set(0, 19, new Forest());
+
+
+    /*
+    map_->set(0, 0, new PlayableGround(&p1_));
+    map_->set(0, 1, new PlayableGround(&p1_));
+    map_->set(0, 2, new PlayableGround(&p1_));
+    map_->set(0, 3, new PlayableGround(&p1_));
+    map_->refresh();
+    */
+    
+    /*
+    map_->set(1, 2, new Water());
+    map_->set(3, 3, new Water());
+
+    map_->set(12, 8, new PlayableGround(&p1_));
+    map_->set(12, 9, new PlayableGround(&p1_));
+    map_->set(11, 8, new PlayableGround(&p1_));
+    map_->set(11, 9, new PlayableGround(&p1_));
+    map_->set(13, 8, new PlayableGround(&p1_));
+
+    map_->set(3, 14, new PlayableGround(&p2_));
+    map_->set(3, 15, new PlayableGround(&p2_));
+    map_->set(2, 13, new PlayableGround(&p2_));
+    map_->set(3, 12, new PlayableGround(&p2_));
+    map_->set(3, 11, new PlayableGround(&p2_));
+
+    map_->refresh();
+    */
 
 }
 

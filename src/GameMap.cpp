@@ -4,9 +4,8 @@
 #include "SDL2/SDL2_gfxPrimitives.h"
 #include "SDL2/SDL_image.h"
 #include "Water.hpp"
-#include "Territory.hpp"
-#include "PlayerTerritory.hpp"
-#include "Plain.hpp"
+#include "Ground.hpp"
+#include "PlayableGround.hpp"
 #include "Forest.hpp"
 #include "logic/GameElement.hpp"
 #include "RenderTargetGuard.hpp"
@@ -36,7 +35,7 @@ Texture* GameMap::selectSprite_ = nullptr;
 
 void GameMap::init(SDL_Renderer *renderer) {
     renderer_ = renderer;
-    selectSprite_ = (new Texture(renderer_, "../assets/img/plate.png"))->convertAlpha();
+    selectSprite_ = (new Texture(renderer_, "../assets/img/plate.png"))->convertAlpha(); //!temp
 }
 
 GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize)
@@ -49,11 +48,9 @@ GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize)
         for (int y = 0; y < getHeight(); y++) {
             int v = std::rand() % 4;
             if (v == 0)
-                set(x, y, new PlayerTerritory());
+                set(x, y, new PlayableGround());
             else if (v == 1)
                 set(x, y, new Water());
-            else if (v == 2)
-                set(x, y, new Plain());
             else if (v == 3)
                 set(x, y, new Forest());
         }
@@ -123,16 +120,6 @@ void GameMap::loadMap(const std::string& mapFile) {
             char cellType = token[0];
             Cell* cell = nullptr;
             switch (cellType) {
-                case 'T': {
-                    cell = new PlayerTerritory();
-                    break;
-                }
-
-                case 'P': {
-                    cell = new Plain();
-                    break;
-                }
-
                 case 'F': {
                     cell = new Forest();
                     break;
@@ -140,6 +127,11 @@ void GameMap::loadMap(const std::string& mapFile) {
 
                 case 'W': {
                     cell = new Water();
+                    break;
+                }
+                
+                case '0': {
+                    cell = new PlayableGround();
                     break;
                 }
 
@@ -150,9 +142,9 @@ void GameMap::loadMap(const std::string& mapFile) {
                     //! mettre au propre
                     int playerId = cellType - '0';
                     if (players.find(playerId) == players.end())
-                        players[playerId] = new Player(std::string("Player ") + std::to_string(playerId), ColorUtils::getTerritoryColor(playerId, true));
+                        players[playerId] = new Player(std::string("Player ") + std::to_string(playerId), ColorUtils::getGroundColor(playerId, true));
 
-                    cell = new PlayerTerritory(players[playerId]);
+                    cell = new PlayableGround(players[playerId]);
                     break;
                 }
             }
@@ -164,56 +156,56 @@ void GameMap::loadMap(const std::string& mapFile) {
                 case 'B': {
                     gameElt = new Bandit();
                     if (cellType != 'W' && cellType != 'F')
-                        dynamic_cast<PlayableTerritory*>(cell)->setElement(gameElt);
+                        dynamic_cast<PlayableGround*>(cell)->setElement(gameElt);
                     break;
                 }
 
                 case 'T': {
                     gameElt = new Town();
-                    PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
-                    if (t) t->setElement(gameElt);
+                    PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
+                    if (t && cellType != '0') t->setElement(gameElt);
                     break;
                 }
 
                 case 'C': {
                     gameElt = new Castle();
-                    PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
-                    if (t) t->setElement(gameElt);
+                    PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
+                    if (t && cellType != '0') t->setElement(gameElt);
                     break;
                 }
 
                 case 'A': {
                     gameElt = new Camp();
-                    PlayableTerritory* t = dynamic_cast<PlayableTerritory*>(cell);
-                    if (t && cellType == 'T') t->setElement(gameElt);
+                    PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
+                    if (t && cellType == '0') t->setElement(gameElt);
                     break;
                 }
 
                 case 'V': {
                     gameElt = new Villager();
-                    PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
-                    if (t) t->setElement(gameElt);
+                    PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
+                    if (t && cellType != '0') t->setElement(gameElt);
                     break;
                 }
 
                 case 'P': {
                     gameElt = new Pikeman();
-                    PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
-                    if (t) t->setElement(gameElt);
+                    PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
+                    if (t && cellType != '0') t->setElement(gameElt);
                     break;
                 }
 
                 case 'K': {
                     gameElt = new Knight();
-                    PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
-                    if (t) t->setElement(gameElt);
+                    PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
+                    if (t && cellType != '0') t->setElement(gameElt);
                     break;
                 }
 
                 case 'H': {
                     gameElt = new Hero();
-                    PlayerTerritory* t = dynamic_cast<PlayerTerritory*>(cell);
-                    if (t) t->setElement(gameElt);
+                    PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
+                    if (t && cellType != '0') t->setElement(gameElt);
                     break;
                 }
 
@@ -262,9 +254,9 @@ void GameMap::updateNeighbors() {
 
 void GameMap::createSprite() {
     // Get utils dimensions
-    Size islandSize = Territory::getIslandSize();
-    double islandInnerRadius = Territory::getInnerRadius();
-    double islandRadius = Territory::getRadius();
+    Size islandSize = Ground::getIslandSize();
+    double islandInnerRadius = Ground::getInnerRadius();
+    double islandRadius = Ground::getRadius();
 
     // Get pos of last hexagon
     auto cx = HexagonUtils::offsetToPixel(getWidth()-1, 1, islandRadius).first;
@@ -272,7 +264,7 @@ void GameMap::createSprite() {
     cx += islandInnerRadius + islandSize.getWidth() / 2.0;
     cy += islandRadius + islandSize.getHeight() / 2.0;
 
-    // Resize 
+    // Resize
     spriteSize_ = {static_cast<int>(cx), static_cast<int>(cy)};
     setProportionalSize(size_);
 
@@ -325,9 +317,9 @@ void GameMap::refresh()
     elements_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
 
     // Get utils dimensions
-    Size islandSize = Territory::getIslandSize();
-    double islandInnerRadius = Territory::getInnerRadius();
-    double islandRadius = Territory::getRadius();
+    Size islandSize = Ground::getIslandSize();
+    double islandInnerRadius = Ground::getInnerRadius();
+    double islandRadius = Ground::getRadius();
 
     // Draw islands and cells
     for (int y = 0; y < getHeight(); y++) {
@@ -343,13 +335,13 @@ void GameMap::refresh()
             };
 
             // Draw island
-            if (auto* t = dynamic_cast<Territory*>(cell))
-                t->Territory::display(islands_, pos);
+            if (auto* t = dynamic_cast<Ground*>(cell))
+                t->Ground::display(islands_, pos);
 
             if (auto* disp = dynamic_cast<Displayer*>(cell))
                 disp->display(cells_, pos);
 
-            if (auto* pt = dynamic_cast<PlayableTerritory*>(cell)) {
+            if (auto* pt = dynamic_cast<PlayableGround*>(cell)) {
                 if (auto* elt = pt->getElement())
                     elt->display(elements_, pos);
             }
@@ -358,7 +350,7 @@ void GameMap::refresh()
 }
 
 void GameMap::setProportionalSize(const Size size) {
-    double islandRadius = Territory::getRadius();
+    double islandRadius = Ground::getRadius();
 
     // Get ratio
     double ratioW = static_cast<double>(size.getWidth()) / spriteSize_.getWidth();

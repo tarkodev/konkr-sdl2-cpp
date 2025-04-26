@@ -1,8 +1,27 @@
 #include "Player.hpp"
+#include "Ground.hpp"
 #include "ColorUtils.hpp"
 #include <stdexcept>
 
-Player::Player(const std::string& name, const SDL_Color& color) : color_(color), name_(name) {}
+HexagonDisplayer Player::plateDisplayer = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
+SDL_Renderer* Player::renderer_ = nullptr;
+
+void Player::init(SDL_Renderer *renderer) {
+    renderer_ = renderer;
+
+    // Load plate
+    Texture* plate = (new Texture(renderer_, "../assets/img/plate.png"))->convertAlpha();
+    Texture* plateLink = (new Texture(renderer_, "../assets/img/plate_link.png"))->convertAlpha();
+    Texture* plateLinkBottomLeft = (new Texture(renderer_, "../assets/img/plate_link_bottom_left.png"))->convertAlpha();
+    Texture* plateLinkBottom = (new Texture(renderer_, "../assets/img/plate_link_bottom.png"))->convertAlpha();
+    Texture* plateLinkBottomRight = (new Texture(renderer_, "../assets/img/plate_link_bottom_right.png"))->convertAlpha();
+
+    plateDisplayer = HexagonDisplayer{renderer_, Ground::getRadius(), plate, plateLink, plateLinkBottomLeft, plateLinkBottom, plateLinkBottomRight};
+}
+
+Player::Player(const std::string& name, const SDL_Color& color) : color_(color), name_(name), plate_(plateDisplayer.copy()) {
+    plate_.colorize(color);
+}
 
 Player::~Player() = default;
 
@@ -11,15 +30,6 @@ SDL_Color& Player::getColor() {
     return color_;
 }
 
-HexagonDisplayer& Player::getPlateDisplayer() {
-    return plateDisplayer_;
-}
-
-void Player::setPlateDisplayer(HexagonDisplayer& plateDisplayer) {
-    plateDisplayer_ = plateDisplayer;
-    hasPlate_ = true;
-}
-
-bool Player::hasPlate() const {
-    return hasPlate_;
+HexagonDisplayer& Player::getPlate() {
+    return plate_;
 }

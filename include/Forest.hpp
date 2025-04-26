@@ -4,9 +4,9 @@
 #include "SDL.h"
 #include "Texture.hpp"
 #include "Player.hpp"
-#include "PlayableTerritory.hpp"
+#include "PlayableGround.hpp"
 
-class Forest: public PlayableTerritory {
+class Forest: public PlayableGround {
 public:
     static const std::string TYPE;
 
