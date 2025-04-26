@@ -52,10 +52,6 @@ private:
 
     // Overlay
     Overlay overlay_;
-
-    std::optional<Player> p1_;
-    std::optional<Player> p2_;
-    std::optional<Player> p3_;
 };
 
 #endif

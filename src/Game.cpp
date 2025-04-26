@@ -37,6 +37,7 @@ Game::Game()
     Cell::init(renderer_);
     Ground::init();
     Forest::init();
+    PlayableGround::init();
 
     GameElement::init(renderer_);
     Troop::init();
@@ -53,17 +54,8 @@ Game::Game()
 
     GameMap::init(renderer_);
 
-    p3_.emplace("Théo", ColorUtils::BLUE);
-    p3_.emplace("Kevin", ColorUtils::LIGHT_GOLDENROD_YELLOW);
-    p3_.emplace("Jean", ColorUtils::RED);
-
-    p3_.emplace("Théo", ColorUtils::BLUE);
-    p3_.emplace("Kevin", ColorUtils::LIGHT_GOLDENROD_YELLOW);
-    p3_.emplace("Jean", ColorUtils::RED);
-
     // Create map;
     map_.emplace(windowSize_ * 0.75, "../assets/map/map1");
-    SDL_Log("B");
 
     Size mapRealSize = map_->getSize();
     mapPos_ = {(windowSize_.getWidth() - mapRealSize.getWidth()) / 2, (windowSize_.getHeight() - mapRealSize.getHeight()) / 2};

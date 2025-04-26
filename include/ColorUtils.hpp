@@ -289,22 +289,18 @@ namespace ColorUtils
      *
      * @param index Un entier de 0 à 6 représentant le type de territoire :
      *        0 = Ground, 1 = Vert, 2 = Orange, 3 = Jaune, 4 = Brun, 5 = Gris, 6 = Lime.
-     * @param owned Booléen indiquant si le territoire est possédé (true) ou disponible (false).
      *
      * @return SDL_Color La couleur correspondante.
      */
-    inline SDL_Color getGroundColor(int index, bool owned) {
+    inline GroundColor getGroundColor(int index) {
         // Vérifie que l'index est dans les bornes valides
         if (index < 0 || index >= 6) {
             // Retourne Gris comme couleur par défaut si l'index est invalide
-            return owned ? GroundPalette::GREY.owned : GroundPalette::GREY.available;
+            return GroundPalette::GREY;
         }
 
         // Récupère le duo de couleurs (owned / available) selon l'index
-        const GroundColor& color = GroundPalette::Palette[index];
-
-        // Retourne la bonne couleur selon la possession du territoire
-        return owned ? color.owned : color.available;
+        return GroundPalette::Palette[index];
     }
 }
 

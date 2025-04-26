@@ -60,6 +60,7 @@ private:
     Size spriteSize_;
     Texture* islands_ = nullptr;
     Texture* cells_ = nullptr;
+    Texture* fences_ = nullptr;
     Texture* elements_ = nullptr;
 };
 

@@ -142,7 +142,7 @@ void GameMap::loadMap(const std::string& mapFile) {
                     //! mettre au propre
                     int playerId = cellType - '0';
                     if (players.find(playerId) == players.end())
-                        players[playerId] = new Player(std::string("Player ") + std::to_string(playerId), ColorUtils::getGroundColor(playerId, true));
+                        players[playerId] = new Player(std::string("Player ") + std::to_string(playerId), ColorUtils::getGroundColor(playerId));
 
                     cell = new PlayableGround(players[playerId]);
                     break;
@@ -291,6 +291,17 @@ void GameMap::createSprite() {
 
 
     // Delete elements sprite if already exists
+    if (fences_) {
+        delete fences_;
+        fences_ = nullptr;
+    }
+
+    // Create sprite for elements
+    fences_ = new Texture(renderer_, spriteSize_);
+    fences_->convertAlpha();
+
+
+    // Delete elements sprite if already exists
     if (elements_) {
         delete elements_;
         elements_ = nullptr;
@@ -307,13 +318,14 @@ void GameMap::refresh()
     updateNeighbors();
 
     // Create sprite of map if isn't exists
-    if (!islands_ || !cells_ || !elements_)
+    if (!islands_ || !cells_ || !fences_ || !elements_)
         createSprite();
 
     // Draw transparent background
     //! faire un calc général qui est refresh à chaque changement d'un de ces troiq calques et qui est blit directement (cela permettra de diviser par 3 le nombre de blit)
     islands_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
     cells_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
+    fences_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
     elements_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
 
     // Get utils dimensions
@@ -338,10 +350,13 @@ void GameMap::refresh()
             if (auto* t = dynamic_cast<Ground*>(cell))
                 t->Ground::display(islands_, pos);
 
+            // Draw cell
             if (auto* disp = dynamic_cast<Displayer*>(cell))
                 disp->display(cells_, pos);
 
+            // Draw element
             if (auto* pt = dynamic_cast<PlayableGround*>(cell)) {
+                pt->displayFences(fences_, pos);
                 if (auto* elt = pt->getElement())
                     elt->display(elements_, pos);
             }
@@ -375,6 +390,7 @@ void GameMap::draw(const Point& pos)
     Rect dest = {pos, size_};
     SDL_RenderCopy(renderer_, islands_->get(), nullptr, &dest.get());
     SDL_RenderCopy(renderer_, cells_->get(), nullptr, &dest.get());
+    SDL_RenderCopy(renderer_, fences_->get(), nullptr, &dest.get());
     SDL_RenderCopy(renderer_, elements_->get(), nullptr, &dest.get());
 
     if (selectedHexagon_.has_value()) {
@@ -394,7 +410,8 @@ void GameMap::draw(const Point& pos)
 void GameMap::test() {
     if (!selectedHexagon_.has_value()) return;
 
-    set(selectedHexagon_->getX(), selectedHexagon_->getY(), new Water());
+    dynamic_cast<PlayableGround*>(get(selectedHexagon_->getX(), selectedHexagon_->getY()))->setOwner(nullptr);
+    //set(selectedHexagon_->getX(), selectedHexagon_->getY(), new Water());
     refresh();
 }
 

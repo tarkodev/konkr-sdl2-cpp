@@ -1,6 +1,5 @@
 #include "Player.hpp"
 #include "Ground.hpp"
-#include "ColorUtils.hpp"
 #include <stdexcept>
 
 HexagonDisplayer Player::plateDisplayer = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
@@ -19,17 +18,18 @@ void Player::init(SDL_Renderer *renderer) {
     plateDisplayer = HexagonDisplayer{renderer_, Ground::getRadius(), plate, plateLink, plateLinkBottomLeft, plateLinkBottom, plateLinkBottomRight};
 }
 
-Player::Player(const std::string& name, const SDL_Color& color) : color_(color), name_(name), plate_(plateDisplayer.copy()) {
-    plate_.colorize(color);
+Player::Player(const std::string& name, const GroundColor& color) : color_(color), name_(name), plate_(plateDisplayer.copy()), lostPlate_(plateDisplayer.copy()) {
+    plate_.colorize(color.owned);
+    lostPlate_.colorize(color.available);
 }
 
 Player::~Player() = default;
 
 
-SDL_Color& Player::getColor() {
-    return color_;
-}
-
 HexagonDisplayer& Player::getPlate() {
     return plate_;
+}
+
+HexagonDisplayer& Player::getLostPlate() {
+    return lostPlate_;
 }

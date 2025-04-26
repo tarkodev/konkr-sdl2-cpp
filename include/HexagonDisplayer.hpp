@@ -35,7 +35,6 @@ private:
     Texture* linkBottomLeft_;
     Texture* linkBottom_;
     Texture* linkBottomRight_;
-    std::vector<bool> neighbors_;
 };
 
 #endif
