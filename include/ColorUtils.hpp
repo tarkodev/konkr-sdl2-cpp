@@ -241,6 +241,69 @@ namespace ColorUtils
     const SDL_Color TRANSPARENT_LOCK        = {0, 0, 0, 100};
     const SDL_Color TRANSPARENT             = {255, 255, 255, 0};
     const SDL_Color TRANSPARENT_BLACK       = {0, 0, 0, 0};
+
+    /**
+     * @brief Convertit un code HTML hexadécimal en couleur SDL.
+     * 
+     * Cette fonction prend un code couleur HTML sous la forme "#RRGGBB"
+     * et le convertit en structure SDL_Color avec une opacité (alpha) de 255.
+     * 
+     * @param htmlCode Une chaîne représentant une couleur HTML (ex : "#FF5733").
+     * @return SDL_Color La couleur correspondante en format SDL.
+     * @throws std::invalid_argument Si le format du code est incorrect.
+     */
+    SDL_Color fromHtml(const std::string& htmlCode) {
+        if (htmlCode.size() != 7 || htmlCode[0] != '#')
+            throw std::invalid_argument("Code HTML invalide. Format attendu : #RRGGBB");
+
+        SDL_Color color;
+        color.r = std::stoi(htmlCode.substr(1, 2), nullptr, 16);
+        color.g = std::stoi(htmlCode.substr(3, 2), nullptr, 16);
+        color.b = std::stoi(htmlCode.substr(5, 2), nullptr, 16);
+        color.a = 255;
+        return color;
+    }
+
+    /**
+     * @brief Renvoie la couleur SDL correspondant à un territoire en fonction de son index et de son statut.
+     *
+     * @param index Un entier de 0 à 6 représentant le type de territoire :
+     *        0 = Ground, 1 = Vert, 2 = Orange, 3 = Jaune, 4 = Brun, 5 = Gris, 6 = Lime.
+     * @param owned Booléen indiquant si le territoire est possédé (true) ou disponible (false).
+     *
+     * @return SDL_Color La couleur correspondante.
+     */
+    SDL_Color getTerritoryColor(int index, bool owned) {
+        // Vérifie que l'index est dans les bornes valides
+        if (index < 0 || index >= 6) {
+            // Retourne Gris comme couleur par défaut si l'index est invalide
+            return owned ? TerritoryPalette::Grey.owned : TerritoryPalette::Grey.available;
+        }
+
+        // Récupère le duo de couleurs (owned / available) selon l'index
+        const TerritoryColor& color = TerritoryPalette::Palette[index];
+
+        // Retourne la bonne couleur selon la possession du territoire
+        return owned ? color.owned : color.available;
+    }
+    
+    struct TerritoryColor {
+        SDL_Color owned;
+        SDL_Color available;
+    };
+
+    namespace TerritoryPalette {
+        const TerritoryColor Ground  = { fromHtml("#886347"), fromHtml("#886347") };
+        const TerritoryColor Green   = { fromHtml("#148000"), fromHtml("#106600") };
+        const TerritoryColor Orange  = { fromHtml("#f3835d"), fromHtml("#da7553") };
+        const TerritoryColor Yellow  = { fromHtml("#f2b65d"), fromHtml("#d8a353") };
+        const TerritoryColor Brown   = { fromHtml("#a27654"), fromHtml("#886347") };
+        const TerritoryColor Grey    = { fromHtml("#6a747c"), fromHtml("#545c62") };
+        const TerritoryColor Lime    = { fromHtml("#7fc83a"), fromHtml("#6fae33") };
+
+        // An array or vector to access by index
+        const TerritoryColor Palette[] = { Ground, Green, Orange, Yellow, Brown, Grey, Lime };
+    }
 }
 
 #endif
