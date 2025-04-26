@@ -1,13 +1,13 @@
-#ifndef SEA_HPP
-#define SEA_HPP
+#ifndef WATER_HPP
+#define WATER_HPP
 
 #include "Cell.hpp"
 
-class Sea: public Cell {
+class Water: public Cell {
 public:
     static const std::string TYPE;
 
-    Sea();
+    Water();
 
     const std::string getType() override;
 };

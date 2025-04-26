@@ -3,7 +3,7 @@
 #include "HexagonUtils.hpp"
 #include "SDL2/SDL2_gfxPrimitives.h"
 #include "SDL2/SDL_image.h"
-#include "Sea.hpp"
+#include "Water.hpp"
 #include "Territory.hpp"
 #include "PlayerTerritory.hpp"
 #include "Plain.hpp"
@@ -51,7 +51,7 @@ GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize)
             if (v == 0)
                 set(x, y, new PlayerTerritory());
             else if (v == 1)
-                set(x, y, new Sea());
+                set(x, y, new Water());
             else if (v == 2)
                 set(x, y, new Plain());
             else if (v == 3)
@@ -139,7 +139,7 @@ void GameMap::loadMap(const std::string& mapFile) {
                 }
 
                 case 'S': {
-                    cell = new Sea();
+                    cell = new Water();
                     break;
                 }
 
@@ -150,7 +150,7 @@ void GameMap::loadMap(const std::string& mapFile) {
                     //! mettre au propre
                     int playerId = cellType - '0';
                     if (players.find(playerId) == players.end())
-                        players[playerId] = new Player(std::string("Player ") + std::to_string(playerId), std::vector{ColorUtils::INDIAN_RED, ColorUtils::MEDIUM_VIOLET_RED, ColorUtils::DARK_ORANGE, ColorUtils::OLIVE_DRAB, ColorUtils::MEDIUM_AQUAMARINE, ColorUtils::STEEL_BLUE, ColorUtils::PLUM, ColorUtils::SADDLE_BROWN, ColorUtils::SEABLUE}[playerId]);
+                        players[playerId] = new Player(std::string("Player ") + std::to_string(playerId), ColorUtils::getTerritoryColor(playerId, true));
 
                     cell = new PlayerTerritory(players[playerId]);
                     break;
@@ -225,7 +225,7 @@ void GameMap::loadMap(const std::string& mapFile) {
         }
         
         for (; x < getWidth(); x++)
-            set(x, y, new Sea());
+            set(x, y, new Water());
     }
 
     if (y != getHeight())
@@ -402,7 +402,7 @@ void GameMap::draw(const Point& pos)
 void GameMap::test() {
     if (!selectedHexagon_.has_value()) return;
 
-    set(selectedHexagon_->getX(), selectedHexagon_->getY(), new Sea());
+    set(selectedHexagon_->getX(), selectedHexagon_->getY(), new Water());
     refresh();
 }
 

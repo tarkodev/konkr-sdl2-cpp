@@ -272,16 +272,16 @@ namespace ColorUtils
     };
 
     namespace TerritoryPalette {
-        const TerritoryColor Ground  = { fromHtml("#886347"), fromHtml("#886347") };
-        const TerritoryColor Green   = { fromHtml("#148000"), fromHtml("#106600") };
-        const TerritoryColor Orange  = { fromHtml("#f3835d"), fromHtml("#da7553") };
-        const TerritoryColor Yellow  = { fromHtml("#f2b65d"), fromHtml("#d8a353") };
-        const TerritoryColor Brown   = { fromHtml("#a27654"), fromHtml("#886347") };
-        const TerritoryColor Grey    = { fromHtml("#6a747c"), fromHtml("#545c62") };
-        const TerritoryColor Lime    = { fromHtml("#7fc83a"), fromHtml("#6fae33") };
+        const TerritoryColor GROUND  = { fromHtml("#886347"), fromHtml("#886347") };
+        const TerritoryColor GREEN   = { fromHtml("#148000"), fromHtml("#106600") };
+        const TerritoryColor ORANGE  = { fromHtml("#f3835d"), fromHtml("#da7553") };
+        const TerritoryColor YELLOW  = { fromHtml("#f2b65d"), fromHtml("#d8a353") };
+        const TerritoryColor BROWN   = { fromHtml("#a27654"), fromHtml("#886347") };
+        const TerritoryColor GREY    = { fromHtml("#6a747c"), fromHtml("#545c62") };
+        const TerritoryColor LIME    = { fromHtml("#7fc83a"), fromHtml("#6fae33") };
 
         // An array or vector to access by index
-        const TerritoryColor Palette[] = { Ground, Green, Orange, Yellow, Brown, Grey, Lime };
+        const TerritoryColor Palette[] = { GROUND, GREEN, ORANGE, YELLOW, BROWN, GREY, LIME };
     }
 
     /**
@@ -297,7 +297,7 @@ namespace ColorUtils
         // Vérifie que l'index est dans les bornes valides
         if (index < 0 || index >= 6) {
             // Retourne Gris comme couleur par défaut si l'index est invalide
-            return owned ? TerritoryPalette::Grey.owned : TerritoryPalette::Grey.available;
+            return owned ? TerritoryPalette::GREY.owned : TerritoryPalette::GREY.available;
         }
 
         // Récupère le duo de couleurs (owned / available) selon l'index

@@ -2,7 +2,7 @@
 #include "HexagonUtils.hpp"
 #include "HexagonGrid.hpp"
 #include "Texture.hpp"
-#include "Sea.hpp"
+#include "Water.hpp"
 #include "Territory.hpp"
 #include "PlayableTerritory.hpp"
 #include "PlayerTerritory.hpp"
@@ -70,8 +70,8 @@ Game::Game()
     */
     
     /*
-    map_->set(1, 2, new Sea());
-    map_->set(3, 3, new Sea());
+    map_->set(1, 2, new Water());
+    map_->set(3, 3, new Water());
 
     map_->set(12, 8, new PlayerTerritory(&p1_));
     map_->set(12, 9, new PlayerTerritory(&p1_));
