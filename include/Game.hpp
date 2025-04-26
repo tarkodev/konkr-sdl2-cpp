@@ -7,6 +7,7 @@
 #include "GameMap.hpp"
 #include "Window.hpp"
 #include "Player.hpp"
+#include "Overlay.hpp"
 
 class Game {
 public:
@@ -48,6 +49,9 @@ private:
 
     // Map of game
     std::optional<GameMap> map_;
+
+    // Overlay
+    Overlay overlay_;
 
     Player p1_{"Jean", ColorUtils::RED};
     Player p2_{"Théo", ColorUtils::BLUE};

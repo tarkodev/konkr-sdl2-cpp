@@ -18,9 +18,12 @@
 #include "logic/units/Pikeman.hpp"
 #include "logic/units/Knight.hpp"
 #include "logic/units/Hero.hpp"
+#include "Button.hpp"
 
 #include <memory>
 #include <vector>
+
+
 
 Game::Game() 
     : window_(std::make_unique<Window>("Konkr", windowSize_.getWidth(), windowSize_.getHeight())) {
@@ -51,42 +54,43 @@ Game::Game()
 
     GameMap::init(renderer_);
 
-    // Create map
-    //map_.emplace(windowSize_ * 0.75, gridSize_);
+    // Create map;
     map_.emplace(windowSize_ * 0.75, "../assets/map/map1");
 
     Size mapRealSize = map_->getSize();
     mapPos_ = {(windowSize_.getWidth() - mapRealSize.getWidth()) / 2, (windowSize_.getHeight() - mapRealSize.getHeight()) / 2};
 
-    //map_->set(0, 19, new Forest());
+    //////////// Button
 
+    // Après avoir créé vos textures :
+    Texture* undoTex  = new Texture(renderer_, "../assets/img/undo.png");
+    Button* undoBtn = new Button(undoTex, nullptr, nullptr, Point{150,100});
+    undoBtn->setCallback([](){
+        std::cout << "Undo button clicked!" << std::endl;
+    });
 
-    /*
-    map_->set(0, 0, new PlayerTerritory(&p1_));
-    map_->set(0, 1, new PlayerTerritory(&p1_));
-    map_->set(0, 2, new PlayerTerritory(&p1_));
-    map_->set(0, 3, new PlayerTerritory(&p1_));
-    map_->refresh();
-    */
-    
-    /*
-    map_->set(1, 2, new Water());
-    map_->set(3, 3, new Water());
+    Texture* turnTex  = new Texture(renderer_, "../assets/img/turn.png");
+    Button* turnBtn = new Button(turnTex, nullptr, nullptr, Point{150,200});
+    turnBtn->setCallback([](){
+        std::cout << "Turn button clicked!" << std::endl;
+    });
 
-    map_->set(12, 8, new PlayerTerritory(&p1_));
-    map_->set(12, 9, new PlayerTerritory(&p1_));
-    map_->set(11, 8, new PlayerTerritory(&p1_));
-    map_->set(11, 9, new PlayerTerritory(&p1_));
-    map_->set(13, 8, new PlayerTerritory(&p1_));
+    Texture* nextTex  = new Texture(renderer_, "../assets/img/next.png");
+    Button* nextBtn = new Button(nextTex, nullptr, nullptr, Point{150,300});
+    nextBtn->setCallback([](){
+        std::cout << "Next button clicked!" << std::endl;
+    });
 
-    map_->set(3, 14, new PlayerTerritory(&p2_));
-    map_->set(3, 15, new PlayerTerritory(&p2_));
-    map_->set(2, 13, new PlayerTerritory(&p2_));
-    map_->set(3, 12, new PlayerTerritory(&p2_));
-    map_->set(3, 11, new PlayerTerritory(&p2_));
+    Texture* skipTex  = new Texture(renderer_, "../assets/img/skip.png");
+    Button* skipBtn = new Button(skipTex, nullptr, nullptr, Point{150,400});
+    skipBtn->setCallback([](){
+        std::cout << "Skip button clicked!" << std::endl;
+    });
 
-    map_->refresh();
-    */
+    overlay_.addButton(undoBtn);
+    overlay_.addButton(turnBtn);
+    overlay_.addButton(nextBtn);
+    overlay_.addButton(skipBtn);
 
 }
 
@@ -162,6 +166,8 @@ void Game::handleEvents() {
         }
 
         map_->handleEvent(event);
+        overlay_.handleEvent(event);
+
     }
 }
 
@@ -171,6 +177,10 @@ void Game::draw() {
     SDL_RenderClear(renderer_);
 
     map_->draw(mapPos_);
+
+
+    // Dans la boucle de rendu :
+    overlay_.render(renderer_);
     
     // Show rendering
     SDL_RenderPresent(renderer_);

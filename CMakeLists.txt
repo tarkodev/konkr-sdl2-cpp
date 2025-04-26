@@ -92,6 +92,8 @@ set(SRC_FILES
     "${CMAKE_SOURCE_DIR}/src/Window.cpp"
     "${CMAKE_SOURCE_DIR}/src/Game.cpp"
     "${CMAKE_SOURCE_DIR}/src/main.cpp" 
+    "${CMAKE_SOURCE_DIR}/src/Button.cpp" 
+    "${CMAKE_SOURCE_DIR}/src/Overlay.cpp" 
 )
 
 # Compilation de l'exécutable en activant SDL
