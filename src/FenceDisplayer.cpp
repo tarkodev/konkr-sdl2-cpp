@@ -54,11 +54,6 @@ void FenceDisplayer::display(const Texture* target, const Point& pos, const std:
             static_cast<int>(x - innerRadius_ - linkTop_->getWidth() / 2.0),
             static_cast<int>(y - linkTop_->getHeight() / 2.0)
         });
-    } else if (neighbors[0] && !neighbors[1]) {
-        target->blit(linkBottomLeft_, Point{
-            static_cast<int>(x - 0.5 * innerRadius_ - linkBottomLeft_->getWidth() / 2.0),
-            static_cast<int>(y - 0.75 * radius_ - linkBottomLeft_->getHeight() / 2.0)
-        });
     }
 
     if (!neighbors[4] && !neighbors[5]) {
@@ -96,6 +91,11 @@ void FenceDisplayer::display(const Texture* target, const Point& pos, const std:
         target->blit(linkBottomRight_, Point{
             static_cast<int>(x - 0.5 * innerRadius_ - linkBottomRight_->getWidth() / 2.0),
             static_cast<int>(y + 0.75 * radius_ - linkBottomRight_->getHeight() / 2.0)
+        });
+    } else if (!neighbors[2] && neighbors[3]) {
+        target->blit(linkBottomLeft_, Point{
+            static_cast<int>(x + 0.5 * innerRadius_ - linkBottomLeft_->getWidth() / 2.0),
+            static_cast<int>(y + 0.75 * radius_ - linkBottomLeft_->getHeight() / 2.0)
         });
     }
 }

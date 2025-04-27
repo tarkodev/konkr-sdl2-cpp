@@ -1,6 +1,9 @@
 #include "PlayableGround.hpp"
 #include "Cell.hpp"
 #include "ColorUtils.hpp"
+#include "logic/units/Castle.hpp"
+#include "logic/units/Town.hpp"
+#include "logic/units/Camp.hpp"
 
 FenceDisplayer PlayableGround::fenceDisplayer_ = FenceDisplayer{ nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 
@@ -97,18 +100,34 @@ void PlayableGround::display(const Texture* target, const Point& pos) {
     }
 }
 
+bool PlayableGround::hasFences() const {
+    if (element && (dynamic_cast<Castle*>(element) || dynamic_cast<Town*>(element) || dynamic_cast<Camp*>(element)))
+        return true;
+
+    return owner_ && std::any_of(neighbors.begin(), neighbors.end(), [this](Cell* n) {
+        if (auto* pg = dynamic_cast<PlayableGround*>(n)) {
+            if (pg->getOwner() != owner_) return false;
+            auto elt = pg->getElement();
+            return (elt && (dynamic_cast<Castle*>(elt) || dynamic_cast<Town*>(elt)));
+        }
+        return false;
+    });
+}
+
 void PlayableGround::displayFences(const Texture* target, const Point& pos) {
-    if (!hasPlate_ || !owner_) return;
+    if (!hasFences()) return;
 
-    std::vector<bool> similarNeighbors;
-    for (Cell* n : neighbors) {
-        if (auto* pg = dynamic_cast<PlayableGround*>(n))
-            similarNeighbors.push_back(pg->getOwner() == owner_);
-        else
-            similarNeighbors.push_back(false);
-    }
+    std::vector<bool> similarNeighborsWithFences;
+    if (owner_) {
+        for (Cell* n : neighbors) {
+            if (auto* pg = dynamic_cast<PlayableGround*>(n))
+                similarNeighborsWithFences.push_back(pg->getOwner() == owner_ && pg->hasFences());
+            else
+                similarNeighborsWithFences.push_back(false);
+        }
+    } else similarNeighborsWithFences.resize(6, false);
 
-    fenceDisplayer_.display(target, pos, similarNeighbors);
+    fenceDisplayer_.display(target, pos, similarNeighborsWithFences);
 }
 
 void PlayableGround::setElement(GameElement* elt) {

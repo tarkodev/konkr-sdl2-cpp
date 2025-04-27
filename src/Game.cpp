@@ -60,8 +60,11 @@ Game::Game()
     Size mapRealSize = map_->getSize();
     mapPos_ = {(windowSize_.getWidth() - mapRealSize.getWidth()) / 2, (windowSize_.getHeight() - mapRealSize.getHeight()) / 2};
 
+
+
     //////////// Button
 
+    //! A déplacer dans Overlay pour le chargement des textures
     // Après avoir créé vos textures :
     Texture* undoTex  = new Texture(renderer_, "../assets/img/undo.png");
     Button* undoBtn = new Button(undoTex, nullptr, nullptr, Point{150,100});
@@ -91,35 +94,6 @@ Game::Game()
     overlay_.addButton(turnBtn);
     overlay_.addButton(nextBtn);
     overlay_.addButton(skipBtn);
-    //map_->set(0, 19, new Forest());
-
-
-    /*
-    map_->set(0, 0, new PlayableGround(&p1_));
-    map_->set(0, 1, new PlayableGround(&p1_));
-    map_->set(0, 2, new PlayableGround(&p1_));
-    map_->set(0, 3, new PlayableGround(&p1_));
-    map_->refresh();
-    */
-    
-    /*
-    map_->set(1, 2, new Water());
-    map_->set(3, 3, new Water());
-
-    map_->set(12, 8, new PlayableGround(&p1_));
-    map_->set(12, 9, new PlayableGround(&p1_));
-    map_->set(11, 8, new PlayableGround(&p1_));
-    map_->set(11, 9, new PlayableGround(&p1_));
-    map_->set(13, 8, new PlayableGround(&p1_));
-
-    map_->set(3, 14, new PlayableGround(&p2_));
-    map_->set(3, 15, new PlayableGround(&p2_));
-    map_->set(2, 13, new PlayableGround(&p2_));
-    map_->set(3, 12, new PlayableGround(&p2_));
-    map_->set(3, 11, new PlayableGround(&p2_));
-
-    map_->refresh();
-    */
 
 }
 

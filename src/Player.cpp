@@ -33,3 +33,11 @@ HexagonDisplayer& Player::getPlate() {
 HexagonDisplayer& Player::getLostPlate() {
     return lostPlate_;
 }
+
+//! Pour chaque troupe qui lui appartient, ajouter depuis la troupe `owner_->addTroop(this)`
+void Player::addTroop(Troop* troop) {
+    if (troop) {
+        troops_.push_back(troop);
+        troop->setOwner(this);
+    }
+}

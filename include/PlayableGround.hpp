@@ -23,6 +23,8 @@ public:
 
     const std::string getType() override;
     void display(const Texture* target, const Point& pos) override;
+
+    bool hasFences() const;
     void displayFences(const Texture* target, const Point& pos);
 
     GameElement* getElement();
