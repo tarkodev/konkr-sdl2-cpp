@@ -3,7 +3,8 @@
 
 #include <string>
 #include "Displayer.hpp"
-#include "Player.hpp"
+
+class Player;
 
 /**
  * @brief Élément logique posé sur une Cell (unité, bâtiment, nuisible…).
@@ -17,7 +18,7 @@ public:
     int      getCost()       const { return cost_;     }   // 0 si gratuit
     int      getUpkeep()     const { return upkeep_;   }   // 0 si aucun entretien
     Player*  getOwner()      const { return owner_;    }
-    void     setOwner(Player* p)   { owner_ = p;       }
+    void     setOwner(Player* p)   { owner_ = p;       } //! supprimer (camp n'a pas de propriétaire, créer classe abstraite PlayerTroop qui n'inclut pas bandit et PlayerBuilding qui n'inclut pas de camp)
 
     /* --- Cycle de tour --- */
     virtual void onTurnStart()  {}   ///< début du tour du propriétaire

@@ -7,7 +7,7 @@
 #include "SDL2/SDL_image.h"
 #include "HexagonDisplayer.hpp"
 #include "ColorUtils.hpp"
-#include "Troop.hpp"
+#include "logic/Troop.hpp"
 
 using namespace ColorUtils;
 
@@ -21,7 +21,7 @@ public:
     HexagonDisplayer& getPlate();
     HexagonDisplayer& getLostPlate();
 
-    void Player::addTroop(Troop* troop);
+    void addTroop(Troop* troop);
 
 private:
     static SDL_Renderer *renderer_;

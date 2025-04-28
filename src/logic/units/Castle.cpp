@@ -6,6 +6,7 @@ Texture* Castle::sprite_ = nullptr;
 Castle::Castle(Player* owner)
     : Building(STRENGTH, COST, UPKEEP, owner) {}
 
+//! supprimer (ce sera depuis players qu'on fera pour chaque town le parcours des cellules pour connaitre la somme à ajouter)
 void Castle::onTurnStart()
 {
     // TODO : ajouter les pièces à la province

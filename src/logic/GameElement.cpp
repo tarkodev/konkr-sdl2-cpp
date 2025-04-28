@@ -1,4 +1,5 @@
 #include "logic/GameElement.hpp"
+#include "Player.hpp"
 
 SDL_Renderer* GameElement::renderer = nullptr;
 
