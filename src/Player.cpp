@@ -2,6 +2,8 @@
 #include "Ground.hpp"
 #include "logic/units/Town.hpp"
 #include <stdexcept>
+#include <algorithm>
+#include "PlayableGround.hpp"
 
 HexagonDisplayer Player::plateDisplayer = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
 SDL_Renderer* Player::renderer_ = nullptr;
@@ -35,22 +37,34 @@ HexagonDisplayer& Player::getLostPlate() {
     return lostPlate_;
 }
 
-void Player::addTown(Town* town) {
-    if (town) towns_.push_back(town);
+void Player::addTownCell(PlayableGround* townCell) {
+    if (townCell) townCells_.insert(townCell);
 }
 
 void Player::onTurnStart() {
-    for (auto& town : towns_) {
+    // Remove destroyed towns
+    std::erase_if(townCells_, [](PlayableGround* townCell) {
+        return dynamic_cast<Town*>(townCell->getElement()) == nullptr;
+    });
+    
+    for (PlayableGround* townCell : townCells_) {
+        Town* town = dynamic_cast<Town*>(townCell->getElement());
         town->setSelected(true);
-        // sum = town->getNextCapital(false);
-        // if (sum < 0)
-        // town->freeTroops();
+        // sum = townCell->getNextCapital(false);
+        // if (sum < 0) {
+        //    townCell->freeTroops();
+        //    town->setCoins(0);
+        // } else {
+        //    //! Si un camp sur la map, le bandit doit ajouter le coin au camp (si plusieurs, choix aléatoire)
+        //    town->setCoins(sum);
+        // }
     }
 }
 
 void Player::onTurnEnd() {
-    for (auto& town : towns_) {
-        town->setSelected(false);
+    for (PlayableGround* townCell : townCells_) {
+        Town* town = dynamic_cast<Town*>(townCell->getElement());
+        if (town) town->setSelected(false);
 
     }
 }

@@ -65,6 +65,15 @@ public:
      */
     void setAxial(int q, int r, const T& value);
 
+    auto begin() { return grid_.begin(); }
+    auto end()   { return grid_.end();   }
+
+    auto begin()  const { return grid_.cbegin(); }
+    auto end()    const { return grid_.cend();   }
+
+    auto cbegin() const { return grid_.cbegin(); }
+    auto cend()   const { return grid_.cend();   }
+
 private:
     int width_;
     int height_;

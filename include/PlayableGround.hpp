@@ -6,8 +6,8 @@
 #include "Player.hpp"
 #include "Ground.hpp"
 #include "logic/GameElement.hpp"
-#include "PlayableGround.hpp"
 #include "FenceDisplayer.hpp"
+#include <unordered_set>
 
 class PlayableGround: public Ground {
 public:
@@ -27,6 +27,9 @@ public:
     bool hasFences() const;
     void displayFences(const Texture* target, const Point& pos);
 
+    bool isLinked();
+    void updateLinked();
+
     GameElement* getElement();
     void setElement(GameElement* elt);
 
@@ -39,6 +42,9 @@ private:
     HexagonDisplayer lostPlate_ = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
     GameElement* element = nullptr;
     bool hasPlate_ = false;
+
+    bool isLinked(std::unordered_set<PlayableGround*>& visited);
+    void unlink(std::unordered_set<PlayableGround*>& visited);
 };
 
 #endif

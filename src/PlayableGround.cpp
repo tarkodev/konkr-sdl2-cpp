@@ -2,8 +2,9 @@
 #include "Cell.hpp"
 #include "ColorUtils.hpp"
 #include "logic/units/Castle.hpp"
-#include "logic/units/Town.hpp"
 #include "logic/units/Camp.hpp"
+#include "logic/units/Bandit.hpp"
+#include "logic/Troop.hpp"
 
 FenceDisplayer PlayableGround::fenceDisplayer_ = FenceDisplayer{ nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 
@@ -112,6 +113,63 @@ bool PlayableGround::hasFences() const {
         }
         return false;
     });
+}
+
+bool PlayableGround::isLinked(std::unordered_set<PlayableGround*>& visited) {
+    if (!owner_ || visited.find(this) != visited.end()) return false;
+    visited.insert(this);
+
+    auto town = dynamic_cast<Town*>(element);
+    if (town) return true;
+
+    for (Cell* n : neighbors) {
+        auto* pg = dynamic_cast<PlayableGround*>(n);
+        if (pg && pg->getOwner() == owner_ && pg->isLinked(visited))
+            return true;
+    }
+
+    return false;
+}
+
+bool PlayableGround::isLinked() {
+    std::unordered_set<PlayableGround*> visited;
+    return isLinked(visited);
+}
+
+void PlayableGround::unlink(std::unordered_set<PlayableGround*>& visited) {
+    if (visited.find(this) != visited.end()) return;
+    visited.insert(this);
+
+    if (owner_) {
+        for (Cell* n : neighbors) {
+            auto* pg = dynamic_cast<PlayableGround*>(n);
+            if (pg && pg->getOwner() == owner_)
+                pg->unlink(visited);
+        }
+
+        setOwner(nullptr);
+    }
+
+    if (auto castle = dynamic_cast<Castle*>(element)) {
+        delete castle;
+        element = new Camp();
+        oldOwner_ = nullptr;
+        hasPlate_ = false;
+    } else if (auto troop = dynamic_cast<Troop*>(element)) {
+        delete troop;
+        element = new Bandit();
+    }
+}
+
+//! check si voisin.owner == null && oldowner = owner
+// void link(owner, visited)
+
+void PlayableGround::updateLinked() {
+    std::unordered_set<PlayableGround*> visited;
+    if (!isLinked(visited)) {
+        visited.clear();
+        unlink(visited);
+    }
 }
 
 void PlayableGround::displayFences(const Texture* target, const Point& pos) {

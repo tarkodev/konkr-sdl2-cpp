@@ -19,6 +19,9 @@ public:
     int getCost()     const override { return COST; };
     int getUpkeep()   const override { return UPKEEP; };
 
+    int getCoins() const { return coins_; }
+    void setCoins(int coins) { coins_ = coins; }
+
     void setSelected(bool selected) { 
         SDL_Log("Town selected: %d", selected);
         selected_ = selected; }
@@ -33,6 +36,7 @@ private:
     static Texture* selectSprite_;
 
     bool selected_ = false;
+    int coins_ = 0;
 };
 
 #endif

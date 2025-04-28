@@ -7,6 +7,9 @@
 #include "HexagonDisplayer.hpp"
 #include "ColorUtils.hpp"
 #include "logic/units/Town.hpp"
+#include <unordered_set>
+
+class PlayableGround;
 
 using namespace ColorUtils;
 
@@ -20,7 +23,7 @@ public:
     HexagonDisplayer& getPlate();
     HexagonDisplayer& getLostPlate();
 
-    void addTown(Town* town);
+    void addTownCell(PlayableGround* town);
 
     void onTurnStart();
     void onTurnEnd();
@@ -34,7 +37,7 @@ private:
 
     HexagonDisplayer plate_;
     HexagonDisplayer lostPlate_;
-    std::vector<Town*> towns_;
+    std::unordered_set<PlayableGround*> townCells_;
 };
 
 #endif

@@ -55,6 +55,7 @@ GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize)
                 set(x, y, new Forest());
         }
     }
+    updateNeighbors();
     refresh();
 }
 
@@ -69,10 +70,9 @@ GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize, const std
         throw std::runtime_error("Une map doit au moins être de taille 2x2.");
 
     loadMap(mapFile);
-    refresh();
     SDL_Log("Players: %zu", players_.size());
     players_[0]->onTurnStart(); //! Après un onTurnStart, refresh le calc elementsCalc_
-    refreshElements();
+    refresh();
 }
 
 std::pair<int,int> GameMap::getSizeOfMapFile(const std::string& mapFile) {
@@ -170,7 +170,7 @@ void GameMap::loadMap(const std::string& mapFile) {
                     PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
                     if (t && cellType != '0') {
                         t->setElement(gameElt);
-                        t->getOwner()->addTown(dynamic_cast<Town*>(gameElt));
+                        t->getOwner()->addTownCell(t);
                     }
                     break;
                 }
@@ -231,7 +231,12 @@ void GameMap::loadMap(const std::string& mapFile) {
     if (y != getHeight())
         throw std::runtime_error("Le fichier de map n'a pas assez de lignes (attendu " + std::to_string(getHeight()) + ")");
 
-    //! Ajouter fonction isLinked à PlayableGround (Renvoie true s'il est une town, sinon s'ajoute à une liste passée en paramètre et demande isLinked à ses voisins)
+    updateNeighbors();
+
+    // Update links
+    for (Cell* cell : *this)
+        if (auto* pg = dynamic_cast<PlayableGround*>(cell))
+            pg->updateLinked();
     //! update state de la map (ex: hexagone/troupe/castle par relié à une town(mettre nullptr/bandit/camp))
 }
 
@@ -359,9 +364,6 @@ void GameMap::refreshElements() {
 
 void GameMap::refresh()
 {
-    // Update Neighbors of cells
-    updateNeighbors();
-
     // Create sprite of map if isn't exists
     if (!islandsCalc_ || !cellsCalc_ || !fencesCalc_ || !elementsCalc_)
         createSprite();
@@ -429,7 +431,7 @@ Size GameMap::getSize() const {
 
 void GameMap::draw(const Point& pos)
 {
-    if (!islandsCalc_)
+    if (!islandsCalc_ || !cellsCalc_ || !fencesCalc_ || !elementsCalc_)
         refresh();
 
     Rect dest = {pos, size_};
@@ -455,8 +457,10 @@ void GameMap::draw(const Point& pos)
 void GameMap::test() {
     if (!selectedHexagon_.has_value()) return;
 
-    dynamic_cast<PlayableGround*>(get(selectedHexagon_->getX(), selectedHexagon_->getY()))->setOwner(nullptr);
+    dynamic_cast<PlayableGround*>(get(selectedHexagon_->getX(), selectedHexagon_->getY()))->updateLinked();
+    //dynamic_cast<PlayableGround*>(get(selectedHexagon_->getX(), selectedHexagon_->getY()))->setOwner(nullptr);
     //set(selectedHexagon_->getX(), selectedHexagon_->getY(), new Water());
+    //updateNeighbors();
     refresh();
 }
 

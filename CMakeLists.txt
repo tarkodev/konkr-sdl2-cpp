@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.10...3.27)
 project(PROJECT LANGUAGES CXX)
 
-# Spécifier le standard C++ (ici C++17)
-set(CMAKE_CXX_STANDARD 17)
+# Spécifier le standard C++ (ici C++23)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(APPLE)
@@ -100,6 +100,8 @@ set(SRC_FILES
     "${CMAKE_SOURCE_DIR}/src/Button.cpp"
     "${CMAKE_SOURCE_DIR}/src/Overlay.cpp"
 )
+
+add_compile_options(-std=c++23)
 
 # Compilation de l'exécutable en activant SDL
 compilation(
