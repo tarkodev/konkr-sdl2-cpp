@@ -26,6 +26,8 @@ public:
 
     bool hasFences() const;
     void displayFences(const Texture* target, const Point& pos);
+    void displayElement(const Texture* target, const Point& pos);
+    void displayShield(const Texture* target, const Point& pos);
 
     bool isLinked();
     void updateLinked();
@@ -33,8 +35,11 @@ public:
     GameElement* getElement();
     void setElement(GameElement* elt);
 
+    int getShield() const;
+
 private:
     static FenceDisplayer fenceDisplayer_;
+    static std::vector<Texture*> shields_;
 
     Player* oldOwner_ = nullptr;
     Player* owner_ = nullptr;

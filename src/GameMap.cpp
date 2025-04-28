@@ -334,7 +334,7 @@ void GameMap::refreshElements() {
         refresh();
 
     // Draw transparent background
-    elementsCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
+    elementsCalc_->fill(ColorUtils::toTransparent(ColorUtils::GREY));
 
     // Get utils dimensions
     Size islandSize = Ground::getIslandSize();
@@ -355,9 +355,10 @@ void GameMap::refreshElements() {
             };
 
             // Draw element
-            if (auto* pt = dynamic_cast<PlayableGround*>(cell))
-                if (auto* elt = pt->getElement())
-                    elt->display(elementsCalc_, pos);
+            if (auto* pt = dynamic_cast<PlayableGround*>(cell)) {
+                pt->displayElement(elementsCalc_, pos);
+                pt->displayShield(elementsCalc_, pos);
+            }
         }
     }
 }
@@ -373,7 +374,7 @@ void GameMap::refresh()
     islandsCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
     cellsCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
     fencesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
-    elementsCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
+    elementsCalc_->fill(ColorUtils::toTransparent(ColorUtils::GREY));
 
     // Get utils dimensions
     Size islandSize = Ground::getIslandSize();
@@ -404,8 +405,8 @@ void GameMap::refresh()
             // Draw element
             if (auto* pt = dynamic_cast<PlayableGround*>(cell)) {
                 pt->displayFences(fencesCalc_, pos);
-                if (auto* elt = pt->getElement())
-                    elt->display(elementsCalc_, pos);
+                pt->displayElement(elementsCalc_, pos);
+                pt->displayShield(elementsCalc_, pos);
             }
         }
     }

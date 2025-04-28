@@ -20,7 +20,7 @@ public:
     int getUpkeep()   const override { return UPKEEP; };
 
 protected:
-    static constexpr int STRENGTH = 1;
+    static constexpr int STRENGTH = 2;
     static constexpr int COST     = 0;
     static constexpr int UPKEEP   = 0;
 

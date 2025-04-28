@@ -5,8 +5,11 @@
 #include "logic/units/Camp.hpp"
 #include "logic/units/Bandit.hpp"
 #include "logic/Troop.hpp"
+#include <algorithm>
+#include <ranges>
 
 FenceDisplayer PlayableGround::fenceDisplayer_ = FenceDisplayer{ nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+std::vector<Texture*> PlayableGround::shields_ = std::vector<Texture*>();
 
 const std::string PlayableGround::TYPE = "PlayableGround";
 const std::string PlayableGround::getType() {
@@ -38,6 +41,12 @@ void PlayableGround::init() {
         fenceLinkTop, fenceLinkTopLeft, fenceLinkTopRight,
         fenceLinkBottom, fenceLinkBottomLeft, fenceLinkBottomRight
     };
+
+    // Load shields
+    shields_.push_back((new Texture(renderer_, "../assets/img/shield1.png"))->convertAlpha());
+    shields_.push_back((new Texture(renderer_, "../assets/img/shield2.png"))->convertAlpha());
+    shields_.push_back((new Texture(renderer_, "../assets/img/shield3.png"))->convertAlpha());
+    shields_.push_back((new Texture(renderer_, "../assets/img/shield3.png"))->convertAlpha());
 }
 
 PlayableGround::PlayableGround(Player *owner)
@@ -188,10 +197,49 @@ void PlayableGround::displayFences(const Texture* target, const Point& pos) {
     fenceDisplayer_.display(target, pos, similarNeighborsWithFences);
 }
 
+void PlayableGround::displayElement(const Texture* target, const Point& pos) {
+    if (element) element->display(target, pos);
+}
+
+void PlayableGround::displayShield(const Texture* target, const Point& pos) {
+    if (element) return;
+
+    int shield = getShield();
+    if (shield > 0) {
+        auto shieldTex = shields_[shield - 1];
+
+        target->blit(shieldTex, Point{
+            static_cast<int>(pos.getX() - shieldTex->getWidth() / 2.0),
+            static_cast<int>(pos.getY() - shieldTex->getHeight() / 2.0)
+        });
+    }
+}
+
+
+
 void PlayableGround::setElement(GameElement* elt) {
     element = elt;
 }
 
 GameElement* PlayableGround::getElement() {
     return element;
+}
+
+int PlayableGround::getShield() const {
+    int maxStrength = element ? element->getStrength() : 0;
+
+    for (Cell* cell : neighbors) {
+        auto* pg = dynamic_cast<PlayableGround*>(cell);
+        if (!pg) continue;
+
+        auto owner = pg->getOwner();
+        if (!owner || owner != owner_) continue;
+
+        auto elt = pg->getElement();
+        if (!elt) continue;
+        
+        maxStrength = std::max(maxStrength, elt->getStrength());
+    }
+
+    return maxStrength;
 }
