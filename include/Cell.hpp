@@ -12,7 +12,7 @@ public:
     static void init(SDL_Renderer *renderer);
 
     virtual const std::string getType();
-    virtual ~Cell() {}
+    virtual ~Cell() = default;
 
     void setNeighbors(std::vector<Cell*> neighbors);
 

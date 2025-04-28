@@ -3,8 +3,15 @@
 
 Texture* Villager::sprite_ = nullptr;
 
-Villager::Villager(Player* owner)
-    : Troop(STRENGTH, COST, UPKEEP, owner) {}
+void Villager::init()
+{
+    if (!renderer)
+        std::runtime_error("GameElement not initialized");
+
+    if (sprite_) return;
+    sprite_ = (new Texture(renderer, "../assets/img/villager.png"))->convertAlpha();
+}
+
 
 void Villager::display(const Texture* target, const Point& pos)
 {
@@ -15,13 +22,4 @@ void Villager::display(const Texture* target, const Point& pos)
 
     target->blit(sprite_, Point{pos.getX() - sprite_->getWidth() / 2,
                                 pos.getY() - sprite_->getHeight() / 2});
-}
-
-void Villager::init()
-{
-    if (!renderer)
-        std::runtime_error("GameElement not initialized");
-
-    if (sprite_) return;
-    sprite_ = new Texture(renderer, "../assets/img/villager.png");
 }

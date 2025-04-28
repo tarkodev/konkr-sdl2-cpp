@@ -1,5 +1,6 @@
 #include "Player.hpp"
 #include "Ground.hpp"
+#include "logic/units/Town.hpp"
 #include <stdexcept>
 
 HexagonDisplayer Player::plateDisplayer = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
@@ -34,10 +35,22 @@ HexagonDisplayer& Player::getLostPlate() {
     return lostPlate_;
 }
 
-//! Pour chaque troupe qui lui appartient, ajouter depuis la troupe `owner_->addTroop(this)`
-void Player::addTroop(Troop* troop) {
-    if (troop) {
-        troops_.push_back(troop);
-        troop->setOwner(this);
+void Player::addTown(Town* town) {
+    if (town) towns_.push_back(town);
+}
+
+void Player::onTurnStart() {
+    for (auto& town : towns_) {
+        town->setSelected(true);
+        // sum = town->getNextCapital(false);
+        // if (sum < 0)
+        // town->freeTroops();
+    }
+}
+
+void Player::onTurnEnd() {
+    for (auto& town : towns_) {
+        town->setSelected(false);
+
     }
 }

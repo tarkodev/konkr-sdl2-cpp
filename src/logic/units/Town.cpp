@@ -14,13 +14,6 @@ void Town::init()
     selectSprite_ = (new Texture(renderer, "../assets/img/bgtown.png"))->convertAlpha();
 }
 
-Town::Town(Player* owner)
-    : Building(STRENGTH, COST, UPKEEP, owner) {}
-
-void Town::onTurnStart()
-{
-    // TODO : ajouter les pièces à la province
-}
 
 void Town::display(const Texture* target, const Point& pos)
 {

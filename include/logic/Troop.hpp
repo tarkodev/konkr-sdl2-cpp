@@ -1,27 +1,24 @@
-#ifndef LOGIC_TROOP_HPP
-#define LOGIC_TROOP_HPP
+#ifndef LOGIC_PLAYERELEMENT_HPP
+#define LOGIC_PLAYERELEMENT_HPP
 
+#include "SDL.h"
 #include "logic/GameElement.hpp"
-#include "logic/Movable.hpp"
+#include "Texture.hpp"
 
-/**
- * @brief Unité mobile contrôlée (ou non) par le joueur.
- */
-class Troop : public GameElement, public Movable {
+class Troop: public GameElement {
 public:
-    Troop(int strength, int cost, int upkeep, Player* owner = nullptr);
-
-    /* --- Movable --- */
-    Point getPosition() const override { return position_; }
-    bool  moveTo(const Point& dest) override;
-
     /** Charge le sprite commun à la classe (à appeler une seule fois). */
     static void init();
+
+    virtual ~Troop() = default;
 
 protected:
     static Texture* shadow;
 
-    Point position_{-1, -1};   ///< position (col,row) offset
+    Troop() = default;
+
+private:
+    static SDL_Renderer* renderer_;
 };
 
 #endif

@@ -5,16 +5,24 @@
 
 class Knight : public Troop {
 public:
-    static constexpr int STRENGTH = 3;
-    static constexpr int COST     = 40;
-    static constexpr int UPKEEP   = 18;
+    /* Chargement des ressources partagées */
+    static void init();
 
-    explicit Knight(Player* owner = nullptr);
+    explicit Knight() = default;
 
+    /* Displayer */
     void display(const Texture* target, const Point& pos) override;
     const Size getSize() const override { return sprite_->getSize(); }
 
-    static void init();
+    /* --- Accesseurs génériques --- */
+    int getStrength() const override { return STRENGTH; };
+    int getCost()     const override { return COST; };
+    int getUpkeep()   const override { return UPKEEP; };
+
+protected:
+    static constexpr int STRENGTH = 3;
+    static constexpr int COST     = 40;
+    static constexpr int UPKEEP   = 18;
 
 private:
     static Texture* sprite_;

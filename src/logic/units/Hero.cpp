@@ -3,8 +3,15 @@
 
 Texture* Hero::sprite_ = nullptr;
 
-Hero::Hero(Player* owner)
-    : Troop(STRENGTH, COST, UPKEEP, owner) {}
+void Hero::init()
+{
+    if (!renderer)
+        std::runtime_error("GameElement not initialized");
+        
+    if (sprite_) return;
+    sprite_ = (new Texture(renderer, "../assets/img/hero.png"))->convertAlpha();
+}
+
 
 void Hero::display(const Texture* target, const Point& pos)
 {
@@ -15,13 +22,4 @@ void Hero::display(const Texture* target, const Point& pos)
 
     target->blit(sprite_, Point{pos.getX() - sprite_->getWidth() / 2,
                                 pos.getY() - sprite_->getHeight() / 2});
-}
-
-void Hero::init()
-{
-    if (!renderer)
-        std::runtime_error("GameElement not initialized");
-        
-    if (sprite_) return;
-    sprite_     = new Texture(renderer, "../assets/img/hero.png");
 }

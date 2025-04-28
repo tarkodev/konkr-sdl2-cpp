@@ -70,6 +70,9 @@ GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize, const std
 
     loadMap(mapFile);
     refresh();
+    SDL_Log("Players: %zu", players_.size());
+    players_[0]->onTurnStart(); //! Après un onTurnStart, refresh le calc elementsCalc_
+    refreshElements();
 }
 
 std::pair<int,int> GameMap::getSizeOfMapFile(const std::string& mapFile) {
@@ -140,16 +143,18 @@ void GameMap::loadMap(const std::string& mapFile) {
                         throw std::runtime_error("Caractère inattendu: " + std::to_string(cellType));
 
                     //! mettre au propre
+                    //! (JSP où dans le code: ne pas oublier de set la somme par défaut de chqque town)
                     int playerId = cellType - '0';
-                    if (players.find(playerId) == players.end())
+                    if (players.find(playerId) == players.end()) {
                         players[playerId] = new Player(std::string("Player ") + std::to_string(playerId), ColorUtils::getGroundColor(playerId));
+                        players_.push_back(players[playerId]);
+                    }
 
                     cell = new PlayableGround(players[playerId]);
                     break;
                 }
             }
 
-            //! décommenter une fois implémenté
             char gameEltType = token[1];
             GameElement* gameElt = nullptr;
             switch (gameEltType) {
@@ -163,7 +168,10 @@ void GameMap::loadMap(const std::string& mapFile) {
                 case 'T': {
                     gameElt = new Town();
                     PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
-                    if (t && cellType != '0') t->setElement(gameElt);
+                    if (t && cellType != '0') {
+                        t->setElement(gameElt);
+                        t->getOwner()->addTown(dynamic_cast<Town*>(gameElt));
+                    }
                     break;
                 }
 
@@ -222,6 +230,9 @@ void GameMap::loadMap(const std::string& mapFile) {
 
     if (y != getHeight())
         throw std::runtime_error("Le fichier de map n'a pas assez de lignes (attendu " + std::to_string(getHeight()) + ")");
+
+    //! Ajouter fonction isLinked à PlayableGround (Renvoie true s'il est une town, sinon s'ajoute à une liste passée en paramètre et demande isLinked à ses voisins)
+    //! update state de la map (ex: hexagone/troupe/castle par relié à une town(mettre nullptr/bandit/camp))
 }
 
 void GameMap::updateNeighbors() {
@@ -252,6 +263,7 @@ void GameMap::updateNeighbors() {
     }
 }
 
+//! Utiliser terme calc plutot que sprite
 void GameMap::createSprite() {
     // Get utils dimensions
     Size islandSize = Ground::getIslandSize();
@@ -269,47 +281,80 @@ void GameMap::createSprite() {
     setProportionalSize(size_);
 
     // Delete islands sprite if already exists
-    if (islands_) {
-        delete islands_;
-        islands_ = nullptr;
+    if (islandsCalc_) {
+        delete islandsCalc_;
+        islandsCalc_ = nullptr;
     }
 
     // Create sprite for islands
-    islands_ = new Texture(renderer_, spriteSize_);
-    islands_->convertAlpha();
+    islandsCalc_ = new Texture(renderer_, spriteSize_);
+    islandsCalc_->convertAlpha();
 
 
     // Delete cells sprite if already exists
-    if (cells_) {
-        delete cells_;
-        cells_ = nullptr;
+    if (cellsCalc_) {
+        delete cellsCalc_;
+        cellsCalc_ = nullptr;
     }
 
     // Create sprite for elements
-    cells_ = new Texture(renderer_, spriteSize_);
-    cells_->convertAlpha();
+    cellsCalc_ = new Texture(renderer_, spriteSize_);
+    cellsCalc_->convertAlpha();
 
 
     // Delete elements sprite if already exists
-    if (fences_) {
-        delete fences_;
-        fences_ = nullptr;
+    if (fencesCalc_) {
+        delete fencesCalc_;
+        fencesCalc_ = nullptr;
     }
 
     // Create sprite for elements
-    fences_ = new Texture(renderer_, spriteSize_);
-    fences_->convertAlpha();
+    fencesCalc_ = new Texture(renderer_, spriteSize_);
+    fencesCalc_->convertAlpha();
 
 
     // Delete elements sprite if already exists
-    if (elements_) {
-        delete elements_;
-        elements_ = nullptr;
+    if (elementsCalc_) {
+        delete elementsCalc_;
+        elementsCalc_ = nullptr;
     }
 
     // Create sprite for elements
-    elements_ = new Texture(renderer_, spriteSize_);
-    elements_->convertAlpha();
+    elementsCalc_ = new Texture(renderer_, spriteSize_);
+    elementsCalc_->convertAlpha();
+}
+
+void GameMap::refreshElements() {
+    if (!elementsCalc_)
+        refresh();
+
+    // Draw transparent background
+    elementsCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
+
+    // Get utils dimensions
+    Size islandSize = Ground::getIslandSize();
+    double islandInnerRadius = Ground::getInnerRadius();
+    double islandRadius = Ground::getRadius();
+
+    // Draw islands and cells
+    for (int y = 0; y < getHeight(); y++) {
+        for (int x = 0; x < getWidth(); x++) {
+            Cell* cell = get(x, y);
+
+            // Calcul de la position de blit
+            auto [q, r] = HexagonUtils::offsetToAxial(x, y);
+            auto [cx, cy] = HexagonUtils::axialToPixel(q, r, islandRadius);
+            auto pos = Point{
+                static_cast<int>(cx + islandInnerRadius),
+                static_cast<int>(cy + islandRadius)
+            };
+
+            // Draw element
+            if (auto* pt = dynamic_cast<PlayableGround*>(cell))
+                if (auto* elt = pt->getElement())
+                    elt->display(elementsCalc_, pos);
+        }
+    }
 }
 
 void GameMap::refresh()
@@ -318,15 +363,15 @@ void GameMap::refresh()
     updateNeighbors();
 
     // Create sprite of map if isn't exists
-    if (!islands_ || !cells_ || !fences_ || !elements_)
+    if (!islandsCalc_ || !cellsCalc_ || !fencesCalc_ || !elementsCalc_)
         createSprite();
 
     // Draw transparent background
-    //! faire un calc général qui est refresh à chaque changement d'un de ces troiq calques et qui est blit directement (cela permettra de diviser par 3 le nombre de blit)
-    islands_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
-    cells_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
-    fences_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
-    elements_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
+    //! faire un calc général qui est refresh à chaque changement d'un de ces quatres calques et qui est blit directement (cela permettra de diviser par 3 le nombre de blit)
+    islandsCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
+    cellsCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
+    fencesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
+    elementsCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
 
     // Get utils dimensions
     Size islandSize = Ground::getIslandSize();
@@ -348,17 +393,17 @@ void GameMap::refresh()
 
             // Draw island
             if (auto* t = dynamic_cast<Ground*>(cell))
-                t->Ground::display(islands_, pos);
+                t->Ground::display(islandsCalc_, pos);
 
             // Draw cell
             if (auto* disp = dynamic_cast<Displayer*>(cell))
-                disp->display(cells_, pos);
+                disp->display(cellsCalc_, pos);
 
             // Draw element
             if (auto* pt = dynamic_cast<PlayableGround*>(cell)) {
-                pt->displayFences(fences_, pos);
+                pt->displayFences(fencesCalc_, pos);
                 if (auto* elt = pt->getElement())
-                    elt->display(elements_, pos);
+                    elt->display(elementsCalc_, pos);
             }
         }
     }
@@ -384,14 +429,14 @@ Size GameMap::getSize() const {
 
 void GameMap::draw(const Point& pos)
 {
-    if (!islands_)
+    if (!islandsCalc_)
         refresh();
 
     Rect dest = {pos, size_};
-    SDL_RenderCopy(renderer_, islands_->get(), nullptr, &dest.get());
-    SDL_RenderCopy(renderer_, cells_->get(), nullptr, &dest.get());
-    SDL_RenderCopy(renderer_, fences_->get(), nullptr, &dest.get());
-    SDL_RenderCopy(renderer_, elements_->get(), nullptr, &dest.get());
+    SDL_RenderCopy(renderer_, islandsCalc_->get(), nullptr, &dest.get());
+    SDL_RenderCopy(renderer_, cellsCalc_->get(), nullptr, &dest.get());
+    SDL_RenderCopy(renderer_, fencesCalc_->get(), nullptr, &dest.get());
+    SDL_RenderCopy(renderer_, elementsCalc_->get(), nullptr, &dest.get());
 
     if (selectedHexagon_.has_value()) {
         auto [q, r] = HexagonUtils::offsetToAxial(selectedHexagon_->getX(), selectedHexagon_->getY());
@@ -399,7 +444,7 @@ void GameMap::draw(const Point& pos)
         x += pos.getX() + innerCellRadius_;
         y += pos.getY() + cellRadius_;
 
-        double ratio = static_cast<double>(dest.getWidth()) / islands_->getWidth();
+        double ratio = static_cast<double>(dest.getWidth()) / islandsCalc_->getWidth();
         int w = static_cast<int>(ratio * selectSprite_->getWidth());
         int h = static_cast<int>(ratio * selectSprite_->getHeight());
 

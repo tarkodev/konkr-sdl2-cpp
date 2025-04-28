@@ -1,30 +1,38 @@
 #ifndef TOWN_HPP
 #define TOWN_HPP
 
-#include "logic/Building.hpp"
+#include "logic/GameElement.hpp"
 
-class Town : public Building {
+class Town : public GameElement {
 public:
-    static constexpr int UPKEEP = 0;
-    static constexpr int STRENGTH = 0;
-    static constexpr int COST     = 1;
+    /* Chargement des ressources partagées */
+    static void init();
 
-    explicit Town(Player* owner = nullptr);
+    explicit Town() = default;
 
-    void onTurnStart() override;
+    /* Displayer */
     void display(const Texture* target, const Point& pos) override;
     const Size getSize() const override { return sprite_->getSize(); }
 
-    void setSelected(bool selected) { selected_ = selected; }
+    /* --- Accesseurs génériques --- */
+    int getStrength() const override { return STRENGTH; };
+    int getCost()     const override { return COST; };
+    int getUpkeep()   const override { return UPKEEP; };
 
-    /* Chargement des ressources partagées */
-    static void init();
+    void setSelected(bool selected) { 
+        SDL_Log("Town selected: %d", selected);
+        selected_ = selected; }
+
+protected:
+    static constexpr int STRENGTH = 0;
+    static constexpr int COST     = 0;
+    static constexpr int UPKEEP   = 1;
 
 private:
     static Texture* sprite_;
     static Texture* selectSprite_;
 
-    bool selected_ = true;
+    bool selected_ = false;
 };
 
 #endif

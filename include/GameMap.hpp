@@ -28,6 +28,8 @@ public:
     Size getSize() const;
     void setProportionalSize(const Size size);
     void selectHexagon(const Point& pos);
+
+    void refreshElements();
     void refresh();
 
     void handleEvent(SDL_Event &event);
@@ -58,10 +60,10 @@ private:
 
     Size size_;
     Size spriteSize_;
-    Texture* islands_ = nullptr;
-    Texture* cells_ = nullptr;
-    Texture* fences_ = nullptr;
-    Texture* elements_ = nullptr;
+    Texture* islandsCalc_ = nullptr;
+    Texture* cellsCalc_ = nullptr;
+    Texture* fencesCalc_ = nullptr;
+    Texture* elementsCalc_ = nullptr;
 };
 
 #endif

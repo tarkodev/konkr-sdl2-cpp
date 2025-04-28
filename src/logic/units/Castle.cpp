@@ -3,27 +3,19 @@
 
 Texture* Castle::sprite_ = nullptr;
 
-Castle::Castle(Player* owner)
-    : Building(STRENGTH, COST, UPKEEP, owner) {}
-
-//! supprimer (ce sera depuis players qu'on fera pour chaque town le parcours des cellules pour connaitre la somme à ajouter)
-void Castle::onTurnStart()
-{
-    // TODO : ajouter les pièces à la province
-}
-
-void Castle::display(const Texture* target, const Point& pos)
-{
-    if (!sprite_) return;
-    target->blit(sprite_, Point{pos.getX()-sprite_->getWidth()/2,
-                                pos.getY()-sprite_->getHeight()/2});
-}
-
 void Castle::init()
 {
     if (!renderer)
         std::runtime_error("GameElement not initialized");
         
     if (sprite_) return;
-    sprite_ = new Texture(renderer, "../assets/img/castle.png");
+    sprite_ = (new Texture(renderer, "../assets/img/castle.png"))->convertAlpha();
+}
+
+
+void Castle::display(const Texture* target, const Point& pos)
+{
+    if (!sprite_) return;
+    target->blit(sprite_, Point{pos.getX()-sprite_->getWidth()/2,
+                                pos.getY()-sprite_->getHeight()/2});
 }

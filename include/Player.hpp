@@ -4,10 +4,9 @@
 #include <string>
 #include <memory>
 #include "Texture.hpp"
-#include "SDL2/SDL_image.h"
 #include "HexagonDisplayer.hpp"
 #include "ColorUtils.hpp"
-#include "logic/Troop.hpp"
+#include "logic/units/Town.hpp"
 
 using namespace ColorUtils;
 
@@ -21,7 +20,10 @@ public:
     HexagonDisplayer& getPlate();
     HexagonDisplayer& getLostPlate();
 
-    void addTroop(Troop* troop);
+    void addTown(Town* town);
+
+    void onTurnStart();
+    void onTurnEnd();
 
 private:
     static SDL_Renderer *renderer_;
@@ -32,7 +34,7 @@ private:
 
     HexagonDisplayer plate_;
     HexagonDisplayer lostPlate_;
-    std::vector<Troop*> troops_;
+    std::vector<Town*> towns_;
 };
 
 #endif
