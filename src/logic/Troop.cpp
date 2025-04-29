@@ -9,3 +9,6 @@ void Troop::init() {
     if (shadow) return;
         shadow = new Texture(renderer, "../assets/img/shadow.png");
 }
+
+
+Troop::Troop(const Point& pos) : GameElement(pos) {}

@@ -14,21 +14,21 @@ public:
     static const std::string TYPE;
     static void init();
 
-    PlayableGround(Player *owner);
-    PlayableGround();
+    PlayableGround(const Point& pos, Player *owner);
+    PlayableGround(const Point& pos);
 
     Player* getOwner();
     Player* getOldOwner();
     void setOwner(Player *owner);
 
     const std::string getType() override;
-    void display(const Texture* target, const Point& pos) override;
+    void display(const Texture* target) override;
 
     bool hasFences() const;
-    void displayFences(const Texture* target, const Point& pos);
-    void displayElement(const Texture* target, const Point& pos);
-    void displayShield(const Texture* target, const Point& pos);
-    void displaySelectable(const Texture* target, const Point& pos);
+    void displayFences(const Texture* target);
+    void displayElement(const Texture* target);
+    void displayShield(const Texture* target);
+    void displaySelectable(const Texture* target);
 
     bool isLinked();
     void updateLinked();

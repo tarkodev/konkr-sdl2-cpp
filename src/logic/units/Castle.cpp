@@ -13,9 +13,11 @@ void Castle::init()
 }
 
 
-void Castle::display(const Texture* target, const Point& pos)
+Castle::Castle(const Point& pos): GameElement(pos) {}
+
+void Castle::display(const Texture* target)
 {
     if (!sprite_) return;
-    target->blit(sprite_, Point{pos.getX()-sprite_->getWidth()/2,
-                                pos.getY()-sprite_->getHeight()/2});
+    target->blit(sprite_, Point{pos_.getX()-sprite_->getWidth()/2,
+                                pos_.getY()-sprite_->getHeight()/2});
 }

@@ -4,9 +4,9 @@
 #include <vector>
 #include "SDL.h"
 #include "Texture.hpp"
-#include "Displayer.hpp"
+#include "GenericDisplayer.hpp"
 
-class FenceDisplayer: public Displayer {
+class FenceDisplayer: public GenericDisplayer {
 public:
     FenceDisplayer(SDL_Renderer* renderer, double hexagonRadius, 
         Texture* fenceTop, Texture* fenceTopLeft, Texture* fenceTopRight, 
@@ -18,8 +18,8 @@ public:
     ~FenceDisplayer();
 
     const Size getSize() const override;
+    void display(const Texture* target) override;
     void display(const Texture* target, const Point& pos) override;
-
     void display(const Texture* target, const Point& pos, const std::vector<bool>& neighbors);
 
     FenceDisplayer copy();

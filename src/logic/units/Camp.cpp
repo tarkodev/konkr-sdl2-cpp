@@ -13,9 +13,11 @@ void Camp::init()
 }
 
 
-void Camp::display(const Texture* target, const Point& pos)
+Camp::Camp(const Point& pos): GameElement(pos) {}
+
+void Camp::display(const Texture* target)
 {
     if (!sprite_) return;
-    target->blit(sprite_, Point{pos.getX()-sprite_->getWidth()/2,
-                                pos.getY()-sprite_->getHeight()/2});
+    target->blit(sprite_, Point{pos_.getX()-sprite_->getWidth()/2,
+                                pos_.getY()-sprite_->getHeight()/2});
 }

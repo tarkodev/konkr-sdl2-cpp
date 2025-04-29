@@ -54,8 +54,8 @@ void PlayableGround::init() {
     selectableSprite_->colorize(ColorUtils::YELLOW);
 }
 
-PlayableGround::PlayableGround(Player *owner)
-    : owner_(owner)
+PlayableGround::PlayableGround(const Point& pos, Player *owner)
+    : Ground(pos), owner_(owner)
 {
     if (owner_) {
         plate_ = owner_->getPlate();
@@ -64,8 +64,8 @@ PlayableGround::PlayableGround(Player *owner)
     }
 }
 
-PlayableGround::PlayableGround()
-    : PlayableGround(nullptr)
+PlayableGround::PlayableGround(const Point& pos)
+    : PlayableGround(pos, nullptr)
 {}
 
 void PlayableGround::setOwner(Player *owner) {
@@ -89,7 +89,7 @@ Player* PlayableGround::getOldOwner() {
     return oldOwner_;
 }
 
-void PlayableGround::display(const Texture* target, const Point& pos) {
+void PlayableGround::display(const Texture* target) {
     if (!hasPlate_) return;
 
     std::vector<bool> similarNeighbors;
@@ -101,7 +101,7 @@ void PlayableGround::display(const Texture* target, const Point& pos) {
                 similarNeighbors.push_back(false);
         }
 
-        plate_.display(target, pos, similarNeighbors);
+        plate_.display(target, pos_, similarNeighbors);
 
     } else {
         for (Cell* n : neighbors) {
@@ -111,7 +111,7 @@ void PlayableGround::display(const Texture* target, const Point& pos) {
                 similarNeighbors.push_back(false);
         }
         
-        lostPlate_.display(target, pos, similarNeighbors);
+        lostPlate_.display(target, pos_, similarNeighbors);
     }
 }
 
@@ -166,12 +166,12 @@ void PlayableGround::unlink(std::unordered_set<PlayableGround*>& visited) {
 
     if (auto castle = dynamic_cast<Castle*>(element)) {
         delete castle;
-        element = new Camp();
+        element = new Camp(pos_);
         oldOwner_ = nullptr;
         hasPlate_ = false;
     } else if (auto troop = dynamic_cast<Troop*>(element)) {
         delete troop;
-        element = new Bandit();
+        element = new Bandit(pos_);
     }
 }
 
@@ -215,7 +215,7 @@ void PlayableGround::updateLinked() {
     }
 }
 
-void PlayableGround::displayFences(const Texture* target, const Point& pos) {
+void PlayableGround::displayFences(const Texture* target) {
     if (!hasFences()) return;
 
     std::vector<bool> similarNeighborsWithFences;
@@ -228,14 +228,14 @@ void PlayableGround::displayFences(const Texture* target, const Point& pos) {
         }
     } else similarNeighborsWithFences.resize(6, false);
 
-    fenceDisplayer_.display(target, pos, similarNeighborsWithFences);
+    fenceDisplayer_.display(target, pos_, similarNeighborsWithFences);
 }
 
-void PlayableGround::displayElement(const Texture* target, const Point& pos) {
-    if (element) element->display(target, pos);
+void PlayableGround::displayElement(const Texture* target) {
+    if (element) element->display(target);
 }
 
-void PlayableGround::displayShield(const Texture* target, const Point& pos) {
+void PlayableGround::displayShield(const Texture* target) {
     if (element) return;
 
     int shield = getShield();
@@ -243,18 +243,18 @@ void PlayableGround::displayShield(const Texture* target, const Point& pos) {
         auto shieldTex = shieldSprites_[shield - 1];
 
         target->blit(shieldTex, Point{
-            static_cast<int>(pos.getX() - shieldTex->getWidth() / 2.0),
-            static_cast<int>(pos.getY() - shieldTex->getHeight() / 2.0)
+            static_cast<int>(pos_.getX() - shieldTex->getWidth() / 2.0),
+            static_cast<int>(pos_.getY() - shieldTex->getHeight() / 2.0)
         });
     }
 }
 
-void PlayableGround::displaySelectable(const Texture* target, const Point& pos) {
+void PlayableGround::displaySelectable(const Texture* target) {
     if (!selectable_ || (owner_ && owner_->hasSelected())) return;
 
     target->blit(selectableSprite_, Point{
-        static_cast<int>(pos.getX() - selectableSprite_->getWidth() / 2.0),
-        static_cast<int>(pos.getY() - selectableSprite_->getHeight() / 2.0)
+        static_cast<int>(pos_.getX() - selectableSprite_->getWidth() / 2.0),
+        static_cast<int>(pos_.getY() - selectableSprite_->getHeight() / 2.0)
     });
 }
 
@@ -262,6 +262,7 @@ void PlayableGround::displaySelectable(const Texture* target, const Point& pos) 
 
 void PlayableGround::setElement(GameElement* elt) {
     element = elt;
+    if (element) elt->setPos(pos_);
 }
 
 GameElement* PlayableGround::getElement() {

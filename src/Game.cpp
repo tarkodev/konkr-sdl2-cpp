@@ -171,6 +171,7 @@ void Game::handleEvents() {
             }
 
             case SDL_MOUSEWHEEL: {
+                //! Mettre limite min/max de zoom
                 Size mapSize = map_->getSize();
                 double zoom = (event.wheel.preciseY > 0) ? 1.1 : 0.9;
 
@@ -225,7 +226,7 @@ void Game::draw() {
     SDL_RenderClear(renderer_);
 
     if (screen_ == ScreenState::InGame) {
-        map_->draw(); //! faire devenir GameMap un Displayer et donc blit (quand on aura retirer le param pos à display)
+        map_->display(nullptr);
 
         // Dans la boucle de rendu :
         overlay_.render(renderer_);

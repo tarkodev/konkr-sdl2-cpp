@@ -9,12 +9,12 @@ const std::string Forest::getType() {
     return Forest::TYPE;
 }
 
-Forest::Forest() {}
+Forest::Forest(const Point& pos): Ground(pos) {}
 
 void Forest::init() {
     forest_ = (new Texture(renderer_, "../assets/img/forest.png"))->convertAlpha();
 }
 
-void Forest::display(const Texture* target, const Point& pos) {
-    target->blit(forest_, Point{pos.getX() - forest_->getWidth() / 2, pos.getY() - forest_->getHeight() / 2});
+void Forest::display(const Texture* target) {
+    target->blit(forest_, Point{pos_.getX() - forest_->getWidth() / 2, pos_.getY() - forest_->getHeight() / 2});
 }

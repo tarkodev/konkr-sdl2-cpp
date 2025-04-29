@@ -14,6 +14,7 @@
 #include "Size.hpp"
 #include "Player.hpp"
 #include "logic/Troop.hpp"
+#include "Displayer.hpp"
 
 /**
  * @brief Classe représentant une carte de jeu.
@@ -21,17 +22,16 @@
  * Hérite de HexagonGrid<int> pour gérer la logique de la grille d'hexagons,
  * et ajoute des fonctionnalités de rendu graphique (création de sprites, etc.).
  */
-class GameMap : public HexagonGrid<Cell*> {
+class GameMap : public HexagonGrid<Cell*>, public Displayer {
 public:
     GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize);
     GameMap(const Point& pos, const Size size, const std::string mapFile);
 
-    Size getSize() const;
+    const Size getSize() const override;
     void setProportionalSize(const Size size);
     void selectCell(const Point& pos);
 
-    void setPos(const Point& pos);
-    Point getPos() const;
+    void setPos(const Point& pos) override;
 
     void refreshElements();
     void refreshSelectables();
@@ -40,7 +40,7 @@ public:
     bool hasTroopSelected() {return selectedTroopCell_ != nullptr;};
 
     void handleEvent(SDL_Event &event);
-    void draw();
+    void display(const Texture* target) override;
 
     void endTurn();
     void test();
@@ -60,13 +60,14 @@ private:
     void updateNeighbors();
     void createSprite();
     void updateSelectedCell();
-    bool isSelectableTroop(Cell* cell);
+    bool isSelectableTroop(PlayableGround* pg);
+    void updateCursor();
 
     void moveTroop(PlayableGround* from, PlayableGround* to);
 
     double ratio_ = 0;
 
-    std::optional<Point> selectedCell_;
+    std::optional<PlayableGround*> selectedCell_;
     bool hasSelection_ = false;
 
     std::vector<Player *> players_;
@@ -76,7 +77,6 @@ private:
     PlayableGround* selectedTroopCell_ = nullptr;
     int selectedPlayerNum_ = 0;
 
-    Point pos_;
     Size size_;
     Size spriteSize_;
     Texture* islandsCalc_ = nullptr;

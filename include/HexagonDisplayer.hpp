@@ -4,9 +4,9 @@
 #include <vector>
 #include "SDL.h"
 #include "Texture.hpp"
-#include "Displayer.hpp"
+#include "GenericDisplayer.hpp"
 
-class HexagonDisplayer: public Displayer {
+class HexagonDisplayer: public GenericDisplayer {
 public:
     HexagonDisplayer(SDL_Renderer* renderer,
                    double hexagonRadius,
@@ -19,6 +19,7 @@ public:
     ~HexagonDisplayer();
 
     const Size getSize() const override;
+    void display(const Texture* target) override;
     void display(const Texture* target, const Point& pos) override;
 
     void display(const Texture* target, const Point& pos, const std::vector<bool>& neighbors);

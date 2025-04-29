@@ -15,7 +15,7 @@ public:
 protected:
     static Texture* shadow;
 
-    Troop() = default;
+    Troop(const Point& pos);
 
 private:
     static SDL_Renderer* renderer_;

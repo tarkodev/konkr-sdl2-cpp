@@ -11,7 +11,6 @@
 #include "RenderTargetGuard.hpp"
 #include "Rect.hpp"
 #include "Point.hpp"
-#include "DrawUtils.hpp"
 #include "logic/units/Bandit.hpp"
 #include "logic/units/Town.hpp"
 #include "logic/units/Castle.hpp"
@@ -43,20 +42,23 @@ void GameMap::init(SDL_Renderer *renderer) {
 }
 
 GameMap::GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize)
-    : pos_{pos}, size_{size}, HexagonGrid<Cell*>(gridSize, nullptr)
+    : Displayer(pos), size_{size}, HexagonGrid<Cell*>(gridSize, nullptr)
 {
     if (getWidth() < 2 || getHeight() < 2)
         throw std::runtime_error("Une map doit au moins être de taille 2x2.");
 
+    double islandRadius = Ground::getRadius();
     for (int x=0; x < getWidth(); x++) {
         for (int y = 0; y < getHeight(); y++) {
+            auto [posX, posY] = HexagonUtils::offsetToPixel(x, y, islandRadius);
+
             int v = std::rand() % 4;
             if (v == 0)
-                set(x, y, new PlayableGround());
+                set(x, y, new PlayableGround(Point{posX, posY}));
             else if (v == 1)
                 set(x, y, new Water());
             else if (v == 3)
-                set(x, y, new Forest());
+                set(x, y, new Forest(Point{posX, posY}));
         }
     }
     updateNeighbors();
@@ -68,7 +70,7 @@ GameMap::GameMap(const Point& pos, const Size size, const std::string mapFile)
 {}
 
 GameMap::GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize, const std::string mapFile)
-    : pos_{pos}, size_{size}, HexagonGrid<Cell*>(gridSize, nullptr)
+    : Displayer(pos), size_{size}, HexagonGrid<Cell*>(gridSize, nullptr)
 {
     if (getWidth() < 2 || getHeight() < 2)
         throw std::runtime_error("Une map doit au moins être de taille 2x2.");
@@ -109,6 +111,8 @@ void GameMap::loadMap(const std::string& mapFile) {
     std::ifstream in(mapFile);
     if (!in) throw std::runtime_error("Impossible d'ouvrir le fichier de map.");
 
+    double islandInnerRadius = Ground::getInnerRadius();
+    double islandRadius = Ground::getRadius();
     std::map<int, Player*> players;
 
     int y;
@@ -123,11 +127,14 @@ void GameMap::loadMap(const std::string& mapFile) {
             if (token.size() != 2)
                 throw std::runtime_error("Malformation du fichier.");
 
+            auto [posX, posY] = HexagonUtils::offsetToPixel(x, y, Ground::getRadius());
+            Point pos{static_cast<int>(posX + islandInnerRadius), static_cast<int>(posY + islandRadius)};
+
             char cellType = token[0];
             Cell* cell = nullptr;
             switch (cellType) {
                 case 'F': {
-                    cell = new Forest();
+                    cell = new Forest(pos);
                     break;
                 }
 
@@ -137,7 +144,7 @@ void GameMap::loadMap(const std::string& mapFile) {
                 }
                 
                 case '0': {
-                    cell = new PlayableGround();
+                    cell = new PlayableGround(pos);
                     break;
                 }
 
@@ -153,7 +160,7 @@ void GameMap::loadMap(const std::string& mapFile) {
                         players_.push_back(players[playerId]);
                     }
 
-                    cell = new PlayableGround(players[playerId]);
+                    cell = new PlayableGround(pos, players[playerId]);
                     break;
                 }
             }
@@ -162,14 +169,14 @@ void GameMap::loadMap(const std::string& mapFile) {
             GameElement* gameElt = nullptr;
             switch (gameEltType) {
                 case 'B': {
-                    gameElt = new Bandit();
+                    gameElt = new Bandit(pos);
                     if (cellType != 'W' && cellType != 'F')
                         dynamic_cast<PlayableGround*>(cell)->setElement(gameElt);
                     break;
                 }
 
                 case 'T': {
-                    gameElt = new Town();
+                    gameElt = new Town(pos);
                     PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
                     if (t && cellType != '0') {
                         t->setElement(gameElt);
@@ -179,42 +186,42 @@ void GameMap::loadMap(const std::string& mapFile) {
                 }
 
                 case 'C': {
-                    gameElt = new Castle();
+                    gameElt = new Castle(pos);
                     PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
                     if (t && cellType != '0') t->setElement(gameElt);
                     break;
                 }
 
                 case 'A': {
-                    gameElt = new Camp();
+                    gameElt = new Camp(pos);
                     PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
                     if (t && cellType == '0') t->setElement(gameElt);
                     break;
                 }
 
                 case 'V': {
-                    gameElt = new Villager();
+                    gameElt = new Villager(pos);
                     PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
                     if (t && cellType != '0') t->setElement(gameElt);
                     break;
                 }
 
                 case 'P': {
-                    gameElt = new Pikeman();
+                    gameElt = new Pikeman(pos);
                     PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
                     if (t && cellType != '0') t->setElement(gameElt);
                     break;
                 }
 
                 case 'K': {
-                    gameElt = new Knight();
+                    gameElt = new Knight(pos);
                     PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
                     if (t && cellType != '0') t->setElement(gameElt);
                     break;
                 }
 
                 case 'H': {
-                    gameElt = new Hero();
+                    gameElt = new Hero(pos);
                     PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
                     if (t && cellType != '0') t->setElement(gameElt);
                     break;
@@ -246,10 +253,6 @@ void GameMap::loadMap(const std::string& mapFile) {
 void GameMap::setPos(const Point& pos) {
     pos_ = pos;
     updateSelectedCell();
-}
-
-Point GameMap::getPos() const {
-    return pos_;
 }
 
 void GameMap::updateNeighbors() {
@@ -379,8 +382,8 @@ void GameMap::refreshElements() {
 
             // Draw element
             if (auto* pt = dynamic_cast<PlayableGround*>(cell)) {
-                pt->displayElement(elementsCalc_, pos);
-                pt->displayShield(elementsCalc_, pos);
+                pt->displayElement(elementsCalc_);
+                pt->displayShield(elementsCalc_);
             }
         }
     }
@@ -413,7 +416,7 @@ void GameMap::refreshSelectables() {
 
             // Draw element
             if (auto* pt = dynamic_cast<PlayableGround*>(cell)) {
-                pt->displaySelectable(selectablesCalc_, pos);
+                pt->displaySelectable(selectablesCalc_);
             }
         }
     }
@@ -453,18 +456,18 @@ void GameMap::refresh()
 
             // Draw island
             if (auto* t = dynamic_cast<Ground*>(cell))
-                t->Ground::display(islandsCalc_, pos);
+                t->Ground::display(islandsCalc_);
 
             // Draw cell
             if (auto* disp = dynamic_cast<Displayer*>(cell))
-                disp->display(cellsCalc_, pos);
+                disp->display(cellsCalc_);
 
             // Draw element
             if (auto* pt = dynamic_cast<PlayableGround*>(cell)) {
-                pt->displaySelectable(selectablesCalc_, pos);
-                pt->displayFences(fencesCalc_, pos);
-                pt->displayElement(elementsCalc_, pos);
-                pt->displayShield(elementsCalc_, pos);
+                pt->displaySelectable(selectablesCalc_);
+                pt->displayFences(fencesCalc_);
+                pt->displayElement(elementsCalc_);
+                pt->displayShield(elementsCalc_);
             }
         }
     }
@@ -482,21 +485,23 @@ void GameMap::setProportionalSize(const Size size) {
     size_ = spriteSize_ * ratio_;
 }
 
-Size GameMap::getSize() const {
+const Size GameMap::getSize() const {
     return size_;
 }
 
-void GameMap::draw()
+void GameMap::display(const Texture* target)
 {
     if (!islandsCalc_ || !cellsCalc_ || !selectablesCalc_ || !fencesCalc_ || !elementsCalc_)
         refresh();
 
+    //! encapsuler renderer dans une classe
+    //! Faire hériter Texture à window et surcharger les méthodes nécessaire (surtout blit)
     Rect dest = {pos_, size_};
-    SDL_RenderCopy(renderer_, islandsCalc_->get(), nullptr, &dest.get());
-    SDL_RenderCopy(renderer_, cellsCalc_->get(), nullptr, &dest.get());
-    SDL_RenderCopy(renderer_, selectablesCalc_->get(), nullptr, &dest.get());
-    SDL_RenderCopy(renderer_, fencesCalc_->get(), nullptr, &dest.get());
-    SDL_RenderCopy(renderer_, elementsCalc_->get(), nullptr, &dest.get());
+    SDL_RenderCopy(renderer_, islandsCalc_->get(), nullptr, &dest.get()); //! A remplacer pas ->blit quand window héritera de Texture
+    SDL_RenderCopy(renderer_, cellsCalc_->get(), nullptr, &dest.get()); //! A remplacer pas ->blit quand window héritera de Texture
+    SDL_RenderCopy(renderer_, selectablesCalc_->get(), nullptr, &dest.get()); //! A remplacer pas ->blit quand window héritera de Texture
+    SDL_RenderCopy(renderer_, fencesCalc_->get(), nullptr, &dest.get()); //! A remplacer pas ->blit quand window héritera de Texture
+    SDL_RenderCopy(renderer_, elementsCalc_->get(), nullptr, &dest.get()); //! A remplacer pas ->blit quand window héritera de Texture
 
     /*
     if (selectedCell_.has_value()) {
@@ -536,17 +541,18 @@ void GameMap::endTurn() {
 void GameMap::test() {
     if (!selectedCell_.has_value()) return;
 
-    //dynamic_cast<PlayableGround*>(get(selectedCell_->getX(), selectedCell_->getY()))->updateLinked();
+    //selectedCell_.value()->updateLinked();
 
-    //dynamic_cast<PlayableGround*>(get(selectedCell_->getX(), selectedCell_->getY()))->setOwner(nullptr);
+    //selectedCell_.value()->setOwner(nullptr);
 
     /*
+    // Plus possible
     set(selectedCell_->getX(), selectedCell_->getY(), new PlayableGround());
     updateNeighbors();
     */
    
     /*
-    auto pg = dynamic_cast<PlayableGround*>(get(selectedCell_->getX(), selectedCell_->getY()));
+    PlayableGround* pg = selectedCell_.value();
     if (!pg) return;
     pg->setElement(nullptr);
     */
@@ -564,10 +570,13 @@ void GameMap::selectCell(const Point& pos) {
     auto [q, r] = HexagonUtils::pixelToAxial(relX, relY, islandRadius);
     auto [x, y] = HexagonUtils::axialToOffset(q, r);
     
-    if (x < 0 || x >= getWidth() || y < 0 || y >= getHeight())
+    if (x < 0 || x >= getWidth() || y < 0 || y >= getHeight()) {
         selectedCell_.reset();
-    else
-        selectedCell_ = {x, y};
+        return;
+    }
+    
+    auto pg = dynamic_cast<PlayableGround*>(get(x, y));
+    selectedCell_ = pg ? pg : nullptr;
 }
 
 void GameMap::updateSelectedCell() {
@@ -613,11 +622,11 @@ void GameMap::moveTroop(PlayableGround* from, PlayableGround* to) {
         else {
             Troop *troop = nullptr;
             if (dynamic_cast<Villager*>(fromTroop) && dynamic_cast<Villager*>(toTroop))
-                troop = new Pikeman();
+                troop = new Pikeman(to->getPos());
             else if (dynamic_cast<Pikeman*>(fromTroop) && dynamic_cast<Pikeman*>(toTroop))
-                troop = new Knight();
+                troop = new Knight(to->getPos());
             else if (dynamic_cast<Knight*>(fromTroop) && dynamic_cast<Knight*>(toTroop)) 
-                troop = new Hero();
+                troop = new Hero(to->getPos());
 
             if (troop) {
                 if (movedTroops_.find(fromTroop) != movedTroops_.find(toTroop))
@@ -633,8 +642,7 @@ void GameMap::moveTroop(PlayableGround* from, PlayableGround* to) {
     }
 }
 
-bool GameMap::isSelectableTroop(Cell* cell) {
-    auto pg = dynamic_cast<PlayableGround*>(cell);
+bool GameMap::isSelectableTroop(PlayableGround* pg) {
     if (!pg) return false;
 
     auto owner = pg->getOwner();
@@ -647,18 +655,23 @@ bool GameMap::isSelectableTroop(Cell* cell) {
     return true;
 }
 
+void GameMap::updateCursor() {
+    if (selectedCell_.has_value() && isSelectableTroop(*selectedCell_))
+        SDL_SetCursor(handCursor_);
+    else
+        SDL_SetCursor(arrowCursor_);
+}
+
 void GameMap::handleEvent(SDL_Event &event) {
     switch (event.type) {
         case SDL_MOUSEBUTTONDOWN: {
             selectedTroopCell_ = nullptr;
             selectedTroop_ = nullptr;
-            if (!selectedCell_.has_value()) break;
-    
-            auto cell = get(selectedCell_->getX(), selectedCell_->getY());
-            if (!cell || !isSelectableTroop(cell)) break;
+            if (!selectedCell_.has_value() || !isSelectableTroop(*selectedCell_))
+                break;
             
             // Select element
-            selectedTroopCell_ = dynamic_cast<PlayableGround*>(cell);
+            selectedTroopCell_ = *selectedCell_;
             selectedTroop_ = dynamic_cast<Troop*>(selectedTroopCell_->getElement());
 
             selectedTroopCell_->updateSelectable(selectedTroop_->getStrength());
@@ -675,12 +688,19 @@ void GameMap::handleEvent(SDL_Event &event) {
 
             if (selectedTroop_) {
                 refreshElements();
-                selectedTroop_->display(elementsCalc_, (Point{static_cast<int>(event.motion.x), static_cast<int>(event.motion.y)} - pos_) * (1/ratio_));
+                selectedTroop_->setPos((Point{static_cast<int>(event.motion.x), static_cast<int>(event.motion.y)} - pos_) * (1/ratio_));
+                selectedTroop_->display(elementsCalc_);
             }
-            else if (selectedCell_.has_value() && isSelectableTroop(get(selectedCell_->getX(), selectedCell_->getY())))
-                SDL_SetCursor(handCursor_);
-            else
-                SDL_SetCursor(arrowCursor_);
+            else {
+                updateCursor();
+                if (selectedCell_.has_value() && (*selectedCell_)) {
+                    auto town = dynamic_cast<Town*>((*selectedCell_)->getElement());
+                    if (town) {
+                        //town->displayCoins()
+                    }
+                }
+            }
+
             break;
         }
 
@@ -689,9 +709,8 @@ void GameMap::handleEvent(SDL_Event &event) {
                 selectedTroopCell_->setElement(selectedTroop_);
 
                 // Move troop
-                if (selectedCell_.has_value()) {
-                    auto pg = dynamic_cast<PlayableGround*>(get(selectedCell_->getX(), selectedCell_->getY()));
-                    if (pg) moveTroop(selectedTroopCell_, pg);
+                if (selectedCell_.has_value() && (*selectedCell_)) {
+                    moveTroop(selectedTroopCell_, *selectedCell_);
                 }
     
                 // Remove possibilities
@@ -700,6 +719,7 @@ void GameMap::handleEvent(SDL_Event &event) {
                 selectedTroop_ = nullptr;
                 refresh();
             }
+            updateCursor();
             break;
         }
     }

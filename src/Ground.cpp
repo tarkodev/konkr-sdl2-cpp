@@ -42,7 +42,9 @@ const double Ground::getInnerRadius() {
 }
 
 
-void Ground::display(const Texture* target, const Point& pos) {
+Ground::Ground(const Point& pos): Displayer(pos) {}
+
+void Ground::display(const Texture* target) {
     std::vector<bool> GroundNeighbors{
         static_cast<bool>(dynamic_cast<Ground*>(neighbors[0])),
         static_cast<bool>(dynamic_cast<Ground*>(neighbors[1])),
@@ -50,7 +52,7 @@ void Ground::display(const Texture* target, const Point& pos) {
         static_cast<bool>(dynamic_cast<Ground*>(neighbors[3]))
     };
 
-    islandDisplayer.display(target, pos, GroundNeighbors);
+    islandDisplayer.display(target, pos_, GroundNeighbors);
 }
 
 const Size Ground::getSize() const {

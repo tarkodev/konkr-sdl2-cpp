@@ -52,12 +52,12 @@ namespace HexagonUtils
     }
 
     /**
-     * @brief Convertit des coordonnées offset (col, row) en coordonnées axiales (q, r).
+     * @brief Convertit des coordonnées offset (x, y) en coordonnées axiales (q, r).
      */
-    inline std::pair<int, int> offsetToAxial(int col, int row)
+    inline std::pair<int, int> offsetToAxial(int x, int y)
     {
-        int q = col - (row - (row & 1)) / 2;
-        int r = row;
+        int q = x - (y - (y & 1)) / 2;
+        int r = y;
         return {q, r};
     }
 
@@ -66,17 +66,17 @@ namespace HexagonUtils
      */
     static std::pair<int, int> axialToOffset(int q, int r)
     {
-        int col = q + ((r - (r & 1)) / 2);
-        int row = r;
-        return {col, row};
+        int x = q + ((r - (r & 1)) / 2);
+        int y = r;
+        return {x, y};
     }
 
     /**
-     * @brief Convertit des coordonnées offset (col, row) en coordonnées axiales (q, r).
+     * @brief Convertit des coordonnées offset (x, y) en coordonnées axiales (q, r).
      */
-    inline std::pair<int, int> offsetToPixel(int col, int row, double hexSize)
+    inline std::pair<int, int> offsetToPixel(int x, int y, double hexSize)
     {
-        auto [q, r] = offsetToAxial(col, row);
+        auto [q, r] = offsetToAxial(x, y);
         return axialToPixel(q, r, hexSize);
     }
 

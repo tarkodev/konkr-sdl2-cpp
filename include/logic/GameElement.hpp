@@ -22,11 +22,11 @@ public:
     virtual int getUpkeep()   const = 0;
 
     /* --- Displayer --- */
-    virtual void display(const Texture* target, const Point& pos) override = 0;
+    virtual void display(const Texture* target) override = 0;
     virtual const Size getSize() const override = 0;
 
 protected:
-    GameElement() = default;
+    GameElement(const Point& pos);
 
     static constexpr int STRENGTH = 0;
     static constexpr int COST     = 0;

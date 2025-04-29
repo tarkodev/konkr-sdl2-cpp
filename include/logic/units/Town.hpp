@@ -8,10 +8,10 @@ public:
     /* Chargement des ressources partagées */
     static void init();
 
-    explicit Town() = default;
+    explicit Town(const Point& pos);
 
     /* Displayer */
-    void display(const Texture* target, const Point& pos) override;
+    void display(const Texture* target) override;
     const Size getSize() const override { return sprite_->getSize(); }
 
     /* --- Accesseurs génériques --- */

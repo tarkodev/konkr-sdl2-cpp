@@ -20,9 +20,6 @@ const Size FenceDisplayer::getSize() const {
     return {static_cast<int>(innerRadius_ * 2), static_cast<int>(radius_ * 2)};
 }
 
-void FenceDisplayer::display(const Texture* target, const Point& pos) {
-    display(target, pos, {false, false, false, false, false, false});
-}
 
 void FenceDisplayer::display(const Texture* target, const Point& pos, const std::vector<bool>& neighbors) {
     auto [x, y] = pos.get();
@@ -99,6 +96,15 @@ void FenceDisplayer::display(const Texture* target, const Point& pos, const std:
         });
     }
 }
+
+void FenceDisplayer::display(const Texture* target, const Point& pos) {
+    display(target, pos, {false, false, false, false, false, false});
+}
+
+void FenceDisplayer::display(const Texture* target) {
+    display(target, pos_, {false, false, false, false, false, false});
+}
+
 
 FenceDisplayer FenceDisplayer::copy() {
     return FenceDisplayer{

@@ -1,7 +1,7 @@
 #include "Texture.hpp"
-#include "DrawUtils.hpp"
 #include "ColorUtils.hpp"
 #include "Point.hpp"
+#include "RenderTargetGuard.hpp"
 #include <sstream>
 
 // Constructeur : charge la texture depuis le fichier
@@ -105,8 +105,8 @@ Texture* Texture::removeAlpha() {
 void Texture::fill(const SDL_Color& color) const {
     RenderTargetGuard target(renderer_, texture_);
 
-    DrawUtils::SetRenderDrawColor(renderer_, color);
-    if (SDL_RenderClear(renderer_) != 0)
+    if (SDL_SetRenderDrawColor(renderer_, color.r, color.g, color.b, color.a) != 0 ||
+        SDL_RenderClear(renderer_) != 0)
         throw std::runtime_error("Erreur lors du fill de la texture: " + std::string(SDL_GetError()));
 }
 

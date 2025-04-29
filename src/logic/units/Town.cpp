@@ -15,12 +15,14 @@ void Town::init()
 }
 
 
-void Town::display(const Texture* target, const Point& pos)
+Town::Town(const Point& pos): GameElement(pos) {}
+
+void Town::display(const Texture* target)
 {
     if (!sprite_) return;
 
     if (selected_)
-        target->blit(selectSprite_, Point{pos.getX()-selectSprite_->getWidth()/2, pos.getY()-selectSprite_->getHeight()/2});
+        target->blit(selectSprite_, Point{pos_.getX()-selectSprite_->getWidth()/2, pos_.getY()-selectSprite_->getHeight()/2});
 
-    target->blit(sprite_, Point{pos.getX()-sprite_->getWidth()/2, pos.getY()-sprite_->getHeight()/2});
+    target->blit(sprite_, Point{pos_.getX()-sprite_->getWidth()/2, pos_.getY()-sprite_->getHeight()/2});
 }

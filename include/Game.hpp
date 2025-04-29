@@ -57,7 +57,7 @@ private:
     const SDL_Color bgColor = ColorUtils::SEABLUE;
 
 
-    // Object to render drawing
+    // Object to render textures
     SDL_Renderer* renderer_;
 
     // Window

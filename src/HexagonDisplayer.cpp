@@ -22,10 +22,6 @@ const Size HexagonDisplayer::getSize() const {
 }
 
 
-void HexagonDisplayer::display(const Texture* target, const Point& pos) {
-    display(target, pos, {false, false, false, false, false, false});
-}
-
 void HexagonDisplayer::display(const Texture* target, const Point& pos, const std::vector<bool>& neighbors) {
     auto [x, y] = pos.get();
     
@@ -46,6 +42,14 @@ void HexagonDisplayer::display(const Texture* target, const Point& pos, const st
             static_cast<int>(y + ((i-1) * radius_ * 0.75) - link->getHeight() / 2.0)
         });
     }
+}
+
+void HexagonDisplayer::display(const Texture* target, const Point& pos) {
+    display(target, pos, {false, false, false, false, false, false});
+}
+
+void HexagonDisplayer::display(const Texture* target) {
+    display(target, pos_, {false, false, false, false, false, false});
 }
 
 HexagonDisplayer HexagonDisplayer::copy() {

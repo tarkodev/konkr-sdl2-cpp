@@ -10,10 +10,10 @@ class Forest: public Ground {
 public:
     static const std::string TYPE;
 
-    Forest();
+    Forest(const Point& pos);
 
     const std::string getType() override;
-    void display(const Texture* target, const Point& pos) override;
+    void display(const Texture* target) override;
 
     static void init();
 

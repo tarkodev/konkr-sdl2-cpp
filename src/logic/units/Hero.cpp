@@ -13,13 +13,15 @@ void Hero::init()
 }
 
 
-void Hero::display(const Texture* target, const Point& pos)
+Hero::Hero(const Point& pos): Troop(pos) {}
+
+void Hero::display(const Texture* target)
 {
     if (!sprite_ || !shadow) return;
     
-    target->blit(shadow, Point{pos.getX() - shadow->getWidth() / 2,
-                               pos.getY() - shadow->getHeight() / 2});
+    target->blit(shadow, Point{pos_.getX() - shadow->getWidth() / 2,
+                               pos_.getY() - shadow->getHeight() / 2});
 
-    target->blit(sprite_, Point{pos.getX() - sprite_->getWidth() / 2,
-                                pos.getY() - sprite_->getHeight() / 2});
+    target->blit(sprite_, Point{pos_.getX() - sprite_->getWidth() / 2,
+                                pos_.getY() - sprite_->getHeight() / 2});
 }

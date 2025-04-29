@@ -3,6 +3,7 @@
 
 #include "SDL.h"
 #include "Texture.hpp"
+#include "Displayer.hpp"
 #include "HexagonDisplayer.hpp"
 #include "Player.hpp"
 #include "Cell.hpp"
@@ -17,11 +18,11 @@ public:
     static const double getInnerRadius();
 
     const std::string getType() override;
-    void display(const Texture* target, const Point& pos) override;
+    void display(const Texture* target) override;
     const Size getSize() const override;
 
 protected:
-    Ground() = default;
+    Ground(const Point& pos);
 
     static HexagonDisplayer islandDisplayer;
     static double islandRadius;
