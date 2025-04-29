@@ -41,12 +41,25 @@ void Player::addTownCell(PlayableGround* townCell) {
     if (townCell) townCells_.insert(townCell);
 }
 
-void Player::onTurnStart() {
-    // Remove destroyed towns
+void Player::updateTowns() {
     std::erase_if(townCells_, [](PlayableGround* townCell) {
         return dynamic_cast<Town*>(townCell->getElement()) == nullptr;
     });
-    
+}
+
+bool Player::hasTowns() {
+    // Remove destroyed towns
+    updateTowns();
+
+    for (PlayableGround* townCell : townCells_)
+        if (dynamic_cast<Town*>(townCell->getElement()))
+            return true;
+
+    return false;
+}
+
+void Player::onTurnStart() {
+    selected_ = true;
     for (PlayableGround* townCell : townCells_) {
         Town* town = dynamic_cast<Town*>(townCell->getElement());
         town->setSelected(true);
@@ -67,4 +80,6 @@ void Player::onTurnEnd() {
         if (town) town->setSelected(false);
 
     }
+
+    selected_ = false;
 }

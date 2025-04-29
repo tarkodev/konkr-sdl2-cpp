@@ -22,9 +22,7 @@ public:
     int getCoins() const { return coins_; }
     void setCoins(int coins) { coins_ = coins; }
 
-    void setSelected(bool selected) { 
-        SDL_Log("Town selected: %d", selected);
-        selected_ = selected; }
+    void setSelected(bool selected) { selected_ = selected; }
 
 protected:
     static constexpr int STRENGTH = 0;

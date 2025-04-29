@@ -30,11 +30,15 @@ public:
     void selectHexagon(const Point& pos);
 
     void refreshElements();
+    void refreshSelectables();
     void refresh();
+
+    bool hasTroopSelected() {return selectedTroop_ != nullptr;};
 
     void handleEvent(SDL_Event &event);
     void draw(const Point& pos);
 
+    void endTurn();
     void test();
 
     static void init(SDL_Renderer* renderer);
@@ -58,10 +62,14 @@ private:
 
     std::vector<Player *> players_;
 
+    PlayableGround* selectedTroop_ = nullptr;
+    int selectedPlayerNum_ = 0;
+
     Size size_;
     Size spriteSize_;
     Texture* islandsCalc_ = nullptr;
     Texture* cellsCalc_ = nullptr;
+    Texture* selectablesCalc_ = nullptr;
     Texture* fencesCalc_ = nullptr;
     Texture* elementsCalc_ = nullptr;
 };
