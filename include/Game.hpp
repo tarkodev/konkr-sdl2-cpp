@@ -13,7 +13,7 @@
 
 enum class ScreenState { MainMenu, MapSelect, InGame };
 
-enum class PendingAction { None, OpenMapSelect, OpenMainMenu /* … */ };
+enum class PendingAction { None, OpenMapSelect, OpenMainMenu, StartGameWithMap };
 
 
 class Game {
@@ -28,6 +28,11 @@ public:
     void openMainMenu();
     void startGameWithMap(const std::string& file);
     void requestAction(PendingAction a) { pendingAction_ = a; }   
+    void requestStartGame(const std::string& file) {
+        pendingMapFile_ = file;
+        pendingAction_  = PendingAction::StartGameWithMap;
+    }
+    
     
 
 private:
@@ -70,6 +75,9 @@ private:
     std::string nextMapFile_;                      // choisi dans MapSelect
 
     PendingAction pendingAction_;
+
+    std::string pendingMapFile_;         
+
 
 };
 

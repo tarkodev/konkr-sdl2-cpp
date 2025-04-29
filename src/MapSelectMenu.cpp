@@ -16,7 +16,9 @@ MapSelectMenu::MapSelectMenu(SDL_Renderer* r, Game& app) : renderer_(r), app_(ap
         Texture* t = new Texture(r, std::string("../assets/map/")+m.label+".png");
         auto* b = new Button(t,nullptr,nullptr, Point{200,y});
         if (m.file[0])   // 3 cartes fournies
-            b->setCallback([this,m](){ app_.startGameWithMap(m.file); });
+            b->setCallback([this,m](){
+                app_.requestStartGame(m.file); 
+            });
         else             // Custom :
             b->setCallback([](){
                 // TODO : ouvrir une boîte de dialogue ou std::cin pour le chemin

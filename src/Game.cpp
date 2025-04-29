@@ -27,7 +27,7 @@ Game::Game()
     : window_(std::make_unique<Window>("Konkr", windowSize_.getWidth(), windowSize_.getHeight())) {
     if (!window_ || !window_->isInitialized())
         throw std::runtime_error("Échec de l'initialisation de SDL: " + std::string(SDL_GetError()));
-        
+
     pendingAction_ = PendingAction::None;
 
 
@@ -207,6 +207,9 @@ void Game::handleEvents() {
     switch (pendingAction_) {
         case PendingAction::OpenMapSelect: openMapSelect(); break;
         case PendingAction::OpenMainMenu:  openMainMenu();  break;
+        case PendingAction::StartGameWithMap:
+            startGameWithMap(pendingMapFile_);
+            break;
         default: break;
     }
     pendingAction_ = PendingAction::None;
