@@ -592,14 +592,13 @@ void GameMap::handleEvent(SDL_Event &event) {
                         }
 
                     } else {
-                        pg->setOwner(selectedTroop_->getOwner());
                         
                         // Move troop
                         delete (pg->getElement());
                         pg->setElement(selectedTroop_->getElement());
                         selectedTroop_->setElement(nullptr);
 
-                        pg->updateLinked(); //!update aussi ses voisins
+                        pg->link(selectedTroop_->getOwner());
                     }
                 };
             }

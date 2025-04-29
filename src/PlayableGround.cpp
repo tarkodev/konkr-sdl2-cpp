@@ -176,7 +176,36 @@ void PlayableGround::unlink(std::unordered_set<PlayableGround*>& visited) {
 }
 
 //! check si voisin.owner == null && oldowner = owner
-// void link(owner, visited)
+void PlayableGround::link(Player* owner, std::unordered_set<PlayableGround*>& visited) {
+    if (visited.find(this) != visited.end()) return;
+    visited.insert(this);
+
+    if (owner_ == nullptr && owner == oldOwner_) {
+        setOwner(owner);
+        for (Cell* n : neighbors) {
+            auto* pg = dynamic_cast<PlayableGround*>(n);
+            if (pg && pg->getOwner() == nullptr && pg->getOldOwner() == owner_)
+                pg->link(owner, visited);
+        }
+    } else {
+        setOwner(owner);
+        for (Cell* n : neighbors) {
+            if (auto* pg = dynamic_cast<PlayableGround*>(n)) {
+                if (pg && pg->getOldOwner() == owner_)
+                    pg->link(owner, visited);
+                else
+                    pg->updateLinked();
+            }
+        }
+    }
+}
+
+void PlayableGround::link(Player* owner) {
+    if (owner == owner_) return;
+
+    std::unordered_set<PlayableGround*> visited;
+    link(owner, visited);
+}
 
 void PlayableGround::updateLinked() {
     std::unordered_set<PlayableGround*> visited;
