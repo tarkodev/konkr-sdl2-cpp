@@ -3,6 +3,8 @@
 #include <SDL.h>
 
 MainMenu::MainMenu(SDL_Renderer* r, Game& app) : renderer_(r), app_(app) {
+
+
     // Bouton Logo (ne fait rien)
     Texture* logoTex = new Texture(r, "../assets/img/konkr.png");
     auto* logoBtn = new Button(logoTex, nullptr, nullptr, Point{200, 50}); // position en haut
@@ -11,7 +13,9 @@ MainMenu::MainMenu(SDL_Renderer* r, Game& app) : renderer_(r), app_(app) {
 
     Texture* expedTex = new Texture(r, "../assets/img/expeditions.png");
     auto*    expedBtn = new Button(expedTex,nullptr,nullptr, Point{200,300});
-    expedBtn->setCallback([this](){ app_.openMapSelect(); });
+    expedBtn->setCallback([this](){
+        app_.requestAction(PendingAction::OpenMapSelect);   // ★ remplace l’ancien appel direct
+    });
     buttons_.push_back(expedBtn);
 
     Texture* howTex   = new Texture(r, "../assets/img/howtoplay.png");

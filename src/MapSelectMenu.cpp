@@ -28,8 +28,8 @@ MapSelectMenu::MapSelectMenu(SDL_Renderer* r, Game& app) : renderer_(r), app_(ap
 
     Texture* backTex = new Texture(renderer_, "../assets/img/back.png");
     auto* backBtn = new Button(backTex, nullptr, nullptr, Point{50, 30});  // Position en haut à gauche
-    backBtn->setCallback([this]() {
-        app_.openMainMenu();
+    backBtn->setCallback([this](){
+        app_.requestAction(PendingAction::OpenMainMenu);
     });
     buttons_.push_back(backBtn);
 }

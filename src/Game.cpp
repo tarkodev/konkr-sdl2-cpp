@@ -27,6 +27,8 @@ Game::Game()
     : window_(std::make_unique<Window>("Konkr", windowSize_.getWidth(), windowSize_.getHeight())) {
     if (!window_ || !window_->isInitialized())
         throw std::runtime_error("Échec de l'initialisation de SDL: " + std::string(SDL_GetError()));
+        
+    pendingAction_ = PendingAction::None;
 
 
     // Get renderer and window size
@@ -53,6 +55,7 @@ Game::Game()
     Player::init(renderer_);
 
     GameMap::init(renderer_);
+    
 
     openMainMenu();
 
@@ -200,6 +203,13 @@ void Game::handleEvents() {
         //map_->handleEvent(event);
         overlay_.handleEvent(event);
     }
+
+    switch (pendingAction_) {
+        case PendingAction::OpenMapSelect: openMapSelect(); break;
+        case PendingAction::OpenMainMenu:  openMainMenu();  break;
+        default: break;
+    }
+    pendingAction_ = PendingAction::None;
 }
 
 void Game::draw() {
