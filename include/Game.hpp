@@ -8,6 +8,10 @@
 #include "Window.hpp"
 #include "Player.hpp"
 #include "Overlay.hpp"
+#include "MainMenu.hpp"
+#include "MapSelectMenu.hpp"
+
+enum class ScreenState { MainMenu, MapSelect, InGame };
 
 class Game {
 public:
@@ -17,6 +21,9 @@ public:
     void handleEvents();
     void draw();
     void run();
+    void openMapSelect();
+    void openMainMenu();
+    void startGameWithMap(const std::string& file);
     
 
 private:
@@ -52,6 +59,12 @@ private:
 
     // Overlay
     Overlay overlay_;
+
+    // Screen
+    ScreenState screen_ {ScreenState::MainMenu};
+    std::unique_ptr<class MenuBase> activeMenu_;   // pointeur polymorphique
+    std::string nextMapFile_;                      // choisi dans MapSelect
+
 };
 
 #endif

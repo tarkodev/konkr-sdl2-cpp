@@ -23,7 +23,6 @@
 #include <vector>
 
 
-
 Game::Game() 
     : window_(std::make_unique<Window>("Konkr", windowSize_.getWidth(), windowSize_.getHeight())) {
     if (!window_ || !window_->isInitialized())
@@ -55,12 +54,19 @@ Game::Game()
 
     GameMap::init(renderer_);
 
+    openMainMenu();
+
 
     // Create map;
-    map_.emplace(windowSize_ * 0.75, "../assets/map/Unity.txt");
+    //map_.emplace(windowSize_ * 0.75, "../assets/map/Unity.txt");
 
-    Size mapRealSize = map_->getSize();
-    mapPos_ = {(windowSize_.getWidth() - mapRealSize.getWidth()) / 2, (windowSize_.getHeight() - mapRealSize.getHeight()) / 2};
+
+    //map_.emplace(windowSize_ * 0.75, "../assets/map/Unity.txt");
+
+    //Size mapRealSize = map_->getSize();
+    //mapPos_ = {(windowSize_.getWidth() - mapRealSize.getWidth()) / 2, (windowSize_.getHeight() - mapRealSize.getHeight()) / 2};
+
+
 
 
     //! A déplacer dans Overlay pour le chargement des textures
@@ -89,6 +95,14 @@ Game::Game()
         std::cout << "Skip button clicked!" << std::endl;
     });
 
+    Texture* backTex = new Texture(renderer_, "../assets/img/back.png");
+    Button* backBtn = new Button(backTex, nullptr, nullptr, Point{150, 500});
+    backBtn->setCallback([this]() {
+        this->openMapSelect();
+    });
+    overlay_.addButton(backBtn);
+
+
     overlay_.addButton(undoBtn);
     overlay_.addButton(turnBtn);
     overlay_.addButton(nextBtn);
@@ -102,13 +116,22 @@ void Game::handleEvents() {
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
+
         switch (event.type)
         {
         case SDL_QUIT: {
             loop_ = false;
             break;
         }
+        }
 
+        if (screen_ != ScreenState::InGame) {
+            if (activeMenu_) activeMenu_->handleEvent(event);
+            continue;                    // ne propage pas l’événement au jeu
+        }
+
+        switch (event.type)
+        {
         case SDL_MOUSEBUTTONDOWN: {
             map_->handleEvent(event);
             if (!(map_->hasTroopSelected())) {
@@ -180,18 +203,40 @@ void Game::handleEvents() {
 }
 
 void Game::draw() {
-    // Fill background
-    SDL_SetRenderDrawColor(renderer_, bgColor.r, bgColor.g, bgColor.b, bgColor.a);
+    SDL_SetRenderDrawColor(renderer_, bgColor.r,bgColor.g,bgColor.b,bgColor.a);
     SDL_RenderClear(renderer_);
 
-    map_->draw(mapPos_);
+    if (screen_ == ScreenState::InGame) {
+        map_->draw(mapPos_);
 
+        // Dans la boucle de rendu :
+        overlay_.render(renderer_);
+    } else if (activeMenu_) {
+        activeMenu_->render(renderer_);
+    }
 
-    // Dans la boucle de rendu :
-    overlay_.render(renderer_);
-    
-    // Show rendering
-    SDL_RenderPresent(renderer_);
+    SDL_RenderPresent(renderer_);  
+}
+
+void Game::openMapSelect() {
+    screen_ = ScreenState::MapSelect;
+    activeMenu_ = std::make_unique<MapSelectMenu>(renderer_, *this);
+}
+
+void Game::openMainMenu() {
+    screen_     = ScreenState::MainMenu;
+    activeMenu_ = std::make_unique<MainMenu>(renderer_, *this);
+}
+
+void Game::startGameWithMap(const std::string& file) {
+    map_.reset();                     // vide l’ancienne éventuelle
+    map_.emplace(windowSize_*0.75, file);
+    screen_     = ScreenState::InGame;
+    activeMenu_.reset();
+    // recalcul du centrage :
+    Size mapSize = map_->getSize();
+    mapPos_ = {(windowSize_.getWidth()-mapSize.getWidth())/2,
+               (windowSize_.getHeight()-mapSize.getHeight())/2};
 }
 
 void Game::run() {
