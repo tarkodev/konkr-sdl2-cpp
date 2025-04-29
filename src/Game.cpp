@@ -58,7 +58,7 @@ Game::Game()
 
 
     // Create map;
-    map_.emplace(windowSize_ * 0.75, "../assets/map/Unity.txt");
+    //map_.emplace(windowSize_ * 0.75, "../assets/map/Unity.txt");
 
 
     //map_.emplace(windowSize_ * 0.75, "../assets/map/Unity.txt");
