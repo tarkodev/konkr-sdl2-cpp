@@ -13,6 +13,9 @@
 
 enum class ScreenState { MainMenu, MapSelect, InGame };
 
+enum class PendingAction { None, OpenMapSelect, OpenMainMenu /* … */ };
+
+
 class Game {
 public:
     Game();
@@ -24,6 +27,7 @@ public:
     void openMapSelect();
     void openMainMenu();
     void startGameWithMap(const std::string& file);
+    void requestAction(PendingAction a) { pendingAction_ = a; }   
     
 
 private:
@@ -64,6 +68,8 @@ private:
     ScreenState screen_ {ScreenState::MainMenu};
     std::unique_ptr<class MenuBase> activeMenu_;   // pointeur polymorphique
     std::string nextMapFile_;                      // choisi dans MapSelect
+
+    PendingAction pendingAction_;
 
 };
 
