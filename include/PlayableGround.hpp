@@ -28,6 +28,7 @@ public:
     void displayFences(const Texture* target, const Point& pos);
     void displayElement(const Texture* target, const Point& pos);
     void displayShield(const Texture* target, const Point& pos);
+    void displaySelectable(const Texture* target, const Point& pos);
 
     bool isLinked();
     void updateLinked();
@@ -36,10 +37,12 @@ public:
     void setElement(GameElement* elt);
 
     int getShield() const;
+    void updateSelectable(int strength);
 
 private:
     static FenceDisplayer fenceDisplayer_;
-    static std::vector<Texture*> shields_;
+    static std::vector<Texture*> shieldSprites_;
+    static Texture* selectableSprite_;
 
     Player* oldOwner_ = nullptr;
     Player* owner_ = nullptr;
@@ -47,9 +50,13 @@ private:
     HexagonDisplayer lostPlate_ = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
     GameElement* element = nullptr;
     bool hasPlate_ = false;
+    bool selectable_ = false;
 
     bool isLinked(std::unordered_set<PlayableGround*>& visited);
     void unlink(std::unordered_set<PlayableGround*>& visited);
+    void updateSelectable(int strength, std::unordered_set<PlayableGround*>& visited);
+
+    void setSelectable(bool selectable);
 };
 
 #endif

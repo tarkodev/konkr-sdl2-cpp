@@ -70,9 +70,8 @@ GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize, const std
         throw std::runtime_error("Une map doit au moins être de taille 2x2.");
 
     loadMap(mapFile);
-    SDL_Log("Players: %zu", players_.size());
     players_[0]->onTurnStart(); //! Après un onTurnStart, refresh le calc elementsCalc_
-    refresh();
+    refresh(); //! la on refresh tout
 }
 
 std::pair<int,int> GameMap::getSizeOfMapFile(const std::string& mapFile) {
@@ -307,6 +306,17 @@ void GameMap::createSprite() {
     cellsCalc_->convertAlpha();
 
 
+    // Delete cells sprite if already exists
+    if (selectablesCalc_) {
+        delete selectablesCalc_;
+        selectablesCalc_ = nullptr;
+    }
+
+    // Create sprite for elements
+    selectablesCalc_ = new Texture(renderer_, spriteSize_);
+    selectablesCalc_->convertAlpha();
+
+
     // Delete elements sprite if already exists
     if (fencesCalc_) {
         delete fencesCalc_;
@@ -363,10 +373,43 @@ void GameMap::refreshElements() {
     }
 }
 
+void GameMap::refreshSelectables() {
+    if (!selectablesCalc_)
+        refresh();
+
+    // Draw transparent background
+    selectablesCalc_->fill(ColorUtils::toTransparent(ColorUtils::GREY));
+
+    // Get utils dimensions
+    Size islandSize = Ground::getIslandSize();
+    double islandInnerRadius = Ground::getInnerRadius();
+    double islandRadius = Ground::getRadius();
+
+    // Draw islands and cells
+    for (int y = 0; y < getHeight(); y++) {
+        for (int x = 0; x < getWidth(); x++) {
+            Cell* cell = get(x, y);
+
+            // Calcul de la position de blit
+            auto [q, r] = HexagonUtils::offsetToAxial(x, y);
+            auto [cx, cy] = HexagonUtils::axialToPixel(q, r, islandRadius);
+            auto pos = Point{
+                static_cast<int>(cx + islandInnerRadius),
+                static_cast<int>(cy + islandRadius)
+            };
+
+            // Draw element
+            if (auto* pt = dynamic_cast<PlayableGround*>(cell)) {
+                pt->displaySelectable(selectablesCalc_, pos);
+            }
+        }
+    }
+}
+
 void GameMap::refresh()
 {
     // Create sprite of map if isn't exists
-    if (!islandsCalc_ || !cellsCalc_ || !fencesCalc_ || !elementsCalc_)
+    if (!islandsCalc_ || !cellsCalc_ || !selectablesCalc_ || !fencesCalc_ || !elementsCalc_)
         createSprite();
 
     // Draw transparent background
@@ -374,6 +417,7 @@ void GameMap::refresh()
     islandsCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
     cellsCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
     fencesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
+    selectablesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
     elementsCalc_->fill(ColorUtils::toTransparent(ColorUtils::GREY));
 
     // Get utils dimensions
@@ -404,6 +448,7 @@ void GameMap::refresh()
 
             // Draw element
             if (auto* pt = dynamic_cast<PlayableGround*>(cell)) {
+                pt->displaySelectable(selectablesCalc_, pos);
                 pt->displayFences(fencesCalc_, pos);
                 pt->displayElement(elementsCalc_, pos);
                 pt->displayShield(elementsCalc_, pos);
@@ -432,12 +477,13 @@ Size GameMap::getSize() const {
 
 void GameMap::draw(const Point& pos)
 {
-    if (!islandsCalc_ || !cellsCalc_ || !fencesCalc_ || !elementsCalc_)
+    if (!islandsCalc_ || !cellsCalc_ || !selectablesCalc_ || !fencesCalc_ || !elementsCalc_)
         refresh();
 
     Rect dest = {pos, size_};
     SDL_RenderCopy(renderer_, islandsCalc_->get(), nullptr, &dest.get());
     SDL_RenderCopy(renderer_, cellsCalc_->get(), nullptr, &dest.get());
+    SDL_RenderCopy(renderer_, selectablesCalc_->get(), nullptr, &dest.get());
     SDL_RenderCopy(renderer_, fencesCalc_->get(), nullptr, &dest.get());
     SDL_RenderCopy(renderer_, elementsCalc_->get(), nullptr, &dest.get());
 
@@ -458,7 +504,23 @@ void GameMap::draw(const Point& pos)
 void GameMap::test() {
     if (!selectedHexagon_.has_value()) return;
 
-    dynamic_cast<PlayableGround*>(get(selectedHexagon_->getX(), selectedHexagon_->getY()))->updateLinked();
+    if (selectedTroop_) {
+        selectedTroop_->updateSelectable(0);
+        selectedTroop_ = nullptr;
+    }
+
+    if (auto pg = dynamic_cast<PlayableGround*>(get(selectedHexagon_->getX(), selectedHexagon_->getY()))) {
+        auto owner = pg->getOwner();
+        if (owner && owner->hasSelected()) {
+            auto troop = dynamic_cast<Troop*>(pg->getElement());
+            if (troop && !dynamic_cast<Bandit*>(troop)) {
+                selectedTroop_ = pg;
+                pg->updateSelectable(troop->getStrength());
+            }
+        }
+    }
+
+    //dynamic_cast<PlayableGround*>(get(selectedHexagon_->getX(), selectedHexagon_->getY()))->updateLinked();
     //dynamic_cast<PlayableGround*>(get(selectedHexagon_->getX(), selectedHexagon_->getY()))->setOwner(nullptr);
     //set(selectedHexagon_->getX(), selectedHexagon_->getY(), new Water());
     //updateNeighbors();

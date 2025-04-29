@@ -30,6 +30,7 @@ public:
     void selectHexagon(const Point& pos);
 
     void refreshElements();
+    void refreshSelectables();
     void refresh();
 
     void handleEvent(SDL_Event &event);
@@ -58,10 +59,13 @@ private:
 
     std::vector<Player *> players_;
 
+    PlayableGround * selectedTroop_ = nullptr;
+
     Size size_;
     Size spriteSize_;
     Texture* islandsCalc_ = nullptr;
     Texture* cellsCalc_ = nullptr;
+    Texture* selectablesCalc_ = nullptr;
     Texture* fencesCalc_ = nullptr;
     Texture* elementsCalc_ = nullptr;
 };

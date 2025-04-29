@@ -9,7 +9,8 @@
 #include <ranges>
 
 FenceDisplayer PlayableGround::fenceDisplayer_ = FenceDisplayer{ nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
-std::vector<Texture*> PlayableGround::shields_ = std::vector<Texture*>();
+std::vector<Texture*> PlayableGround::shieldSprites_ = std::vector<Texture*>();
+Texture* PlayableGround::selectableSprite_ = nullptr;
 
 const std::string PlayableGround::TYPE = "PlayableGround";
 const std::string PlayableGround::getType() {
@@ -42,11 +43,15 @@ void PlayableGround::init() {
         fenceLinkBottom, fenceLinkBottomLeft, fenceLinkBottomRight
     };
 
-    // Load shields
-    shields_.push_back((new Texture(renderer_, "../assets/img/shield1.png"))->convertAlpha());
-    shields_.push_back((new Texture(renderer_, "../assets/img/shield2.png"))->convertAlpha());
-    shields_.push_back((new Texture(renderer_, "../assets/img/shield3.png"))->convertAlpha());
-    shields_.push_back((new Texture(renderer_, "../assets/img/shield3.png"))->convertAlpha());
+    // Load sprites of shields
+    shieldSprites_.push_back((new Texture(renderer_, "../assets/img/shield1.png"))->convertAlpha());
+    shieldSprites_.push_back((new Texture(renderer_, "../assets/img/shield2.png"))->convertAlpha());
+    shieldSprites_.push_back((new Texture(renderer_, "../assets/img/shield3.png"))->convertAlpha());
+    shieldSprites_.push_back((new Texture(renderer_, "../assets/img/shield3.png"))->convertAlpha());
+
+    // Load selectable sprite
+    selectableSprite_ = (new Texture(renderer_, "../assets/img/selectable.png"))->convertAlpha();
+    selectableSprite_->colorize(ColorUtils::YELLOW);
 }
 
 PlayableGround::PlayableGround(Player *owner)
@@ -206,13 +211,22 @@ void PlayableGround::displayShield(const Texture* target, const Point& pos) {
 
     int shield = getShield();
     if (shield > 0) {
-        auto shieldTex = shields_[shield - 1];
+        auto shieldTex = shieldSprites_[shield - 1];
 
         target->blit(shieldTex, Point{
             static_cast<int>(pos.getX() - shieldTex->getWidth() / 2.0),
             static_cast<int>(pos.getY() - shieldTex->getHeight() / 2.0)
         });
     }
+}
+
+void PlayableGround::displaySelectable(const Texture* target, const Point& pos) {
+    if (!selectable_ || (owner_ && owner_->hasSelected())) return;
+
+    target->blit(selectableSprite_, Point{
+        static_cast<int>(pos.getX() - selectableSprite_->getWidth() / 2.0),
+        static_cast<int>(pos.getY() - selectableSprite_->getHeight() / 2.0)
+    });
 }
 
 
@@ -242,4 +256,27 @@ int PlayableGround::getShield() const {
     }
 
     return maxStrength;
+}
+
+void PlayableGround::setSelectable(bool selectable) {
+    selectable_ = selectable;
+}
+
+void PlayableGround::updateSelectable(int strength, std::unordered_set<PlayableGround*>& visited) {
+    if (visited.find(this) != visited.end()) return;
+    visited.insert(this);
+
+    selectable_ = strength > 0;
+    
+    for (Cell* cell : neighbors) {
+        if (auto* pg = dynamic_cast<PlayableGround*>(cell)) {
+            if (pg->getOwner() == owner_) pg->updateSelectable(strength, visited);
+            else pg->setSelectable(pg->getShield() < strength);
+        }
+    }
+}
+
+void PlayableGround::updateSelectable(int strength) {
+    std::unordered_set<PlayableGround*> visited;
+    updateSelectable(strength, visited);
 }

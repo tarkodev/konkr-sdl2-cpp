@@ -23,6 +23,8 @@ public:
     HexagonDisplayer& getPlate();
     HexagonDisplayer& getLostPlate();
 
+    bool hasSelected() const { return selected_; };
+
     void addTownCell(PlayableGround* town);
 
     void onTurnStart();
@@ -38,6 +40,8 @@ private:
     HexagonDisplayer plate_;
     HexagonDisplayer lostPlate_;
     std::unordered_set<PlayableGround*> townCells_;
+
+    bool selected_ = false;
 };
 
 #endif

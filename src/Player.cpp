@@ -47,6 +47,7 @@ void Player::onTurnStart() {
         return dynamic_cast<Town*>(townCell->getElement()) == nullptr;
     });
     
+    selected_ = true;
     for (PlayableGround* townCell : townCells_) {
         Town* town = dynamic_cast<Town*>(townCell->getElement());
         town->setSelected(true);
@@ -67,4 +68,6 @@ void Player::onTurnEnd() {
         if (town) town->setSelected(false);
 
     }
+
+    selected_ = true;
 }

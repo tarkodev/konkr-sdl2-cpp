@@ -6,7 +6,7 @@
 #include "Player.hpp"
 #include "PlayableGround.hpp"
 
-class Forest: public PlayableGround {
+class Forest: public Ground {
 public:
     static const std::string TYPE;
 

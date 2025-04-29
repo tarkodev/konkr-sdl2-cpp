@@ -55,7 +55,7 @@ Game::Game()
     GameMap::init(renderer_);
 
     // Create map;
-    map_.emplace(windowSize_ * 0.75, "../assets/map/map1");
+    map_.emplace(windowSize_ * 0.75, "../assets/map/Unity.txt");
 
     Size mapRealSize = map_->getSize();
     mapPos_ = {(windowSize_.getWidth() - mapRealSize.getWidth()) / 2, (windowSize_.getHeight() - mapRealSize.getHeight()) / 2};
