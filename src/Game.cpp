@@ -67,7 +67,7 @@ Game::Game()
     //map_.emplace(windowSize_ * 0.75, "../assets/map/Unity.txt");
 
     //Size mapRealSize = map_->getSize();
-    //mapPos_ = {(windowSize_.getWidth() - mapRealSize.getWidth()) / 2, (windowSize_.getHeight() - mapRealSize.getHeight()) / 2};
+    //map->setPos({(windowSize_.getWidth() - mapRealSize.getWidth()) / 2, (windowSize_.getHeight() - mapRealSize.getHeight()) / 2});
 
 
 
@@ -122,82 +122,87 @@ void Game::handleEvents() {
 
         switch (event.type)
         {
-        case SDL_QUIT: {
-            loop_ = false;
-            break;
-        }
+            case SDL_QUIT: {
+                loop_ = false;
+                break;
+            }
         }
 
         if (screen_ != ScreenState::InGame) {
-            if (activeMenu_) activeMenu_->handleEvent(event);
-            continue;                    // ne propage pas l’événement au jeu
+            if (activeMenu_)
+                activeMenu_->handleEvent(event);
+
+            continue;
         }
 
         switch (event.type)
         {
-        case SDL_MOUSEBUTTONDOWN: {
-            map_->handleEvent(event);
-            if (!(map_->hasTroopSelected())) {
-                moveOrigin_ = {event.motion.x, event.motion.y};
-                moved_ = false;
+            case SDL_MOUSEBUTTONDOWN: {
+                map_->handleEvent(event);
+                if (!(map_->hasTroopSelected())) {
+                    moveOrigin_ = {event.motion.x, event.motion.y};
+                    moved_ = false;
+                }
+                break;
             }
-            break;
-        }
 
-        case SDL_MOUSEBUTTONUP: {
-            moveOrigin_.reset();
-            if (!moved_)
-                map_->test();
-            map_->handleEvent(event);
-            break;
-        }
-
-        case SDL_MOUSEMOTION: {
-            if (moveOrigin_.has_value()) {
-                moved_ = true;
-                SDL_Point origin = moveOrigin_.value();
-                mapPos_ += Point{(event.motion.x - origin.x), (event.motion.y - origin.y)};
-                moveOrigin_ = {event.motion.x, event.motion.y};
-
-            } else {
-                //! mettre les pos dans les objets et ne plus passer de pos à display
-                map_->selectHexagon({event.motion.x - mapPos_.getX(), event.motion.y - mapPos_.getY()});
+            case SDL_MOUSEBUTTONUP: {
+                moveOrigin_.reset();
+                if (!moved_)
+                    map_->test();
+                map_->handleEvent(event);
+                break;
             }
-            break;
-        }
 
-        case SDL_MOUSEWHEEL: {
-            Size mapSize = map_->getSize();
-            double zoom = (event.wheel.preciseY > 0) ? 1.1 : 0.9;
+            case SDL_MOUSEMOTION: {
+                Point mapPos = map_->getPos();
 
-            mapSize *= zoom;
-            map_->setProportionalSize(mapSize);
+                if (moveOrigin_.has_value()) {
+                    moved_ = true;
+                    SDL_Point origin = moveOrigin_.value();
 
-            mapPos_ -= Point{
-                static_cast<int>((mapPos_.getX() - windowSize_.getWidth() / 2.0) * (1 - zoom)),
-                static_cast<int>((mapPos_.getY() - windowSize_.getHeight() / 2.0) * (1 - zoom))
-            };
+                    mapPos += Point{(event.motion.x - origin.x), (event.motion.y - origin.y)};
+                    map_->setPos(mapPos);
 
-            map_->selectHexagon({
-                event.wheel.mouseX - mapPos_.getX(), 
-                event.wheel.mouseY - mapPos_.getY()
-            });
-            break;
-        }
+                    moveOrigin_ = {event.motion.x, event.motion.y};
+                }
+                map_->handleEvent(event);
+                break;
+            }
 
-        case SDL_KEYDOWN: {
-            if (event.key.keysym.sym == SDLK_LEFT)
-                mapPos_.addX(10);
-            else if (event.key.keysym.sym == SDLK_RIGHT)
-                mapPos_.addX(-10);
-            else if (event.key.keysym.sym == SDLK_UP)
-                mapPos_.addY(10);
-            else if (event.key.keysym.sym == SDLK_DOWN)
-                mapPos_.addY(-10);
-            else if (event.key.keysym.sym == SDLK_RETURN)
-                map_->endTurn();
-            break;
-        }
+            case SDL_MOUSEWHEEL: {
+                Size mapSize = map_->getSize();
+                double zoom = (event.wheel.preciseY > 0) ? 1.1 : 0.9;
+
+                mapSize *= zoom;
+                map_->setProportionalSize(mapSize);
+
+                Point mapPos = map_->getPos();
+                mapPos -= Point{
+                    static_cast<int>((mapPos.getX() - windowSize_.getWidth() / 2.0) * (1 - zoom)),
+                    static_cast<int>((mapPos.getY() - windowSize_.getHeight() / 2.0) * (1 - zoom))
+                };
+                map_->setPos(mapPos);
+                break;
+            }
+
+            case SDL_KEYDOWN: {
+                Point mapPos = map_->getPos();
+
+                if (event.key.keysym.sym == SDLK_LEFT)
+                    mapPos.addX(10);
+                else if (event.key.keysym.sym == SDLK_RIGHT)
+                    mapPos.addX(-10);
+                else if (event.key.keysym.sym == SDLK_UP)
+                    mapPos.addY(10);
+                else if (event.key.keysym.sym == SDLK_DOWN)
+                    mapPos.addY(-10);
+                else if (event.key.keysym.sym == SDLK_RETURN)
+                    map_->endTurn();
+
+                map_->setPos(mapPos);
+                break;
+            }
         }
 
         //map_->handleEvent(event);
@@ -220,7 +225,7 @@ void Game::draw() {
     SDL_RenderClear(renderer_);
 
     if (screen_ == ScreenState::InGame) {
-        map_->draw(mapPos_);
+        map_->draw(); //! faire devenir GameMap un Displayer et donc blit (quand on aura retirer le param pos à display)
 
         // Dans la boucle de rendu :
         overlay_.render(renderer_);
@@ -242,14 +247,13 @@ void Game::openMainMenu() {
 }
 
 void Game::startGameWithMap(const std::string& file) {
-    map_.reset();                     // vide l’ancienne éventuelle
-    map_.emplace(windowSize_*0.75, file);
+    map_.reset();
+    map_.emplace(Point{0, 0}, windowSize_*0.75, file);
     screen_     = ScreenState::InGame;
     activeMenu_.reset();
     // recalcul du centrage :
     Size mapSize = map_->getSize();
-    mapPos_ = {(windowSize_.getWidth()-mapSize.getWidth())/2,
-               (windowSize_.getHeight()-mapSize.getHeight())/2};
+    map_->setPos({(windowSize_.getWidth() - mapSize.getWidth()) / 2, (windowSize_.getHeight() - mapSize.getHeight())/2});
 }
 
 void Game::run() {

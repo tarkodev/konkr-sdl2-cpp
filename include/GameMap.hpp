@@ -13,6 +13,7 @@
 #include "Point.hpp"
 #include "Size.hpp"
 #include "Player.hpp"
+#include "logic/Troop.hpp"
 
 /**
  * @brief Classe représentant une carte de jeu.
@@ -22,12 +23,15 @@
  */
 class GameMap : public HexagonGrid<Cell*> {
 public:
-    GameMap(const Size size, const std::pair<int, int>& gridSize);
-    GameMap(const Size size, const std::string mapFile);
+    GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize);
+    GameMap(const Point& pos, const Size size, const std::string mapFile);
 
     Size getSize() const;
     void setProportionalSize(const Size size);
-    void selectHexagon(const Point& pos);
+    void selectCell(const Point& pos);
+
+    void setPos(const Point& pos);
+    Point getPos() const;
 
     void refreshElements();
     void refreshSelectables();
@@ -36,7 +40,7 @@ public:
     bool hasTroopSelected() {return selectedTroopCell_ != nullptr;};
 
     void handleEvent(SDL_Event &event);
-    void draw(const Point& pos);
+    void draw();
 
     void endTurn();
     void test();
@@ -46,25 +50,33 @@ public:
 private:
     static SDL_Renderer* renderer_;
     static Texture* selectSprite_; //!temp
+    static SDL_Cursor* handCursor_;
+    static SDL_Cursor* arrowCursor_;
 
-    GameMap(const Size size, const std::pair<int, int>& gridSize, const std::string mapFile);
+    GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize, const std::string mapFile);
     void loadMap(const std::string& mapFile);
     std::pair<int,int> getSizeOfMapFile(const std::string& mapFile);
 
     void updateNeighbors();
     void createSprite();
+    void updateSelectedCell();
+    bool isSelectableTroop(Cell* cell);
 
-    double cellRadius_; //! Peut être pas garder et enregistrer un ratio (taille_sprite/taille_reelle)
-    double innerCellRadius_;
+    void moveTroop(PlayableGround* from, PlayableGround* to);
 
-    std::optional<Point> selectedHexagon_;
+    double ratio_ = 0;
+
+    std::optional<Point> selectedCell_;
     bool hasSelection_ = false;
 
     std::vector<Player *> players_;
 
+    std::unordered_set<Troop *> movedTroops_;
+    Troop* selectedTroop_ = nullptr;
     PlayableGround* selectedTroopCell_ = nullptr;
     int selectedPlayerNum_ = 0;
 
+    Point pos_;
     Size size_;
     Size spriteSize_;
     Texture* islandsCalc_ = nullptr;
