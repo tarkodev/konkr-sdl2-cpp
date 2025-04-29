@@ -29,11 +29,12 @@ Game::Game()
     if (!window_ || !window_->isInitialized())
         throw std::runtime_error("Échec de l'initialisation de SDL: " + std::string(SDL_GetError()));
 
+
     // Get renderer and window size
     renderer_ = window_->getRenderer();
     windowSize_ = window_->getSize();
 
-    // Set texture in Cell
+    // Init each class to initialize
     Cell::init(renderer_);
     Ground::init();
     Forest::init();
@@ -54,15 +55,13 @@ Game::Game()
 
     GameMap::init(renderer_);
 
+
     // Create map;
     map_.emplace(windowSize_ * 0.75, "../assets/map/Unity.txt");
 
     Size mapRealSize = map_->getSize();
     mapPos_ = {(windowSize_.getWidth() - mapRealSize.getWidth()) / 2, (windowSize_.getHeight() - mapRealSize.getHeight()) / 2};
 
-
-
-    //////////// Button
 
     //! A déplacer dans Overlay pour le chargement des textures
     // Après avoir créé vos textures :
@@ -94,7 +93,7 @@ Game::Game()
     overlay_.addButton(turnBtn);
     overlay_.addButton(nextBtn);
     overlay_.addButton(skipBtn);
-
+    //! A déplacer dans Overlay pour le chargement des textures
 }
 
 Game::~Game() = default;
@@ -111,8 +110,11 @@ void Game::handleEvents() {
         }
 
         case SDL_MOUSEBUTTONDOWN: {
-            moveOrigin_ = {event.motion.x, event.motion.y};
-            moved_ = false;
+            map_->handleEvent(event);
+            if (!(map_->hasTroopSelected())) {
+                moveOrigin_ = {event.motion.x, event.motion.y};
+                moved_ = false;
+            }
             break;
         }
 
@@ -120,6 +122,7 @@ void Game::handleEvents() {
             moveOrigin_.reset();
             if (!moved_)
                 map_->test();
+            map_->handleEvent(event);
             break;
         }
 
@@ -131,6 +134,7 @@ void Game::handleEvents() {
                 moveOrigin_ = {event.motion.x, event.motion.y};
 
             } else {
+                //! mettre les pos dans les objets et ne plus passer de pos à display
                 map_->selectHexagon({event.motion.x - mapPos_.getX(), event.motion.y - mapPos_.getY()});
             }
             break;
@@ -164,13 +168,14 @@ void Game::handleEvents() {
                 mapPos_.addY(10);
             else if (event.key.keysym.sym == SDLK_DOWN)
                 mapPos_.addY(-10);
+            else if (event.key.keysym.sym == SDLK_RETURN)
+                map_->endTurn();
             break;
         }
         }
 
-        map_->handleEvent(event);
+        //map_->handleEvent(event);
         overlay_.handleEvent(event);
-
     }
 }
 

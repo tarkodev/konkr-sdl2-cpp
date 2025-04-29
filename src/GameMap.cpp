@@ -70,7 +70,7 @@ GameMap::GameMap(const Size size, const std::pair<int, int>& gridSize, const std
         throw std::runtime_error("Une map doit au moins être de taille 2x2.");
 
     loadMap(mapFile);
-    players_[0]->onTurnStart(); //! Après un onTurnStart, refresh le calc elementsCalc_
+    players_[selectedPlayerNum_]->onTurnStart(); //! Après un onTurnStart, refresh le calc elementsCalc_
     refresh(); //! la on refresh tout
 }
 
@@ -236,7 +236,7 @@ void GameMap::loadMap(const std::string& mapFile) {
     for (Cell* cell : *this)
         if (auto* pg = dynamic_cast<PlayableGround*>(cell))
             pg->updateLinked();
-    //! update state de la map (ex: hexagone/troupe/castle par relié à une town(mettre nullptr/bandit/camp))
+    //! update state de la map (ex: hexagone/troupe/castle pas relié à une town(mettre nullptr/bandit/camp))
 }
 
 void GameMap::updateNeighbors() {
@@ -487,6 +487,7 @@ void GameMap::draw(const Point& pos)
     SDL_RenderCopy(renderer_, fencesCalc_->get(), nullptr, &dest.get());
     SDL_RenderCopy(renderer_, elementsCalc_->get(), nullptr, &dest.get());
 
+    /*
     if (selectedHexagon_.has_value()) {
         auto [q, r] = HexagonUtils::offsetToAxial(selectedHexagon_->getX(), selectedHexagon_->getY());
         auto [x, y] = HexagonUtils::axialToPixel(q, r, cellRadius_);
@@ -499,32 +500,46 @@ void GameMap::draw(const Point& pos)
 
         SDL_RenderCopy(renderer_, selectSprite_->get(), nullptr, new SDL_Rect{static_cast<int>(x -  w/2), static_cast<int>(y - h/2), w, h});
     }
+    */
+}
+
+void GameMap::endTurn() {
+    if (players_.empty()) return;
+
+    players_[selectedPlayerNum_]->onTurnEnd();
+    selectedPlayerNum_ = (selectedPlayerNum_ + 1) % players_.size();
+
+    while (!players_[selectedPlayerNum_]->hasTowns()) {
+        delete players_[selectedPlayerNum_];
+        players_.erase(players_.begin() + selectedPlayerNum_);
+        if (players_.empty()) return;
+
+        selectedPlayerNum_ %= players_.size();
+    }
+
+    players_[selectedPlayerNum_]->onTurnStart();
+    refreshElements();
 }
 
 void GameMap::test() {
     if (!selectedHexagon_.has_value()) return;
 
-    if (selectedTroop_) {
-        selectedTroop_->updateSelectable(0);
-        selectedTroop_ = nullptr;
-    }
-
-    if (auto pg = dynamic_cast<PlayableGround*>(get(selectedHexagon_->getX(), selectedHexagon_->getY()))) {
-        auto owner = pg->getOwner();
-        if (owner && owner->hasSelected()) {
-            auto troop = dynamic_cast<Troop*>(pg->getElement());
-            if (troop && !dynamic_cast<Bandit*>(troop)) {
-                selectedTroop_ = pg;
-                pg->updateSelectable(troop->getStrength());
-            }
-        }
-    }
-
     //dynamic_cast<PlayableGround*>(get(selectedHexagon_->getX(), selectedHexagon_->getY()))->updateLinked();
+
     //dynamic_cast<PlayableGround*>(get(selectedHexagon_->getX(), selectedHexagon_->getY()))->setOwner(nullptr);
-    //set(selectedHexagon_->getX(), selectedHexagon_->getY(), new Water());
-    //updateNeighbors();
-    refresh();
+
+    /*
+    set(selectedHexagon_->getX(), selectedHexagon_->getY(), new PlayableGround());
+    updateNeighbors();
+    */
+   
+    /*
+    auto pg = dynamic_cast<PlayableGround*>(get(selectedHexagon_->getX(), selectedHexagon_->getY()));
+    if (!pg) return;
+    pg->setElement(nullptr);
+    */
+
+    //refresh();
 }
 
 void GameMap::selectHexagon(const Point& pos) {
@@ -540,4 +555,61 @@ void GameMap::selectHexagon(const Point& pos) {
         selectedHexagon_ = {x, y};
 }
 
-void GameMap::handleEvent(SDL_Event &event) {}
+void GameMap::handleEvent(SDL_Event &event) {
+    if (event.type == SDL_MOUSEBUTTONDOWN) {
+        if (!(selectedHexagon_.has_value())) return;
+
+        auto pg = dynamic_cast<PlayableGround*>(get(selectedHexagon_->getX(), selectedHexagon_->getY()));
+        if (!pg) return;
+
+        auto owner = pg->getOwner();
+        if (!(owner && owner->hasSelected())) return;
+
+        auto troop = dynamic_cast<Troop*>(pg->getElement());
+        if (!troop || dynamic_cast<Bandit*>(troop)) return;
+        
+        selectedTroop_ = pg;
+        pg->updateSelectable(troop->getStrength());
+        refresh();
+
+    } else if (event.type == SDL_MOUSEBUTTONUP) {
+        if (!selectedTroop_) return;
+
+        if (selectedHexagon_.has_value()) {
+            if (auto pg = dynamic_cast<PlayableGround*>(get(selectedHexagon_->getX(), selectedHexagon_->getY()))) {
+                if (pg != selectedTroop_ && pg->isSelectable()) {
+                    if (pg->getOwner() == selectedTroop_->getOwner()) {
+                        auto troop = dynamic_cast<Troop*>(pg->getElement());
+                        if (troop && !dynamic_cast<Bandit*>(troop)) {
+                            //! Troop peut bouger si les deux troops fusionnées peuvent bouger
+
+                        } else {
+                            // if (dynamic_cast<Bandit*>(troop)) ;//! Troop doit plus pouvoir bouger
+
+                            delete (pg->getElement());
+                            pg->setElement(selectedTroop_->getElement());
+                            selectedTroop_->setElement(nullptr);
+                        }
+
+                    } else {
+                        pg->setOwner(selectedTroop_->getOwner());
+                        
+                        // Move troop
+                        delete (pg->getElement());
+                        pg->setElement(selectedTroop_->getElement());
+                        selectedTroop_->setElement(nullptr);
+
+                        pg->updateLinked(); //!update aussi ses voisins
+                    }
+                };
+            }
+        }
+
+        selectedTroop_->updateSelectable(0);
+        selectedTroop_ = nullptr;
+        refresh();
+
+    } else if (event.type == SDL_MOUSEMOTION) {
+    } else if (event.type == SDL_MOUSEWHEEL) {
+    }
+}

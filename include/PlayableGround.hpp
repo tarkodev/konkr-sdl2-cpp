@@ -38,6 +38,7 @@ public:
 
     int getShield() const;
     void updateSelectable(int strength);
+    bool isSelectable() const { return selectable_; }
 
 private:
     static FenceDisplayer fenceDisplayer_;

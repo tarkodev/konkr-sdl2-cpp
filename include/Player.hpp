@@ -23,7 +23,9 @@ public:
     HexagonDisplayer& getPlate();
     HexagonDisplayer& getLostPlate();
 
+    void updateTowns();
     bool hasSelected() const { return selected_; };
+    bool hasTowns();
 
     void addTownCell(PlayableGround* town);
 
