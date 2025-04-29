@@ -106,7 +106,7 @@ void PlayableGround::display(const Texture* target, const Point& pos) {
     } else {
         for (Cell* n : neighbors) {
             if (auto* pg = dynamic_cast<PlayableGround*>(n))
-                similarNeighbors.push_back(pg->getOldOwner() == oldOwner_);
+                similarNeighbors.push_back(!(pg->getOwner()) && pg->getOldOwner() == oldOwner_);
             else
                 similarNeighbors.push_back(false);
         }
@@ -191,7 +191,8 @@ void PlayableGround::link(Player* owner, std::unordered_set<PlayableGround*>& vi
         setOwner(owner);
         for (Cell* n : neighbors) {
             if (auto* pg = dynamic_cast<PlayableGround*>(n)) {
-                if (pg && pg->getOldOwner() == owner_)
+                //! faire en sorte que si owner, alors oldOwner est systématiquement nullptr
+                if (pg && pg->getOwner() == nullptr && pg->getOldOwner() == owner_)
                     pg->link(owner, visited);
                 else
                     pg->updateLinked();

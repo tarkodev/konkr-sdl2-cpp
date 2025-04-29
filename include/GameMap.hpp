@@ -33,7 +33,7 @@ public:
     void refreshSelectables();
     void refresh();
 
-    bool hasTroopSelected() {return selectedTroop_ != nullptr;};
+    bool hasTroopSelected() {return selectedTroopCell_ != nullptr;};
 
     void handleEvent(SDL_Event &event);
     void draw(const Point& pos);
@@ -62,7 +62,7 @@ private:
 
     std::vector<Player *> players_;
 
-    PlayableGround* selectedTroop_ = nullptr;
+    PlayableGround* selectedTroopCell_ = nullptr;
     int selectedPlayerNum_ = 0;
 
     Size size_;

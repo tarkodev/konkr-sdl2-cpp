@@ -568,44 +568,67 @@ void GameMap::handleEvent(SDL_Event &event) {
         auto troop = dynamic_cast<Troop*>(pg->getElement());
         if (!troop || dynamic_cast<Bandit*>(troop)) return;
         
-        selectedTroop_ = pg;
+        selectedTroopCell_ = pg;
         pg->updateSelectable(troop->getStrength());
         refresh();
 
     } else if (event.type == SDL_MOUSEBUTTONUP) {
-        if (!selectedTroop_) return;
+        if (!selectedTroopCell_) return;
 
-        if (selectedHexagon_.has_value()) {
+        auto selectedTroop = dynamic_cast<Troop*>(selectedTroopCell_->getElement());
+        if (selectedTroop && selectedHexagon_.has_value()) {
             if (auto pg = dynamic_cast<PlayableGround*>(get(selectedHexagon_->getX(), selectedHexagon_->getY()))) {
-                if (pg != selectedTroop_ && pg->isSelectable()) {
-                    if (pg->getOwner() == selectedTroop_->getOwner()) {
-                        auto troop = dynamic_cast<Troop*>(pg->getElement());
-                        if (troop && !dynamic_cast<Bandit*>(troop)) {
-                            //! Troop peut bouger si les deux troops fusionnées peuvent bouger
+                if (pg != selectedTroopCell_ && pg->isSelectable()) {
+                    if (pg->getOwner() == selectedTroopCell_->getOwner()) {
+                        if (auto troop = dynamic_cast<Troop*>(pg->getElement())) {
+                            if (!dynamic_cast<Bandit*>(troop)) {
+                                //! Troop peut bouger si les deux troops fusionnées peuvent bouger
+                                if (dynamic_cast<Villager*>(selectedTroop) && dynamic_cast<Villager*>(troop)) {
+                                    delete selectedTroop;
+                                    delete troop;
 
-                        } else {
-                            // if (dynamic_cast<Bandit*>(troop)) ;//! Troop doit plus pouvoir bouger
+                                    pg->setElement(new Pikeman());
+                                    selectedTroopCell_->setElement(nullptr);
+                                } else if (dynamic_cast<Pikeman*>(selectedTroop) && dynamic_cast<Pikeman*>(troop)) {
+                                    delete selectedTroop;
+                                    delete troop;
 
+                                    pg->setElement(new Knight());
+                                    selectedTroopCell_->setElement(nullptr);
+                                } else if (dynamic_cast<Knight*>(selectedTroop) && dynamic_cast<Knight*>(troop)) {
+                                    delete selectedTroop;
+                                    delete troop;
+
+                                    pg->setElement(new Hero());
+                                    selectedTroopCell_->setElement(nullptr);
+                                }
+                            } else {
+                                // if (dynamic_cast<Bandit*>(troop)) ;//! Troop doit plus pouvoir bouger
+
+                                delete (pg->getElement());
+                                pg->setElement(selectedTroopCell_->getElement());
+                                selectedTroopCell_->setElement(nullptr);
+                            }
+                        } else if (pg->getElement() == nullptr) {
                             delete (pg->getElement());
-                            pg->setElement(selectedTroop_->getElement());
-                            selectedTroop_->setElement(nullptr);
+                            pg->setElement(selectedTroopCell_->getElement());
+                            selectedTroopCell_->setElement(nullptr);
                         }
-
                     } else {
                         
                         // Move troop
                         delete (pg->getElement());
-                        pg->setElement(selectedTroop_->getElement());
-                        selectedTroop_->setElement(nullptr);
+                        pg->setElement(selectedTroopCell_->getElement());
+                        selectedTroopCell_->setElement(nullptr);
 
-                        pg->link(selectedTroop_->getOwner());
+                        pg->link(selectedTroopCell_->getOwner());
                     }
                 };
             }
         }
 
-        selectedTroop_->updateSelectable(0);
-        selectedTroop_ = nullptr;
+        selectedTroopCell_->updateSelectable(0);
+        selectedTroopCell_ = nullptr;
         refresh();
 
     } else if (event.type == SDL_MOUSEMOTION) {

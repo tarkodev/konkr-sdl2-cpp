@@ -25,7 +25,7 @@ public:
     void setSelected(bool selected) { selected_ = selected; }
 
 protected:
-    static constexpr int STRENGTH = 0;
+    static constexpr int STRENGTH = 1;
     static constexpr int COST     = 0;
     static constexpr int UPKEEP   = 1;
 
