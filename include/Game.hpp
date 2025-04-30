@@ -51,6 +51,11 @@ private:
     // Loop condition of game
     bool loop_ = true;
 
+    Size minHexSize_;
+    Size maxHexSize_;
+    Size minMapSize_;
+    Size maxMapSize_;
+
     std::optional<SDL_Point> moveOrigin_;
 
     // Background color

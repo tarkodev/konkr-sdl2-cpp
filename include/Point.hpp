@@ -4,6 +4,8 @@
 #include "SDL.h"
 #include <iostream>
 
+class Size;
+
 /**
  * @brief Classe enveloppant SDL_Point.
  *
@@ -13,75 +15,59 @@
 class Point {
 public:
     // Constructeur par défaut
-    Point() : point_{0, 0} {}
+    Point();
     
     // Constructeur avec coordonnées
-    Point(int x, int y) : point_{x, y} {}
+    Point(int x, int y);
     
     // Constructeur à partir d'un SDL_Point
-    Point(const SDL_Point& p) : point_(p) {}
+    Point(const SDL_Point& p);
 
     // Accesseurs
-    int getX() const { return point_.x; }
-    int getY() const { return point_.y; }
+    int getX() const;
+    int getY() const;
 
     // Mutateurs
-    void setX(int x) { point_.x = x; }
-    void setY(int y) { point_.y = y; }
+    void setX(int x);
+    void setY(int y);
 
-    void addX(int x) { point_.x += x; }
-    void addY(int y) { point_.y += y; }
+    void addX(int x);
+    void addY(int y);
 
     // Accès direct au SDL_Point interne
-    const SDL_Point& get() const { return point_; }
-    SDL_Point& get() { return point_; }
+    const SDL_Point& get() const;
+    SDL_Point& get();
 
     // Opérateur de conversion explicite en SDL_Point pour utilisation via static_cast
-    explicit operator SDL_Point() const {
-        return point_;
-    }
+    explicit operator SDL_Point() const;
 
     // Opérateur d'addition : retourne une somme de points
-    Point operator+(const Point& other) const {
-        return Point(point_.x + other.point_.x, point_.y + other.point_.y);
-    }
+    Point operator+(const Point& other) const;
+    Point operator+(const Size& other) const;
 
     // Opérateur de soustraction : retourne une soustraction de points
-    Point operator-(const Point& other) const {
-        return Point(point_.x - other.point_.x, point_.y - other.point_.y);
-    }
+    Point operator-(const Point& other) const;
+    Point operator-(const Size& other) const;
 
     // Opérateur de multiplicaion : retourne un produit de points
-    Point operator*(const double coef) const {
-        return Point(point_.x * coef, point_.y * coef);
-    }
+    Point operator*(const double coef) const;
+
+    // Opérateur de division(entière) : retourne une division entière de points
+    Point operator/(const double coef) const;
 
     // Opérateur d'addition affecté
-    Point& operator+=(const Point& other) {
-        point_.x += other.point_.x;
-        point_.y += other.point_.y;
-        return *this;
-    }
+    Point& operator+=(const Point& other);
+    Point& operator+=(const Size& other);
 
     // Opérateur de soustraction affecté
-    Point& operator-=(const Point& other) {
-        point_.x -= other.point_.x;
-        point_.y -= other.point_.y;
-        return *this;
-    }
+    Point& operator-=(const Point& other);
+    Point& operator-=(const Size& other);
 
     // Opérateur de multiplication affecté
-    Point& operator*=(const double coef) {
-        point_.x *= coef;
-        point_.y *= coef;
-        return *this;
-    }
-    
-    // Surcharge de l'opérateur << pour l'affichage
-    friend std::ostream& operator<<(std::ostream& os, const Point& p) {
-        os << "Point(" << p.point_.x << ", " << p.point_.y << ")";
-        return os;
-    }
+    Point& operator*=(const double coef);
+
+    // Opérateur de division affecté
+    Point& operator/=(const double coef);
     
 private:
     SDL_Point point_;

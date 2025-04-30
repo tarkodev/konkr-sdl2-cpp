@@ -502,21 +502,17 @@ void GameMap::display(const Texture* target)
     SDL_RenderCopy(renderer_, selectablesCalc_->get(), nullptr, &dest.get()); //! A remplacer pas ->blit quand window héritera de Texture
     SDL_RenderCopy(renderer_, fencesCalc_->get(), nullptr, &dest.get()); //! A remplacer pas ->blit quand window héritera de Texture
     SDL_RenderCopy(renderer_, elementsCalc_->get(), nullptr, &dest.get()); //! A remplacer pas ->blit quand window héritera de Texture
+    // target->blit(islandsCalc_, dest);
+    // target->blit(cellsCalc_, dest);
+    // target->blit(selectablesCalc_, dest);
+    // target->blit(fencesCalc_, dest);
+    // target->blit(elementsCalc_, dest);
 
-    /*
-    if (selectedCell_.has_value()) {
-        auto [q, r] = HexagonUtils::offsetToAxial(selectedCell_->getX(), selectedCell_->getY());
-        auto [x, y] = HexagonUtils::axialToPixel(q, r, cellRadius_);
-        x += pos.getX() + innerCellRadius_;
-        y += pos.getY() + cellRadius_;
-
-        double ratio = static_cast<double>(dest.getWidth()) / islandsCalc_->getWidth();
-        int w = static_cast<int>(ratio * selectSprite_->getWidth());
-        int h = static_cast<int>(ratio * selectSprite_->getHeight());
-
-        SDL_RenderCopy(renderer_, selectSprite_->get(), nullptr, new SDL_Rect{static_cast<int>(x -  w/2), static_cast<int>(y - h/2), w, h});
+    if (selectedTroop_) {
+        SDL_Rect r{selectedTroop_->getPos().get().x, selectedTroop_->getPos().get().y, selectedTroop_->getSize().get().x, selectedTroop_->getSize().get().y};
+        SDL_RenderCopy(renderer_, selectSprite_->get(), nullptr, &r);
+        // selectedTroop_->display(target);
     }
-    */
 }
 
 void GameMap::endTurn() {
@@ -614,12 +610,12 @@ void GameMap::moveTroop(PlayableGround* from, PlayableGround* to) {
     
     // Same Owner
     else {
-        if (!toTroop) {
+        if (!to->getElement()) {
             from->setElement(nullptr);
             to->setElement(fromTroop);
         }
 
-        else {
+        else if (toTroop) {
             Troop *troop = nullptr;
             if (dynamic_cast<Villager*>(fromTroop) && dynamic_cast<Villager*>(toTroop))
                 troop = new Pikeman(to->getPos());
@@ -688,8 +684,7 @@ void GameMap::handleEvent(SDL_Event &event) {
 
             if (selectedTroop_) {
                 refreshElements();
-                selectedTroop_->setPos((Point{static_cast<int>(event.motion.x), static_cast<int>(event.motion.y)} - pos_) * (1/ratio_));
-                selectedTroop_->display(elementsCalc_);
+                selectedTroop_->setPos(Point{static_cast<int>(event.motion.x), static_cast<int>(event.motion.y)});
             }
             else {
                 updateCursor();

@@ -1,5 +1,6 @@
 #include "Ground.hpp"
 #include "ColorUtils.hpp"
+#include "HexagonUtils.hpp"
 
 HexagonDisplayer Ground::islandDisplayer = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
 double Ground::islandRadius = 0;
@@ -23,7 +24,7 @@ void Ground::init() {
 
     // Get radius of hexagon of island
     islandInnerRadius = island->getWidth() / 2;
-    islandRadius = islandInnerRadius * 2 / std::sqrt(3);
+    islandRadius = HexagonUtils::innerToRadius(islandInnerRadius);
 
     // Set displayer of territory
     islandDisplayer = HexagonDisplayer{renderer_, islandRadius, island, link, linkBottomLeft, linkBottom, linkBottomRight};

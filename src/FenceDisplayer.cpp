@@ -1,11 +1,12 @@
 
 #include "FenceDisplayer.hpp"
+#include "HexagonUtils.hpp"
 
 
 FenceDisplayer::FenceDisplayer(SDL_Renderer* renderer, double hexagonRadius, 
     Texture* fenceTop, Texture* fenceTopLeft, Texture* fenceTopRight, Texture* fenceBottom, Texture* fenceBottomLeft, Texture* fenceBottomRight,
     Texture* fenceLinkTop, Texture* fenceLinkTopLeft, Texture* fenceLinkTopRight, Texture* fenceLinkBottom, Texture* fenceLinkBottomLeft, Texture* fenceLinkBottomRight
-) : renderer_(renderer), radius_(hexagonRadius), innerRadius_(std::sqrt(3) * hexagonRadius / 2.0),
+) : renderer_(renderer), radius_(hexagonRadius), innerRadius_(HexagonUtils::radiusToInner(hexagonRadius)),
       top_(fenceTop), topLeft_(fenceTopLeft), topRight_(fenceTopRight), 
       bottom_(fenceBottom), bottomLeft_(fenceBottomLeft), bottomRight_(fenceBottomRight), 
       linkTop_(fenceLinkTop), linkTopLeft_(fenceLinkTopLeft), linkTopRight_(fenceLinkTopRight), 

@@ -1,7 +1,10 @@
 #ifndef SIZE_HPP
 #define SIZE_HPP
 
+#include "SDL.h"
 #include "Point.hpp"
+
+#include <algorithm>
 
 /**
  * @brief Classe Size représentant une taille avec une largeur et une hauteur.
@@ -9,58 +12,49 @@
 class Size {
 public:
     // Constructeur par défaut
-    Size() : size_{0, 0} {}
+    Size();
     
     // Constructeur avec coordonnées
-    Size(int w, int h) : size_{w, h} {}
+    Size(int w, int h);
     
     // Constructeur à partir d'un SDL_Point
-    Size(const SDL_Point& p) : size_{p.x, p.y} {}
+    Size(const SDL_Point& p);
 
     // Constructeur à partir d'un Size
-    Size(const Size& s) : size_{s.getWidth(), s.getHeight()} {}
+    Size(const Size& s);
 
     // Accesseurs
-    int getWidth() const { return size_.x; }
-    int getHeight() const { return size_.y; }
+    int getWidth() const;
+    int getHeight() const;
 
     // Mutateurs
-    void setWidth(int w) { size_.x = w; }
-    void setHeight(int h) { size_.y = h; }
+    void setWidth(int w);
+    void setHeight(int h);
 
     // Accès direct au SDL_Point interne
-    const SDL_Point& get() const { return size_; }
-    SDL_Point& get() { return size_; }
+    const SDL_Point& get() const;
+    SDL_Point& get();
 
     // Opérateur d'addition : retourne une somme de points
-    Size operator+(const Size& other) const {
-        return Size(size_.x + other.getWidth(), size_.y + other.getHeight());
-    }
+    Size operator+(const Size& other) const;
+
+    // Opérateur d'addition : retourne une somme de points
+    Point operator-(const Point& other) const;
 
     // Opérateur de multiplicaion : retourne un produit de points
-    Size operator*(const double coef) const {
-        return Size(size_.x * coef, size_.y * coef);
-    }
+    Size operator*(const double coef) const;
+
+    // Opérateur de division(entière) : retourne une division entière de points
+    Size operator/(const double coef) const;
 
     // Opérateur d'addition affecté
-    Size& operator+=(const Size& other) {
-        size_.x += other.getWidth();
-        size_.y += other.getHeight();
-        return *this;
-    }
+    Size& operator+=(const Size& other);
 
     // Opérateur de multiplication affecté
-    Size& operator*=(const double coef) {
-        size_.x *= coef;
-        size_.y *= coef;
-        return *this;
-    }
-    
-    // Surcharge de l'opérateur << pour l'affichage
-    friend std::ostream& operator<<(std::ostream& os, const Size& p) {
-        os << "Size(" << p.getWidth() << ", " << p.getHeight() << ")";
-        return os;
-    }
+    Size& operator*=(const double coef);
+
+    // Opérateur de division affecté
+    Size& operator/=(const double coef);
     
 private:
     SDL_Point size_;

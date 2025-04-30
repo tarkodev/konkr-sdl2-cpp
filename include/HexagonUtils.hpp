@@ -64,7 +64,7 @@ namespace HexagonUtils
     /**
      * @brief Convertit des coordonnées axiales (q, r) en coordonnées offset (x, y).
      */
-    static std::pair<int, int> axialToOffset(int q, int r)
+    inline std::pair<int, int> axialToOffset(int q, int r)
     {
         int x = q + ((r - (r & 1)) / 2);
         int y = r;
@@ -83,10 +83,20 @@ namespace HexagonUtils
     /**
      * @brief Convertit des coordonnées axiales (q, r) en coordonnées offset (x, y).
      */
-    static std::pair<int, int> pixelToOffset(int x, int y, double hexSize)
+    inline std::pair<int, int> pixelToOffset(int x, int y, double hexSize)
     {
         auto [q, r] = pixelToAxial(x, y, hexSize);
         return axialToOffset(q, r);
+    }
+
+    inline double innerToRadius(double radius)
+    {
+        return radius * 2.0 / std::sqrt(3);
+    }
+
+    inline double radiusToInner(double innerRadius)
+    {
+        return innerRadius * std::sqrt(3) / 2.0;
     }
 }
 

@@ -1,11 +1,11 @@
 
+#include "HexagonUtils.hpp"
 #include "HexagonDisplayer.hpp"
-
 
 HexagonDisplayer::HexagonDisplayer(SDL_Renderer* renderer, double hexagonRadius, Texture* hexagonTexture, Texture* linkTexture, Texture* linkBottomLeftTexture, Texture* linkBottomTexture, Texture* linkBottomRightTexture)
     : renderer_(renderer),
       radius_(hexagonRadius),
-      innerRadius_(std::sqrt(3) * hexagonRadius / 2.0),
+      innerRadius_(HexagonUtils::radiusToInner(hexagonRadius)),
       hexagon_(hexagonTexture),
       link_(linkTexture),
       linkBottomLeft_(linkBottomLeftTexture),

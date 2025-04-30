@@ -35,6 +35,9 @@ Game::Game()
     renderer_ = window_->getRenderer();
     windowSize_ = window_->getSize();
 
+    minHexSize_ = windowSize_ * 0.03;
+    maxHexSize_ = windowSize_ * 0.13;
+
     // Init each class to initialize
     Cell::init(renderer_);
     Ground::init();
@@ -171,19 +174,15 @@ void Game::handleEvents() {
             }
 
             case SDL_MOUSEWHEEL: {
-                //! Mettre limite min/max de zoom
-                Size mapSize = map_->getSize();
                 double zoom = (event.wheel.preciseY > 0) ? 1.1 : 0.9;
+                Size mapSize = map_->getSize() * zoom;
 
-                mapSize *= zoom;
-                map_->setProportionalSize(mapSize);
-
-                Point mapPos = map_->getPos();
-                mapPos -= Point{
-                    static_cast<int>((mapPos.getX() - windowSize_.getWidth() / 2.0) * (1 - zoom)),
-                    static_cast<int>((mapPos.getY() - windowSize_.getHeight() / 2.0) * (1 - zoom))
-                };
-                map_->setPos(mapPos);
+                if (minMapSize_.getWidth() < mapSize.getWidth() && mapSize.getWidth() < maxMapSize_.getWidth() && 
+                    minMapSize_.getHeight() < mapSize.getHeight() && mapSize.getHeight() < maxMapSize_.getHeight()) {
+                    map_->setProportionalSize(mapSize);
+                    Point mapPos = map_->getPos();
+                    map_->setPos(mapPos + ((windowSize_ / 2) - mapPos) * (1 - zoom));
+                }
                 break;
             }
 
@@ -252,8 +251,27 @@ void Game::startGameWithMap(const std::string& file) {
     map_.emplace(Point{0, 0}, windowSize_*0.75, file);
     screen_     = ScreenState::InGame;
     activeMenu_.reset();
-    // recalcul du centrage :
+
+    minMapSize_ = Size{
+        static_cast<int>(map_->getWidth() * minHexSize_.getWidth()),
+        static_cast<int>(map_->getHeight() * HexagonUtils::radiusToInner(minHexSize_.getHeight()))
+    };
+
+    maxMapSize_ = Size{
+        static_cast<int>(map_->getWidth() * maxHexSize_.getWidth()),
+        static_cast<int>(map_->getHeight() * HexagonUtils::radiusToInner(maxHexSize_.getHeight()))
+    };
+
+   // recalcul de la taille de la map
     Size mapSize = map_->getSize();
+    mapSize = Size{
+        std::min(std::max(mapSize.getWidth(), minMapSize_.getWidth()), maxMapSize_.getWidth()),
+        std::min(std::max(mapSize.getHeight(), minMapSize_.getHeight()), maxMapSize_.getHeight())
+    };
+    map_->setProportionalSize(mapSize);
+
+    // recalcul du centrage :
+    mapSize = map_->getSize();
     map_->setPos({(windowSize_.getWidth() - mapSize.getWidth()) / 2, (windowSize_.getHeight() - mapSize.getHeight())/2});
 }
 
