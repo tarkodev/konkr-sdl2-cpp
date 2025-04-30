@@ -9,7 +9,7 @@ void Troop::init() {
 
     if (shadow_) return;
     shadow_ = (new Texture(renderer, "../assets/img/shadow.png"))->convertAlpha();
-    lostSprite_ = (new Texture(renderer, "../assets/img/town.png"))->convertAlpha();
+    lostSprite_ = (new Texture(renderer, "../assets/img/lost.png"))->convertAlpha();
 }
 
 

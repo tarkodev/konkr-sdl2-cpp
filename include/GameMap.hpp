@@ -32,7 +32,7 @@ public:
     GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize);
     GameMap(const Point& pos, const Size size, const std::string mapFile);
 
-    const Size getSize() const;
+    const Size getSize() const override;
     void setProportionalSize(const Size size);
     void selectCell(const Point& pos);
 
