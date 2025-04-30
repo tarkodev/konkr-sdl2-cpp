@@ -75,11 +75,10 @@ void Player::onTurnStart() {
 }
 
 void Player::onTurnEnd() {
-    for (PlayableGround* townCell : townCells_) {
-        Town* town = dynamic_cast<Town*>(townCell->getElement());
-        if (town) town->setSelected(false);
-
-    }
+    // Unselect towns
+    for (PlayableGround* townCell : townCells_)
+        if (Town* town = dynamic_cast<Town*>(townCell->getElement()))
+            town->setSelected(false);
 
     selected_ = false;
 }

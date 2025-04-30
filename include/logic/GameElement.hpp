@@ -26,13 +26,18 @@ public:
     virtual void display(const BlitTarget* target) override = 0;
     virtual const Size getSize() const override = 0;
 
+    virtual bool isLost() const { return lost_; };
+    virtual void lost() { lost_ = true; };
+
 protected:
     GameElement(const Point& pos);
 
     static constexpr int STRENGTH = 0;
     static constexpr int COST     = 0;
     static constexpr int UPKEEP   = 0;
+
     Player* owner_;
+    bool lost_ = false;
 
     /* --- Ressources graphiques partagées --- */
     static SDL_Renderer* renderer;

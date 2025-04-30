@@ -519,10 +519,29 @@ void GameMap::setProportionalSize(const Size size) {
     size_ = calcSize_ * ratio_;
 }
 
+void GameMap::updateLostElements() {
+    for (Cell* cell : *this) {
+        auto* pg = dynamic_cast<PlayableGround*>(cell);
+        if (!pg) continue;
+
+        auto* elt = pg->getElement();
+        if (!elt || !elt->isLost()) continue;
+
+        if (dynamic_cast<Castle*>(elt)) {
+            delete elt;
+            pg->setElement(new Camp(pg->getPos()));
+        } else if (dynamic_cast<Troop*>(elt)) {
+            delete elt;
+            pg->setElement(new Bandit(pg->getPos()));
+        }
+    }
+}
+
 void GameMap::nextPlayer() {
     if (players_.empty()) return;
 
     // Finish turn of current player
+    updateLostElements();
     players_[selectedPlayerNum_]->onTurnEnd();
     selectedPlayerNum_ = (selectedPlayerNum_ + 1) % players_.size();
 

@@ -164,15 +164,10 @@ void PlayableGround::unlink(std::unordered_set<PlayableGround*>& visited) {
         setOwner(nullptr);
     }
 
-    if (auto castle = dynamic_cast<Castle*>(element)) {
-        delete castle;
-        element = new Camp(pos_);
-        oldOwner_ = nullptr;
-        hasPlate_ = false;
-    } else if (auto troop = dynamic_cast<Troop*>(element)) {
-        delete troop;
-        element = new Bandit(pos_);
-    }
+    if (auto castle = dynamic_cast<Castle*>(element))
+        castle->lost();
+    else if (auto troop = dynamic_cast<Troop*>(element))
+        troop->lost();
 }
 
 //! check si voisin.owner == null && oldowner = owner

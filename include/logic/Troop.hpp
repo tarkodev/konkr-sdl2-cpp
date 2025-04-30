@@ -13,9 +13,12 @@ public:
     virtual ~Troop() = default;
 
 protected:
-    static Texture* shadow;
+    static Texture* shadow_;
+    static Texture* lostSprite_;
 
     Troop(const Point& pos);
+
+    void displaySprite(const BlitTarget* target, const Texture* sprite);
 
 private:
     static SDL_Renderer* renderer_;

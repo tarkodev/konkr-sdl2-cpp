@@ -17,11 +17,5 @@ Knight::Knight(const Point& pos): Troop(pos) {}
 
 void Knight::display(const BlitTarget* target)
 {
-    if (!sprite_ || !shadow) return;
-    
-    target->blit(shadow, Point{pos_.getX() - shadow->getWidth() / 2,
-                               pos_.getY() - shadow->getHeight() / 2});
-
-    target->blit(sprite_, Point{pos_.getX() - sprite_->getWidth() / 2,
-                                pos_.getY() - sprite_->getHeight() / 2});
+    Troop::displaySprite(target, sprite_);
 }

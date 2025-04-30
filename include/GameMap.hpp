@@ -72,6 +72,7 @@ private:
     void updateCursor();
     void refreshMain();
 
+    void updateLostElements();
     void moveTroop(PlayableGround* from, PlayableGround* to);
     void moveBandit(PlayableGround* from, PlayableGround* to);
     void moveBandits();
