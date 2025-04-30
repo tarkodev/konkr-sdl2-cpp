@@ -41,6 +41,7 @@ void GameMap::init(SDL_Renderer *renderer) {
     arrowCursor_ = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
 }
 
+
 GameMap::GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize)
     : Displayer(pos), size_{size}, HexagonGrid<Cell*>(gridSize, nullptr)
 {
@@ -48,19 +49,22 @@ GameMap::GameMap(const Point& pos, const Size size, const std::pair<int, int>& g
         throw std::runtime_error("Une map doit au moins être de taille 2x2.");
 
     double islandRadius = Ground::getRadius();
+    double islandInnerRadius = Ground::getInnerRadius();
     for (int x=0; x < getWidth(); x++) {
         for (int y = 0; y < getHeight(); y++) {
             auto [posX, posY] = HexagonUtils::offsetToPixel(x, y, islandRadius);
+            Point pos{static_cast<int>(posX + islandInnerRadius), static_cast<int>(posY + islandRadius)};
 
-            int v = std::rand() % 4;
+            int v = std::rand() % 3;
             if (v == 0)
-                set(x, y, new PlayableGround(Point{posX, posY}));
+                set(x, y, new PlayableGround(pos));
             else if (v == 1)
                 set(x, y, new Water());
-            else if (v == 3)
-                set(x, y, new Forest(Point{posX, posY}));
+            else if (v == 2)
+                set(x, y, new Forest(pos));
         }
     }
+
     updateNeighbors();
     refresh();
 }
@@ -77,8 +81,9 @@ GameMap::GameMap(const Point& pos, const Size size, const std::pair<int, int>& g
 
     loadMap(mapFile);
     players_[selectedPlayerNum_]->onTurnStart(); //! Après un onTurnStart, refresh le calc elementsCalc_
-    refresh(); //! la on refresh tout
+    refresh();
 }
+
 
 std::pair<int,int> GameMap::getSizeOfMapFile(const std::string& mapFile) {
     std::ifstream in(mapFile);
@@ -108,6 +113,7 @@ std::pair<int,int> GameMap::getSizeOfMapFile(const std::string& mapFile) {
 }
 
 void GameMap::loadMap(const std::string& mapFile) {
+    //! Si on a le temps, découper cette fonction (voir la mettre dans une classe à part entière avec getSizeOfMapFile)
     std::ifstream in(mapFile);
     if (!in) throw std::runtime_error("Impossible d'ouvrir le fichier de map.");
 
@@ -127,7 +133,7 @@ void GameMap::loadMap(const std::string& mapFile) {
             if (token.size() != 2)
                 throw std::runtime_error("Malformation du fichier.");
 
-            auto [posX, posY] = HexagonUtils::offsetToPixel(x, y, Ground::getRadius());
+            auto [posX, posY] = HexagonUtils::offsetToPixel(x, y, islandRadius);
             Point pos{static_cast<int>(posX + islandInnerRadius), static_cast<int>(posY + islandRadius)};
 
             char cellType = token[0];
@@ -250,14 +256,20 @@ void GameMap::loadMap(const std::string& mapFile) {
     //! update state de la map (ex: hexagone/troupe/castle pas relié à une town(mettre nullptr/bandit/camp))
 }
 
+
 void GameMap::setPos(const Point& pos) {
     pos_ = pos;
     updateSelectedCell();
 }
 
+const Size GameMap::getSize() const {
+    return size_;
+}
+
+
 void GameMap::updateNeighbors() {
     for (int y = 0; y < getHeight(); y++) {
-        if (y & 1) { // odd line
+        if (y & 1) {
             for (int x = 0; x < getWidth(); x++) {
                 get(x, y)->setNeighbors({
                     y > 0                                 ? get(x,   y-1)   : nullptr,
@@ -268,7 +280,8 @@ void GameMap::updateNeighbors() {
                     x+1 < getWidth() && y > 0             ? get(x+1, y-1) : nullptr,
                 });
             }
-        } else { // even line
+        }
+        else {
             for (int x = 0; x < getWidth(); x++) {
                 get(x, y)->setNeighbors({
                     x > 0 && y > 0                        ? get(x-1, y-1) : nullptr,
@@ -283,8 +296,8 @@ void GameMap::updateNeighbors() {
     }
 }
 
-//! Utiliser terme calc plutot que sprite
-void GameMap::createSprite() {
+
+void GameMap::createCalcs() {
     // Get utils dimensions
     Size islandSize = Ground::getIslandSize();
     double islandInnerRadius = Ground::getInnerRadius();
@@ -297,7 +310,7 @@ void GameMap::createSprite() {
     cy += islandRadius + islandSize.getHeight() / 2.0;
 
     // Resize
-    spriteSize_ = {static_cast<int>(cx), static_cast<int>(cy)};
+    calcSize_ = {static_cast<int>(cx), static_cast<int>(cy)};
     setProportionalSize(size_);
 
     // Delete islands sprite if already exists
@@ -307,19 +320,19 @@ void GameMap::createSprite() {
     }
 
     // Create sprite for islands
-    islandsCalc_ = new Texture(renderer_, spriteSize_);
+    islandsCalc_ = new Texture(renderer_, calcSize_);
     islandsCalc_->convertAlpha();
 
 
     // Delete cells sprite if already exists
-    if (cellsCalc_) {
-        delete cellsCalc_;
-        cellsCalc_ = nullptr;
+    if (platesCalc_) {
+        delete platesCalc_;
+        platesCalc_ = nullptr;
     }
 
     // Create sprite for elements
-    cellsCalc_ = new Texture(renderer_, spriteSize_);
-    cellsCalc_->convertAlpha();
+    platesCalc_ = new Texture(renderer_, calcSize_);
+    platesCalc_->convertAlpha();
 
 
     // Delete cells sprite if already exists
@@ -329,7 +342,7 @@ void GameMap::createSprite() {
     }
 
     // Create sprite for elements
-    selectablesCalc_ = new Texture(renderer_, spriteSize_);
+    selectablesCalc_ = new Texture(renderer_, calcSize_);
     selectablesCalc_->convertAlpha();
 
 
@@ -340,7 +353,7 @@ void GameMap::createSprite() {
     }
 
     // Create sprite for elements
-    fencesCalc_ = new Texture(renderer_, spriteSize_);
+    fencesCalc_ = new Texture(renderer_, calcSize_);
     fencesCalc_->convertAlpha();
 
 
@@ -351,162 +364,163 @@ void GameMap::createSprite() {
     }
 
     // Create sprite for elements
-    elementsCalc_ = new Texture(renderer_, spriteSize_);
+    elementsCalc_ = new Texture(renderer_, calcSize_);
     elementsCalc_->convertAlpha();
+
+
+    // Delete elements sprite if already exists
+    if (calc_) {
+        delete calc_;
+        calc_ = nullptr;
+    }
+
+    // Create sprite for elements
+    calc_ = new Texture(renderer_, calcSize_);
+    calc_->convertAlpha();
+}
+
+
+void GameMap::refreshIslands() {
+    if (!platesCalc_) refresh();
+
+    // Draw transparent background
+    platesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
+
+    // Draw islands
+    for (Cell* cell : *this)
+        if (auto* g = dynamic_cast<Ground*>(cell))
+            g->Ground::display(islandsCalc_);
+
+    refreshMain();
+}
+
+void GameMap::refreshPlates() {
+    if (!platesCalc_) refresh();
+
+    // Draw transparent background
+    platesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
+
+    // Draw plates
+    for (Cell* cell : *this)
+        if (auto* disp = dynamic_cast<Displayer*>(cell))
+            disp->display(platesCalc_);
+
+    refreshMain();
+}
+
+void GameMap::refreshSelectables() {
+    if (!selectablesCalc_) refresh();
+
+    // Draw transparent background
+    selectablesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
+
+    // Draw selectables
+    for (Cell* cell : *this)
+        if (auto* pg = dynamic_cast<PlayableGround*>(cell))
+            pg->displaySelectable(selectablesCalc_);
+
+    refreshMain();
+}
+
+void GameMap::refreshFences() {
+    if (!fencesCalc_) refresh();
+
+    // Draw transparent background
+    fencesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
+
+    // Draw fences
+    for (Cell* cell : *this)
+        if (auto* pg = dynamic_cast<PlayableGround*>(cell))
+            pg->displayFences(fencesCalc_);
+
+    refreshMain();
 }
 
 void GameMap::refreshElements() {
-    if (!elementsCalc_)
-        refresh();
+    if (!elementsCalc_) refresh();
 
     // Draw transparent background
     elementsCalc_->fill(ColorUtils::toTransparent(ColorUtils::GREY));
 
-    // Get utils dimensions
-    Size islandSize = Ground::getIslandSize();
-    double islandInnerRadius = Ground::getInnerRadius();
-    double islandRadius = Ground::getRadius();
-
-    // Draw islands and cells
-    for (int y = 0; y < getHeight(); y++) {
-        for (int x = 0; x < getWidth(); x++) {
-            Cell* cell = get(x, y);
-
-            // Calcul de la position de blit
-            auto [q, r] = HexagonUtils::offsetToAxial(x, y);
-            auto [cx, cy] = HexagonUtils::axialToPixel(q, r, islandRadius);
-            auto pos = Point{
-                static_cast<int>(cx + islandInnerRadius),
-                static_cast<int>(cy + islandRadius)
-            };
-
-            // Draw element
-            if (auto* pt = dynamic_cast<PlayableGround*>(cell)) {
-                pt->displayElement(elementsCalc_);
-                pt->displayShield(elementsCalc_);
-            }
+    // Draw game elements
+    for (Cell* cell : *this) {
+        if (auto* pg = dynamic_cast<PlayableGround*>(cell)) {
+            pg->displayElement(elementsCalc_);
+            pg->displayShield(elementsCalc_);
         }
     }
+
+    refreshMain();
 }
 
-void GameMap::refreshSelectables() {
-    if (!selectablesCalc_)
-        refresh();
+void GameMap::refreshMain() {
+    if (!calc_) refresh();
 
-    // Draw transparent background
-    selectablesCalc_->fill(ColorUtils::toTransparent(ColorUtils::GREY));
+    calc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
 
-    // Get utils dimensions
-    Size islandSize = Ground::getIslandSize();
-    double islandInnerRadius = Ground::getInnerRadius();
-    double islandRadius = Ground::getRadius();
-
-    // Draw islands and cells
-    for (int y = 0; y < getHeight(); y++) {
-        for (int x = 0; x < getWidth(); x++) {
-            Cell* cell = get(x, y);
-
-            // Calcul de la position de blit
-            auto [q, r] = HexagonUtils::offsetToAxial(x, y);
-            auto [cx, cy] = HexagonUtils::axialToPixel(q, r, islandRadius);
-            auto pos = Point{
-                static_cast<int>(cx + islandInnerRadius),
-                static_cast<int>(cy + islandRadius)
-            };
-
-            // Draw element
-            if (auto* pt = dynamic_cast<PlayableGround*>(cell)) {
-                pt->displaySelectable(selectablesCalc_);
-            }
-        }
-    }
+    calc_->blit(islandsCalc_);
+    calc_->blit(platesCalc_);
+    calc_->blit(selectablesCalc_);
+    calc_->blit(fencesCalc_);
+    calc_->blit(elementsCalc_);
 }
 
 void GameMap::refresh()
 {
-    // Create sprite of map if isn't exists
-    if (!islandsCalc_ || !cellsCalc_ || !selectablesCalc_ || !fencesCalc_ || !elementsCalc_)
-        createSprite();
+    // Create calcs of map if isn't exists
+    if (!islandsCalc_ || !platesCalc_ || !selectablesCalc_ || !fencesCalc_ || !elementsCalc_ || !calc_)
+        createCalcs();
 
     // Draw transparent background
-    //! faire un calc général qui est refresh à chaque changement d'un de ces quatres calques et qui est blit directement (cela permettra de diviser par 3 le nombre de blit)
     islandsCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
-    cellsCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
-    fencesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
+    platesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
     selectablesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
+    fencesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
     elementsCalc_->fill(ColorUtils::toTransparent(ColorUtils::GREY));
 
-    // Get utils dimensions
-    Size islandSize = Ground::getIslandSize();
-    double islandInnerRadius = Ground::getInnerRadius();
-    double islandRadius = Ground::getRadius();
-
     // Draw islands and cells
-    for (int y = 0; y < getHeight(); y++) {
-        for (int x = 0; x < getWidth(); x++) {
-            Cell* cell = get(x, y);
+    for (Cell* cell: *this) {
+        // Draw island
+        if (auto* t = dynamic_cast<Ground*>(cell))
+            t->Ground::display(islandsCalc_);
 
-            // Calcul de la position de blit
-            auto [q, r] = HexagonUtils::offsetToAxial(x, y);
-            auto [cx, cy] = HexagonUtils::axialToPixel(q, r, islandRadius);
-            auto pos = Point{
-                static_cast<int>(cx + islandInnerRadius),
-                static_cast<int>(cy + islandRadius)
-            };
+        // Draw cell
+        if (auto* disp = dynamic_cast<Displayer*>(cell))
+            disp->display(platesCalc_);
 
-            // Draw island
-            if (auto* t = dynamic_cast<Ground*>(cell))
-                t->Ground::display(islandsCalc_);
-
-            // Draw cell
-            if (auto* disp = dynamic_cast<Displayer*>(cell))
-                disp->display(cellsCalc_);
-
-            // Draw element
-            if (auto* pt = dynamic_cast<PlayableGround*>(cell)) {
-                pt->displaySelectable(selectablesCalc_);
-                pt->displayFences(fencesCalc_);
-                pt->displayElement(elementsCalc_);
-                pt->displayShield(elementsCalc_);
-            }
+        // Draw element
+        if (auto* pt = dynamic_cast<PlayableGround*>(cell)) {
+            pt->displaySelectable(selectablesCalc_);
+            pt->displayFences(fencesCalc_);
+            pt->displayElement(elementsCalc_);
+            pt->displayShield(elementsCalc_);
         }
     }
+
+    refreshMain();
 }
 
-void GameMap::setProportionalSize(const Size size) {
-    double islandRadius = Ground::getRadius();
 
+void GameMap::setProportionalSize(const Size size) {
     // Get ratio
-    double ratioW = static_cast<double>(size.getWidth()) / spriteSize_.getWidth();
-    double ratioH = static_cast<double>(size.getHeight()) / spriteSize_.getHeight();
+    double ratioW = static_cast<double>(size.getWidth()) / calcSize_.getWidth();
+    double ratioH = static_cast<double>(size.getHeight()) / calcSize_.getHeight();
     ratio_ = std::min(ratioW, ratioH);
 
     // Calculate proportionnal destination
-    size_ = spriteSize_ * ratio_;
-}
-
-const Size GameMap::getSize() const {
-    return size_;
+    size_ = calcSize_ * ratio_;
 }
 
 void GameMap::display(const Texture* target)
 {
-    if (!islandsCalc_ || !cellsCalc_ || !selectablesCalc_ || !fencesCalc_ || !elementsCalc_)
+    if (!islandsCalc_ || !platesCalc_ || !selectablesCalc_ || !fencesCalc_ || !elementsCalc_)
         refresh();
 
     //! encapsuler renderer dans une classe
     //! Faire hériter Texture à window et surcharger les méthodes nécessaire (surtout blit)
     Rect dest = {pos_, size_};
-    SDL_RenderCopy(renderer_, islandsCalc_->get(), nullptr, &dest.get()); //! A remplacer pas ->blit quand window héritera de Texture
-    SDL_RenderCopy(renderer_, cellsCalc_->get(), nullptr, &dest.get()); //! A remplacer pas ->blit quand window héritera de Texture
-    SDL_RenderCopy(renderer_, selectablesCalc_->get(), nullptr, &dest.get()); //! A remplacer pas ->blit quand window héritera de Texture
-    SDL_RenderCopy(renderer_, fencesCalc_->get(), nullptr, &dest.get()); //! A remplacer pas ->blit quand window héritera de Texture
-    SDL_RenderCopy(renderer_, elementsCalc_->get(), nullptr, &dest.get()); //! A remplacer pas ->blit quand window héritera de Texture
-    // target->blit(islandsCalc_, dest);
-    // target->blit(cellsCalc_, dest);
-    // target->blit(selectablesCalc_, dest);
-    // target->blit(fencesCalc_, dest);
-    // target->blit(elementsCalc_, dest);
+    SDL_RenderCopy(renderer_, calc_->get(), nullptr, &dest.get());
+    // target->blit(calc_, dest);
 
     if (selectedTroop_) {
         SDL_Rect r{selectedTroop_->getPos().get().x, selectedTroop_->getPos().get().y, selectedTroop_->getSize().get().x, selectedTroop_->getSize().get().y};
@@ -518,9 +532,11 @@ void GameMap::display(const Texture* target)
 void GameMap::endTurn() {
     if (players_.empty()) return;
 
+    // Finish turn of current player
     players_[selectedPlayerNum_]->onTurnEnd();
     selectedPlayerNum_ = (selectedPlayerNum_ + 1) % players_.size();
 
+    // Search next player
     while (!players_[selectedPlayerNum_]->hasTowns()) {
         delete players_[selectedPlayerNum_];
         players_.erase(players_.begin() + selectedPlayerNum_);
@@ -529,34 +545,15 @@ void GameMap::endTurn() {
         selectedPlayerNum_ %= players_.size();
     }
 
+    // Start turn of new current player
     movedTroops_.clear();
     players_[selectedPlayerNum_]->onTurnStart();
     refreshElements();
 }
 
-void GameMap::test() {
-    if (!selectedCell_.has_value()) return;
-
-    //selectedCell_.value()->updateLinked();
-
-    //selectedCell_.value()->setOwner(nullptr);
-
-    /*
-    // Plus possible
-    set(selectedCell_->getX(), selectedCell_->getY(), new PlayableGround());
-    updateNeighbors();
-    */
-   
-    /*
-    PlayableGround* pg = selectedCell_.value();
-    if (!pg) return;
-    pg->setElement(nullptr);
-    */
-
-    //refresh();
-}
 
 void GameMap::selectCell(const Point& pos) {
+    //! update le code de cette fonction
     double islandInnerRadius = Ground::getInnerRadius();
     double islandRadius = Ground::getRadius();
     
@@ -616,6 +613,7 @@ void GameMap::moveTroop(PlayableGround* from, PlayableGround* to) {
         }
 
         else if (toTroop) {
+            // Check merge
             Troop *troop = nullptr;
             if (dynamic_cast<Villager*>(fromTroop) && dynamic_cast<Villager*>(toTroop))
                 troop = new Pikeman(to->getPos());
@@ -625,6 +623,7 @@ void GameMap::moveTroop(PlayableGround* from, PlayableGround* to) {
                 troop = new Hero(to->getPos());
 
             if (troop) {
+                // Merge troops
                 if (movedTroops_.find(fromTroop) != movedTroops_.find(toTroop))
                     movedTroops_.insert(troop);
 
@@ -641,9 +640,11 @@ void GameMap::moveTroop(PlayableGround* from, PlayableGround* to) {
 bool GameMap::isSelectableTroop(PlayableGround* pg) {
     if (!pg) return false;
 
+    // Check owner
     auto owner = pg->getOwner();
     if (!(owner && owner->hasSelected())) return false;
 
+    // Check troop
     auto troop = dynamic_cast<Troop*>(pg->getElement());
     if (!troop || dynamic_cast<Bandit*>(troop)) return false;
     if (movedTroops_.find(troop) != movedTroops_.end()) return false;
@@ -659,6 +660,7 @@ void GameMap::updateCursor() {
 }
 
 void GameMap::handleEvent(SDL_Event &event) {
+    //! Voir si faire fonction pour chaque event
     switch (event.type) {
         case SDL_MOUSEBUTTONDOWN: {
             selectedTroopCell_ = nullptr;

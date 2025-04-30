@@ -27,14 +27,17 @@ public:
     GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize);
     GameMap(const Point& pos, const Size size, const std::string mapFile);
 
-    const Size getSize() const override;
+    const Size getSize() const;
     void setProportionalSize(const Size size);
     void selectCell(const Point& pos);
 
     void setPos(const Point& pos) override;
 
-    void refreshElements();
+    void refreshIslands();
+    void refreshPlates();
     void refreshSelectables();
+    void refreshFences();
+    void refreshElements();
     void refresh();
 
     bool hasTroopSelected() {return selectedTroopCell_ != nullptr;};
@@ -43,7 +46,6 @@ public:
     void display(const Texture* target) override;
 
     void endTurn();
-    void test();
 
     static void init(SDL_Renderer* renderer);
 
@@ -58,10 +60,11 @@ private:
     std::pair<int,int> getSizeOfMapFile(const std::string& mapFile);
 
     void updateNeighbors();
-    void createSprite();
+    void createCalcs();
     void updateSelectedCell();
     bool isSelectableTroop(PlayableGround* pg);
     void updateCursor();
+    void refreshMain();
 
     void moveTroop(PlayableGround* from, PlayableGround* to);
 
@@ -78,12 +81,13 @@ private:
     int selectedPlayerNum_ = 0;
 
     Size size_;
-    Size spriteSize_;
+    Size calcSize_;
     Texture* islandsCalc_ = nullptr;
-    Texture* cellsCalc_ = nullptr;
+    Texture* platesCalc_ = nullptr;
     Texture* selectablesCalc_ = nullptr;
     Texture* fencesCalc_ = nullptr;
     Texture* elementsCalc_ = nullptr;
+    Texture* calc_ = nullptr;
 };
 
 #endif

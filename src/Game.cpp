@@ -150,9 +150,7 @@ void Game::handleEvents() {
             }
 
             case SDL_MOUSEBUTTONUP: {
-                moveOrigin_.reset();
-                if (!moved_)
-                    map_->test();
+                moveOrigin_.reset(); //! voir si tjrs utile
                 map_->handleEvent(event);
                 break;
             }
