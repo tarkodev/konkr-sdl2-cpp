@@ -13,6 +13,9 @@ Point::Point(int x, int y) : point_{x, y} {}
 // Constructeur à partir d'un SDL_Point
 Point::Point(const SDL_Point& p) : point_(p) {}
 
+// Constructeur à partir d'une Size
+Point::Point(const Size& s) : point_{s.getWidth(), s.getHeight()} {}
+
 // Accesseurs
 int Point::getX() const { return point_.x; }
 int Point::getY() const { return point_.y; }

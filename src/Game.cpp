@@ -103,6 +103,17 @@ Game::Game()
     //! A déplacer dans Overlay pour le chargement des textures
 }
 
+void Game::updateMapPos() {
+    Size mapSize = map_->getSize();
+    Point mapPos = map_->getPos();
+    Point minMapPos = mapSize * 5 / mapCellSize_ - mapSize;
+    Point maxMapPos = windowSize_ - mapSize * 5 / mapCellSize_;
+
+    mapPos_.setX((mapPos_.getX() > mapPos.getX()) ? std::min(mapPos_.getX(), maxMapPos.getX()) : std::max(mapPos_.getX(), minMapPos.getX()));
+    mapPos_.setY((mapPos_.getY() > mapPos.getY()) ? std::min(mapPos_.getY(), maxMapPos.getY()) : std::max(mapPos_.getY(), minMapPos.getY()));
+    map_->setPos(mapPos_);
+}
+
 Game::~Game() = default;
 
 void Game::handleEvents() {
@@ -130,30 +141,27 @@ void Game::handleEvents() {
             case SDL_MOUSEBUTTONDOWN: {
                 map_->handleEvent(event);
                 if (!(map_->hasTroopSelected())) {
-                    moveOrigin_ = {event.motion.x, event.motion.y};
+                    moveOrigin_ = Point{event.motion.x, event.motion.y};
                     moved_ = false;
                 }
                 break;
             }
 
             case SDL_MOUSEBUTTONUP: {
-                moveOrigin_.reset(); //! voir si tjrs utile
+                moveOrigin_.reset();
                 map_->handleEvent(event);
                 break;
             }
 
             case SDL_MOUSEMOTION: {
-                Point mapPos = map_->getPos();
-
                 if (moveOrigin_.has_value()) {
-                    moved_ = true;
-                    SDL_Point origin = moveOrigin_.value();
-
-                    mapPos += Point{(event.motion.x - origin.x), (event.motion.y - origin.y)};
-                    map_->setPos(mapPos);
+                    mapPos_ += Point{event.motion.x, event.motion.y} - *moveOrigin_;
+                    updateMapPos();
 
                     moveOrigin_ = {event.motion.x, event.motion.y};
+                    moved_ = true;
                 }
+
                 map_->handleEvent(event);
                 break;
             }
@@ -162,11 +170,13 @@ void Game::handleEvents() {
                 double zoom = (event.wheel.preciseY > 0) ? 1.1 : 0.9;
                 Size mapSize = map_->getSize() * zoom;
 
+                //! Ecrire operateur comparaison de deux Size
                 if (minMapSize_.getWidth() < mapSize.getWidth() && mapSize.getWidth() < maxMapSize_.getWidth() && 
                     minMapSize_.getHeight() < mapSize.getHeight() && mapSize.getHeight() < maxMapSize_.getHeight()) {
                     map_->setProportionalSize(mapSize);
-                    Point mapPos = map_->getPos();
-                    map_->setPos(mapPos + ((windowSize_ / 2) - mapPos) * (1 - zoom));
+                    
+                    mapPos_ += ((windowSize_ / 2) - mapPos_) * (1 - zoom);
+                    updateMapPos();
                 }
                 break;
             }
@@ -174,18 +184,20 @@ void Game::handleEvents() {
             case SDL_KEYDOWN: {
                 Point mapPos = map_->getPos();
 
-                if (event.key.keysym.sym == SDLK_LEFT)
-                    mapPos.addX(10);
-                else if (event.key.keysym.sym == SDLK_RIGHT)
-                    mapPos.addX(-10);
-                else if (event.key.keysym.sym == SDLK_UP)
-                    mapPos.addY(10);
-                else if (event.key.keysym.sym == SDLK_DOWN)
-                    mapPos.addY(-10);
-                else if (event.key.keysym.sym == SDLK_RETURN)
+                if (event.key.keysym.sym == SDLK_RETURN)
                     map_->nextPlayer();
+                else {
+                    if (event.key.keysym.sym == SDLK_LEFT)
+                        mapPos_.addX(10);
+                    else if (event.key.keysym.sym == SDLK_RIGHT)
+                        mapPos_.addX(-10);
+                    else if (event.key.keysym.sym == SDLK_UP)
+                        mapPos_.addY(10);
+                    else if (event.key.keysym.sym == SDLK_DOWN)
+                        mapPos_.addY(-10);
 
-                map_->setPos(mapPos);
+                    updateMapPos();
+                }
                 break;
             }
         }
@@ -236,6 +248,8 @@ void Game::startGameWithMap(const std::string& file) {
     screen_     = ScreenState::InGame;
     activeMenu_.reset();
 
+    mapCellSize_ = Size{map_->getWidth(), map_->getHeight()};
+
     minMapSize_ = Size{
         static_cast<int>(map_->getWidth() * minHexSize_.getWidth()),
         static_cast<int>(map_->getHeight() * HexagonUtils::radiusToInner(minHexSize_.getHeight()))
@@ -256,7 +270,8 @@ void Game::startGameWithMap(const std::string& file) {
 
     // recalcul du centrage :
     mapSize = map_->getSize();
-    map_->setPos({(windowSize_.getWidth() - mapSize.getWidth()) / 2, (windowSize_.getHeight() - mapSize.getHeight())/2});
+    mapPos_ = Point{(windowSize_.getWidth() - mapSize.getWidth()) / 2, (windowSize_.getHeight() - mapSize.getHeight())/2};
+    updateMapPos();
 }
 
 void Game::run() {

@@ -44,6 +44,7 @@ private:
 
     // Map size and pos (in px)
     Point mapPos_ = {0, 0};
+    Size mapCellSize_ = {0, 0};
 
     // Grid size
     std::pair<int, int> gridSize_ = {20, 15};
@@ -56,7 +57,7 @@ private:
     Size minMapSize_;
     Size maxMapSize_;
 
-    std::optional<SDL_Point> moveOrigin_;
+    std::optional<Point> moveOrigin_;
 
     // Background color
     const SDL_Color bgColor = ColorUtils::SEABLUE;
@@ -81,7 +82,10 @@ private:
 
     PendingAction pendingAction_;
 
-    std::string pendingMapFile_;         
+    std::string pendingMapFile_;  
+    
+    
+    void updateMapPos();
 
 
 };

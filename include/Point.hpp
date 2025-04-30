@@ -23,6 +23,9 @@ public:
     // Constructeur à partir d'un SDL_Point
     Point(const SDL_Point& p);
 
+    // Constructeur à partir d'une size
+    Point(const Size& s);
+
     // Accesseurs
     int getX() const;
     int getY() const;

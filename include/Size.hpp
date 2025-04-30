@@ -44,8 +44,11 @@ public:
     // Opérateur de multiplicaion : retourne un produit de points
     Size operator*(const double coef) const;
 
-    // Opérateur de division(entière) : retourne une division entière de points
+    // Opérateur de division(entière) : retourne une division entière de taille
     Size operator/(const double coef) const;
+
+    // Opérateur de division(entière) : retourne une division entière de taille
+    Size operator/(const Size& other) const;
 
     // Opérateur d'addition affecté
     Size& operator+=(const Size& other);

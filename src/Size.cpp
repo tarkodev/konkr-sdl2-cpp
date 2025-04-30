@@ -48,6 +48,11 @@ Size Size::operator/(const double coef) const {
     return Size{std::max(static_cast<int>(size_.x / coef), 0), std::max(static_cast<int>(size_.y / coef), 0)};
 }
 
+// Opérateur de division(entière) : retourne une division entière de points
+Size Size::operator/(const Size& other) const {
+    return Size{std::max(static_cast<int>(size_.x / other.getWidth()), 0), std::max(static_cast<int>(size_.y / other.getHeight()), 0)};
+}
+
 // Opérateur d'addition affecté
 Size& Size::operator+=(const Size& other) {
     size_.x += other.getWidth();
