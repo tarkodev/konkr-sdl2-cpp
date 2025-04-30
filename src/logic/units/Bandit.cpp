@@ -15,7 +15,7 @@ void Bandit::init()
 
 Bandit::Bandit(const Point& pos): Troop(pos) {}
 
-void Bandit::display(const Texture* target)
+void Bandit::display(const BlitTarget* target)
 {
     if (!sprite_ || !shadow) return;
     

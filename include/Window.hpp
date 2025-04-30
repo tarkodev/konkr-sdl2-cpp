@@ -4,6 +4,8 @@
 #include <memory>
 #include "SDL.h"
 #include "Size.hpp"
+#include "BlitTarget.hpp"
+#include "Texture.hpp"
 
 // To free window memory on closing
 struct SDLWindowDeleter {
@@ -11,34 +13,40 @@ struct SDLWindowDeleter {
         if (sdlWindow) SDL_DestroyWindow(sdlWindow);
     }
 };
-using SDLWindowPtr = std::unique_ptr<SDL_Window, SDLWindowDeleter>;
-
-// To free renderer memory on closing
-struct SDLRendererDeleter {
-    void operator()(SDL_Renderer* renderer) const {
-        if (renderer) SDL_DestroyRenderer(renderer);
-    }
-};
-using SDLRendererPtr = std::unique_ptr<SDL_Renderer, SDLRendererDeleter>;
 
 /**
  * @brief Window of Konkr game.
  */
-class Window {
+class Window: public BlitTarget {
 public:
     Window(const char* title, int width, int height);
     ~Window();
     
-    SDL_Renderer* getRenderer() const { return renderer_.get(); }
-    Size getSize() const { return size_; }
     bool isInitialized() const { return initialized_; }
+
+    SDL_Renderer* getRenderer() const { return renderer_.get(); }
+    Size getSize() const override { return size_; }
+    SDL_Texture* get() const override { return calc_->get(); };
+
+    void fill(const SDL_Color& color) const;
+
+    void blit(const BlitTarget* src) const override;
+    void blit(const BlitTarget* src, const Point& destPos) const override;
+    void blit(const BlitTarget* src, const Size& destSize) const override;
+    void blit(const BlitTarget* src, const Rect& destRect) const override;
+    void blit(const BlitTarget* src, const Rect& srcRect, const Point& destPos) const override;
+    void blit(const BlitTarget* src, const Rect& srcRect, const Size& destSize) const override;
+    void blit(const BlitTarget* src, const Rect& srcRect, const Rect& destRect) const override;
+
+    void refresh();
     
 private:
     bool initialized_;
+    Texture* calc_;
 
     Size size_ = {0, 0};
-    SDLWindowPtr SDLWindow_;
-    SDLRendererPtr renderer_;
+    std::unique_ptr<SDL_Window, SDLWindowDeleter> SDLWindow_;
+    std::unique_ptr<SDL_Renderer, SDLRendererDeleter> renderer_;
 };
 
 #endif

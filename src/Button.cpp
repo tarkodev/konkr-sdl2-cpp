@@ -2,6 +2,12 @@
 #include "Button.hpp"
 #include <SDL.h>
 
+SDL_Renderer* Button::renderer_ = nullptr;
+
+void Button::init(SDL_Renderer *renderer) {
+    renderer_ = renderer;
+}
+
 Button::Button(Texture* normal,
                Texture* hover,
                Texture* pressed,
@@ -49,14 +55,12 @@ void Button::handleEvent(const SDL_Event& e) {
     }
 }
 
-void Button::render(SDL_Renderer* renderer) const {
-    // Choix de la texture selon l'état
+void Button::display(const BlitTarget* target) {
     Texture* toDraw = texNormal_;
     if (isPressed_ && texPressed_)   toDraw = texPressed_;
     else if (isHover_ && texHover_)   toDraw = texHover_;
 
-    SDL_Rect dst = bounds_.get();
-    SDL_RenderCopy(renderer, toDraw->get(), nullptr, &dst);
+    target->blit(toDraw, bounds_);
 }
 
 void Button::setCallback(Callback cb) {

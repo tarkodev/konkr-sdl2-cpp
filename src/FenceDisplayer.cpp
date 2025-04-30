@@ -1,4 +1,3 @@
-
 #include "FenceDisplayer.hpp"
 #include "HexagonUtils.hpp"
 
@@ -22,7 +21,7 @@ const Size FenceDisplayer::getSize() const {
 }
 
 
-void FenceDisplayer::display(const Texture* target, const Point& pos, const std::vector<bool>& neighbors) {
+void FenceDisplayer::display(const BlitTarget* target, const Point& pos, const std::vector<bool>& neighbors) {
     auto [x, y] = pos.get();
 
     if (!neighbors[5] && !neighbors[0]) {
@@ -98,11 +97,11 @@ void FenceDisplayer::display(const Texture* target, const Point& pos, const std:
     }
 }
 
-void FenceDisplayer::display(const Texture* target, const Point& pos) {
+void FenceDisplayer::display(const BlitTarget* target, const Point& pos) {
     display(target, pos, {false, false, false, false, false, false});
 }
 
-void FenceDisplayer::display(const Texture* target) {
+void FenceDisplayer::display(const BlitTarget* target) {
     display(target, pos_, {false, false, false, false, false, false});
 }
 

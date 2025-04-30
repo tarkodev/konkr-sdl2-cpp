@@ -40,6 +40,7 @@ MainMenu::~MainMenu() { for(auto* b:buttons_) delete b; }
 void MainMenu::handleEvent(const SDL_Event& e){
     for(auto* b:buttons_) b->handleEvent(e);
 }
-void MainMenu::render(SDL_Renderer* r) const{
-    for(auto* b:buttons_) b->render(r);
+
+void MainMenu::display(const BlitTarget* target) {
+    for(auto* b:buttons_) b->display(target);
 }

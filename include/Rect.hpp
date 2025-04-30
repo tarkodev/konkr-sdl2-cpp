@@ -30,14 +30,18 @@ public:
     // Accesseurs pour x, y, largeur et hauteur
     int getX() const { return rect_.x; }
     int getY() const { return rect_.y; }
+    Point getPos() const { return Point{rect_.x, rect_.y}; }
     int getWidth() const { return rect_.w; }
     int getHeight() const { return rect_.h; }
+    Size getSize() const { return Size{rect_.w, rect_.h}; }
 
     // Modificateurs
     void setX(int x) { rect_.x = x; }
     void setY(int y) { rect_.y = y; }
+    void getPos(Point pos) { rect_.x = pos.getX(); rect_.y = pos.getY(); }
     void setWidth(int w) { rect_.w = w; }
     void setHeight(int h) { rect_.h = h; }
+    void getPos(Size size) { rect_.w = size.getWidth(); rect_.h = size.getHeight(); }
 
     // Ajuste la taille en respectant un ratio (pour redimensionnement proportionnel)
     void scale(double factor) {

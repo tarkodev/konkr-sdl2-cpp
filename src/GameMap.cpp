@@ -511,24 +511,6 @@ void GameMap::setProportionalSize(const Size size) {
     size_ = calcSize_ * ratio_;
 }
 
-void GameMap::display(const Texture* target)
-{
-    if (!islandsCalc_ || !platesCalc_ || !selectablesCalc_ || !fencesCalc_ || !elementsCalc_)
-        refresh();
-
-    //! encapsuler renderer dans une classe
-    //! Faire hériter Texture à window et surcharger les méthodes nécessaire (surtout blit)
-    Rect dest = {pos_, size_};
-    SDL_RenderCopy(renderer_, calc_->get(), nullptr, &dest.get());
-    // target->blit(calc_, dest);
-
-    if (selectedTroop_) {
-        SDL_Rect r{selectedTroop_->getPos().get().x, selectedTroop_->getPos().get().y, selectedTroop_->getSize().get().x, selectedTroop_->getSize().get().y};
-        SDL_RenderCopy(renderer_, selectSprite_->get(), nullptr, &r);
-        // selectedTroop_->display(target);
-    }
-}
-
 void GameMap::endTurn() {
     if (players_.empty()) return;
 
@@ -720,4 +702,17 @@ void GameMap::handleEvent(SDL_Event &event) {
             break;
         }
     }
+}
+
+void GameMap::display(const BlitTarget* target)
+{
+    if (!islandsCalc_ || !platesCalc_ || !selectablesCalc_ || !fencesCalc_ || !elementsCalc_)
+        refresh();
+
+    //! encapsuler renderer dans une classe
+    Rect dest = {pos_, size_};
+    target->blit(calc_, dest);
+
+    if (selectedTroop_)
+        selectedTroop_->display(target);
 }

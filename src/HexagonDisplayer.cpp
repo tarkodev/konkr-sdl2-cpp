@@ -22,7 +22,7 @@ const Size HexagonDisplayer::getSize() const {
 }
 
 
-void HexagonDisplayer::display(const Texture* target, const Point& pos, const std::vector<bool>& neighbors) {
+void HexagonDisplayer::display(const BlitTarget* target, const Point& pos, const std::vector<bool>& neighbors) {
     auto [x, y] = pos.get();
     
     // Draw hexagon
@@ -44,11 +44,11 @@ void HexagonDisplayer::display(const Texture* target, const Point& pos, const st
     }
 }
 
-void HexagonDisplayer::display(const Texture* target, const Point& pos) {
+void HexagonDisplayer::display(const BlitTarget* target, const Point& pos) {
     display(target, pos, {false, false, false, false, false, false});
 }
 
-void HexagonDisplayer::display(const Texture* target) {
+void HexagonDisplayer::display(const BlitTarget* target) {
     display(target, pos_, {false, false, false, false, false, false});
 }
 

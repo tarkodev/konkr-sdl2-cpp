@@ -1,6 +1,13 @@
 // Overlay.cpp
 #include "Overlay.hpp"
 
+
+SDL_Renderer* Overlay::renderer_ = nullptr;
+
+void Overlay::init(SDL_Renderer *renderer) {
+    renderer_ = renderer;
+}
+
 Overlay::Overlay() = default;
 
 Overlay::~Overlay() {
@@ -20,8 +27,6 @@ void Overlay::handleEvent(const SDL_Event& e) {
     }
 }
 
-void Overlay::render(SDL_Renderer* renderer) const {
-    for (auto btn : buttons_) {
-        btn->render(renderer);
-    }
+void Overlay::display(const BlitTarget* target) {
+    for (auto btn : buttons_) btn->display(target);
 }

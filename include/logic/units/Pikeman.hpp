@@ -1,6 +1,7 @@
 #ifndef UNIT_PIKEMAN_HPP
 #define UNIT_PIKEMAN_HPP
 
+#include "BlitTarget.hpp"
 #include "logic/Troop.hpp"
 
 class Pikeman : public Troop {
@@ -11,7 +12,7 @@ public:
     explicit Pikeman(const Point& pos);
 
     /* Displayer */
-    void display(const Texture* target) override;
+    void display(const BlitTarget* target) override;
     const Size getSize() const override { return sprite_->getSize(); }
 
     /* --- Accesseurs génériques --- */

@@ -17,7 +17,7 @@ void Town::init()
 
 Town::Town(const Point& pos): GameElement(pos) {}
 
-void Town::display(const Texture* target)
+void Town::display(const BlitTarget* target)
 {
     if (!sprite_) return;
 

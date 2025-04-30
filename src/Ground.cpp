@@ -45,7 +45,7 @@ const double Ground::getInnerRadius() {
 
 Ground::Ground(const Point& pos): Displayer(pos) {}
 
-void Ground::display(const Texture* target) {
+void Ground::display(const BlitTarget* target) {
     std::vector<bool> GroundNeighbors{
         static_cast<bool>(dynamic_cast<Ground*>(neighbors[0])),
         static_cast<bool>(dynamic_cast<Ground*>(neighbors[1])),

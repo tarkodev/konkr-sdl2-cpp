@@ -15,7 +15,7 @@ void Pikeman::init()
 
 Pikeman::Pikeman(const Point& pos): Troop(pos) {}
 
-void Pikeman::display(const Texture* target)
+void Pikeman::display(const BlitTarget* target)
 {
     if (!sprite_ || !shadow) return;
     

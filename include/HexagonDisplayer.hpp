@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "SDL.h"
+#include "BlitTarget.hpp"
 #include "Texture.hpp"
 #include "GenericDisplayer.hpp"
 
@@ -19,10 +20,10 @@ public:
     ~HexagonDisplayer();
 
     const Size getSize() const override;
-    void display(const Texture* target) override;
-    void display(const Texture* target, const Point& pos) override;
+    void display(const BlitTarget* target) override;
+    void display(const BlitTarget* target, const Point& pos) override;
 
-    void display(const Texture* target, const Point& pos, const std::vector<bool>& neighbors);
+    void display(const BlitTarget* target, const Point& pos, const std::vector<bool>& neighbors);
 
     HexagonDisplayer copy();
     void colorize(const SDL_Color& color);

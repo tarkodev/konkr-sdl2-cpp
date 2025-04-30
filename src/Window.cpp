@@ -28,10 +28,49 @@ Window::Window(const char* title, int width, int height) : initialized_(false) {
         throw std::runtime_error(SDL_GetError());
     }
 
-    // Initialization success
+    calc_ = new Texture(&(*renderer_), size_);
     initialized_ = true;
 }
 
 Window::~Window() {
     SDL_Quit();
+}
+
+
+void Window::fill(const SDL_Color& color) const {
+    calc_->fill(color);
+}
+
+void Window::blit(const BlitTarget* src) const {
+    calc_->blit(src);
+}
+
+void Window::blit(const BlitTarget* src, const Point& destPos) const {
+    calc_->blit(src, destPos);
+}
+
+void Window::blit(const BlitTarget* src, const Size& destSize) const {
+    calc_->blit(src, destSize);
+}
+
+void Window::blit(const BlitTarget* src, const Rect& destRect) const {
+    calc_->blit(src, destRect);
+}
+
+void Window::blit(const BlitTarget* src, const Rect& srcRect, const Point& destPos) const {
+    calc_->blit(src, srcRect, destPos);
+}
+
+void Window::blit(const BlitTarget* src, const Rect& srcRect, const Size& destSize) const {
+    calc_->blit(src, srcRect, destSize);
+}
+
+void Window::blit(const BlitTarget* src, const Rect& srcRect, const Rect& destRect) const {
+    calc_->blit(src, srcRect, destRect);
+}
+
+
+void Window::refresh() {
+    calc_->display();
+    SDL_RenderPresent(&(*renderer_));
 }

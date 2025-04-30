@@ -9,6 +9,8 @@ static const struct { const char* label; const char* file; } MAPS[] = {
     {"Custom file", ""}              // vide ⇒ à demander plus tard
 };
 
+
+//! faire fonction init pour passer le renderer
 MapSelectMenu::MapSelectMenu(SDL_Renderer* r, Game& app) : renderer_(r), app_(app)
 {
     int y = 120;
@@ -44,6 +46,7 @@ void MapSelectMenu::handleEvent(const SDL_Event& e){
         app_.openMapSelect();   // ou recréer un MainMenu si vous préférez
     }
 }
-void MapSelectMenu::render(SDL_Renderer* r) const{
-    for(auto* b:buttons_) b->render(r);
+
+void MapSelectMenu::display(const BlitTarget* target) {
+    for(auto* b:buttons_) b->display(target);
 }

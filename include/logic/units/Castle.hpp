@@ -1,6 +1,7 @@
 #ifndef UNIT_Castle_HPP
 #define UNIT_Castle_HPP
 
+#include "BlitTarget.hpp"
 #include "logic/GameElement.hpp"
 
 class Castle : public GameElement {
@@ -11,7 +12,7 @@ public:
     explicit Castle(const Point& pos);
 
     /* Displayer */
-    void display(const Texture* target) override;
+    void display(const BlitTarget* target) override;
     const Size getSize() const override { return sprite_->getSize(); }
 
     /* --- Accesseurs génériques --- */

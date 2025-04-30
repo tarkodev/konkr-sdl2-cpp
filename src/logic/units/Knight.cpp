@@ -15,7 +15,7 @@ void Knight::init()
 
 Knight::Knight(const Point& pos): Troop(pos) {}
 
-void Knight::display(const Texture* target)
+void Knight::display(const BlitTarget* target)
 {
     if (!sprite_ || !shadow) return;
     

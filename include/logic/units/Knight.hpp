@@ -1,6 +1,7 @@
 #ifndef UNIT_KNIGHT_HPP
 #define UNIT_KNIGHT_HPP
 
+#include "BlitTarget.hpp"
 #include "logic/Troop.hpp"
 
 class Knight : public Troop {
@@ -11,7 +12,7 @@ public:
     explicit Knight(const Point& pos);
 
     /* Displayer */
-    void display(const Texture* target) override;
+    void display(const BlitTarget* target) override;
     const Size getSize() const override { return sprite_->getSize(); }
 
     /* --- Accesseurs génériques --- */

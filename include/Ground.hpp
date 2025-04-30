@@ -2,6 +2,7 @@
 #define GROUND_HPP
 
 #include "SDL.h"
+#include "BlitTarget.hpp"
 #include "Texture.hpp"
 #include "Displayer.hpp"
 #include "HexagonDisplayer.hpp"
@@ -18,7 +19,7 @@ public:
     static const double getInnerRadius();
 
     const std::string getType() override;
-    void display(const Texture* target) override;
+    void display(const BlitTarget* target) override;
     const Size getSize() const override;
 
 protected:

@@ -3,6 +3,7 @@
 
 #include "SDL.h"
 #include "Texture.hpp"
+#include "BlitTarget.hpp"
 #include "Player.hpp"
 #include "PlayableGround.hpp"
 
@@ -13,7 +14,7 @@ public:
     Forest(const Point& pos);
 
     const std::string getType() override;
-    void display(const Texture* target) override;
+    void display(const BlitTarget* target) override;
 
     static void init();
 

@@ -62,19 +62,6 @@ Game::Game()
 
     openMainMenu();
 
-
-    // Create map;
-    //map_.emplace(windowSize_ * 0.75, "../assets/map/Unity.txt");
-
-
-    //map_.emplace(windowSize_ * 0.75, "../assets/map/Unity.txt");
-
-    //Size mapRealSize = map_->getSize();
-    //map->setPos({(windowSize_.getWidth() - mapRealSize.getWidth()) / 2, (windowSize_.getHeight() - mapRealSize.getHeight()) / 2});
-
-
-
-
     //! A déplacer dans Overlay pour le chargement des textures
     // Après avoir créé vos textures :
     Texture* undoTex  = new Texture(renderer_, "../assets/img/undo.png");
@@ -219,19 +206,18 @@ void Game::handleEvents() {
 }
 
 void Game::draw() {
-    SDL_SetRenderDrawColor(renderer_, bgColor.r,bgColor.g,bgColor.b,bgColor.a);
-    SDL_RenderClear(renderer_);
+    window_->fill(ColorUtils::SEABLUE);
 
     if (screen_ == ScreenState::InGame) {
-        map_->display(nullptr);
+        map_->display(&(*window_));
 
         // Dans la boucle de rendu :
-        overlay_.render(renderer_);
+        overlay_.display(&(*window_));
     } else if (activeMenu_) {
-        activeMenu_->render(renderer_);
+        activeMenu_->display(&(*window_));
     }
-
-    SDL_RenderPresent(renderer_);  
+    
+    window_->refresh();
 }
 
 void Game::openMapSelect() {

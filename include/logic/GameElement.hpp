@@ -2,6 +2,7 @@
 #define LOGIC_GAMEELEMENT_HPP
 
 #include <string>
+#include "BlitTarget.hpp"
 #include "Displayer.hpp"
 
 class Player;
@@ -22,7 +23,7 @@ public:
     virtual int getUpkeep()   const = 0;
 
     /* --- Displayer --- */
-    virtual void display(const Texture* target) override = 0;
+    virtual void display(const BlitTarget* target) override = 0;
     virtual const Size getSize() const override = 0;
 
 protected:

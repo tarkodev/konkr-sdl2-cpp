@@ -6,7 +6,18 @@
 #include "SDL2/SDL_image.h"
 #include "Rect.hpp"
 #include "Point.hpp"
+#include "BlitTarget.hpp"
+
 #include <stdexcept>
+#include <memory>
+
+
+//! Plus utiliser quand Renderer sera encapsulé dans une classe
+struct SDLRendererDeleter {
+    void operator()(SDL_Renderer* renderer) const {
+        if (renderer) SDL_DestroyRenderer(renderer);
+    }
+};
 
 /**
  * @brief Classe qui encapsule une SDL_Texture*.
@@ -14,7 +25,7 @@
  * Fournit des méthodes pour charger la texture depuis un fichier, la copier sur le renderer,
  * appliquer un "color mod" (colorize) et obtenir ses dimensions.
  */
-class Texture {
+class Texture: public BlitTarget {
 public:
     /**
      * @brief Construit une texture à partir d'un fichier image.
@@ -35,6 +46,7 @@ public:
      */
     ~Texture();
 
+
     /**
      * @brief Copie (rend) la texture sur le renderer.
      * 
@@ -54,10 +66,15 @@ public:
     void colorize(const SDL_Color& color);
 
     /**
+     * @brief Retourne le SDL_Texture* encapsulé.
+     */
+    SDL_Texture* get() const override;
+
+    /**
      * @brief Retourne les dimensions de la texture sous la forme d'un Point (width, height).
      *
      */
-    Size getSize() const;
+    Size getSize() const override;
 
     /**
      * @brief Retourne la largeur de la texture sous la forme d'un int.
@@ -71,33 +88,29 @@ public:
      */
     int getHeight() const;
 
-    /**
-     * @brief Retourne le SDL_Texture* encapsulé.
-     */
-    SDL_Texture* get() const;
-
     Texture* convertAlpha();
 
     Texture* removeAlpha();
 
     void fill(const SDL_Color& color) const;
 
-    void blit(Texture* src) const;
-    void blit(Texture* src, const Point& destPos) const;
-    void blit(Texture* src, const Size& destSize) const;
-    void blit(Texture* src, const Rect& destRect) const;
-    void blit(Texture* src, const Rect& srcRect, const Point& destPos) const;
-    void blit(Texture* src, const Rect& srcRect, const Size& destSize) const;
-    void blit(Texture* src, const Rect& srcRect, const Rect& destRect) const;
+    void blit(const BlitTarget* src) const override;
+    void blit(const BlitTarget* src, const Point& destPos) const override;
+    void blit(const BlitTarget* src, const Size& destSize) const override;
+    void blit(const BlitTarget* src, const Rect& destRect) const override;
+    void blit(const BlitTarget* src, const Rect& srcRect, const Point& destPos) const override;
+    void blit(const BlitTarget* src, const Rect& srcRect, const Size& destSize) const override;
+    void blit(const BlitTarget* src, const Rect& srcRect, const Rect& destRect) const override;
+
+    void display(const Point& destPos = Point{0, 0});
 
 private:
-    SDL_Renderer* renderer_;
     SDL_Texture* texture_;
-
+    std::unique_ptr<SDL_Renderer, SDLRendererDeleter> renderer_; //! encapsuler le renderer dans une classe
     Size size_;
     bool alpha_;
 
-    void blit(Texture* src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const;
+    void blit(const BlitTarget* src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const;
 };
 
 #endif // TEXTURE_HPP

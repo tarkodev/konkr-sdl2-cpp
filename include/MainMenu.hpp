@@ -7,8 +7,11 @@ public:
     MainMenu(SDL_Renderer* r, Game& app);
     ~MainMenu();
     void handleEvent(const SDL_Event& e) override;
-    void render(SDL_Renderer* r) const override;
+
+    void display(const BlitTarget* target) override;
+    const Size getSize() const override { return Size{100, 100}; }; //! Changer quand MenuBase aura une size_
+
 private:
-    SDL_Renderer* renderer_;
+    SDL_Renderer* renderer_; //! Voir s'il est nécessaire
     Game&         app_;
 };

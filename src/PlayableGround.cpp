@@ -89,7 +89,7 @@ Player* PlayableGround::getOldOwner() {
     return oldOwner_;
 }
 
-void PlayableGround::display(const Texture* target) {
+void PlayableGround::display(const BlitTarget* target) {
     if (!hasPlate_) return;
 
     std::vector<bool> similarNeighbors;

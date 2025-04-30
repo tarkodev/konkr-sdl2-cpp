@@ -15,6 +15,7 @@
 #include "Player.hpp"
 #include "logic/Troop.hpp"
 #include "Displayer.hpp"
+#include "BlitTarget.hpp"
 
 /**
  * @brief Classe représentant une carte de jeu.
@@ -43,7 +44,7 @@ public:
     bool hasTroopSelected() {return selectedTroopCell_ != nullptr;};
 
     void handleEvent(SDL_Event &event);
-    void display(const Texture* target) override;
+    void display(const BlitTarget* target) override;
 
     void endTurn();
 

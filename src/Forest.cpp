@@ -15,6 +15,6 @@ void Forest::init() {
     forest_ = (new Texture(renderer_, "../assets/img/forest.png"))->convertAlpha();
 }
 
-void Forest::display(const Texture* target) {
+void Forest::display(const BlitTarget* target) {
     target->blit(forest_, Point{pos_.getX() - forest_->getWidth() / 2, pos_.getY() - forest_->getHeight() / 2});
 }

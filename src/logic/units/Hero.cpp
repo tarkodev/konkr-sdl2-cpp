@@ -15,7 +15,7 @@ void Hero::init()
 
 Hero::Hero(const Point& pos): Troop(pos) {}
 
-void Hero::display(const Texture* target)
+void Hero::display(const BlitTarget* target)
 {
     if (!sprite_ || !shadow) return;
     

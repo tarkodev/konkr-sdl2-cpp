@@ -52,16 +52,16 @@ Texture::~Texture() {
 }
 
 void Texture::colorize(const SDL_Color& color) {
-    SDL_Texture* currentTarget = SDL_GetRenderTarget(renderer_);
-    SDL_SetRenderTarget(renderer_, texture_);
+    SDL_Texture* currentTarget = SDL_GetRenderTarget(&(*renderer_));
+    SDL_SetRenderTarget(&(*renderer_), texture_);
 
     SDL_SetTextureColorMod(texture_, color.r, color.g, color.b);
     
-    SDL_SetRenderTarget(renderer_, currentTarget);
+    SDL_SetRenderTarget(&(*renderer_), currentTarget);
 }
 
 Texture* Texture::copy() {
-    Texture* copy = new Texture(renderer_, size_);
+    Texture* copy = new Texture(&(*renderer_), size_);
     if (alpha_) copy->convertAlpha();
 
     copy->fill(ColorUtils::TRANSPARENT);
@@ -103,51 +103,57 @@ Texture* Texture::removeAlpha() {
 }
 
 void Texture::fill(const SDL_Color& color) const {
-    RenderTargetGuard target(renderer_, texture_);
+    RenderTargetGuard target(&(*renderer_), texture_);
 
-    if (SDL_SetRenderDrawColor(renderer_, color.r, color.g, color.b, color.a) != 0 ||
-        SDL_RenderClear(renderer_) != 0)
+    if (SDL_SetRenderDrawColor(&(*renderer_), color.r, color.g, color.b, color.a) != 0 ||
+        SDL_RenderClear(&(*renderer_)) != 0)
         throw std::runtime_error("Erreur lors du fill de la texture: " + std::string(SDL_GetError()));
 }
 
 
-void Texture::blit(Texture* src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const {
-    RenderTargetGuard target(renderer_, texture_);
+void Texture::blit(const BlitTarget* src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const {
+    RenderTargetGuard target(&(*renderer_), texture_);
 
-    if (SDL_RenderCopy(renderer_, src->get(), srcRect, destRect) != 0)
+    if (SDL_RenderCopy(&(*renderer_), src->get(), srcRect, destRect) != 0)
         throw std::runtime_error("Erreur lors du blitting de la texture: " + std::string(SDL_GetError()));
 }
 
 
-void Texture::blit(Texture* src) const {
+void Texture::blit(const BlitTarget* src) const {
     blit(src, nullptr, nullptr);
 }
 
-void Texture::blit(Texture* src, const Point& destPos) const {
+void Texture::blit(const BlitTarget* src, const Point& destPos) const {
     Rect destRect(destPos, src->getSize());
     blit(src, nullptr, &destRect.get());
 }
 
-void Texture::blit(Texture* src, const Size& destSize) const {
+void Texture::blit(const BlitTarget* src, const Size& destSize) const {
     Rect destRect({0, 0}, destSize);
     blit(src, nullptr, &destRect.get());
 }
 
-void Texture::blit(Texture* src, const Rect& destRect) const {
+void Texture::blit(const BlitTarget* src, const Rect& destRect) const {
     blit(src, nullptr, &destRect.get());
 }
 
-void Texture::blit(Texture* src, const Rect& srcRect, const Point& destPos) const {
+void Texture::blit(const BlitTarget* src, const Rect& srcRect, const Point& destPos) const {
     Rect destRect(destPos, src->getSize());
     blit(src, &srcRect.get(), &destRect.get());
 }
 
-void Texture::blit(Texture* src, const Rect& srcRect, const Size& destSize) const {
+void Texture::blit(const BlitTarget* src, const Rect& srcRect, const Size& destSize) const {
     Rect destRect({0, 0}, destSize);
     blit(src, &srcRect.get(), &destRect.get());
 }
 
-void Texture::blit(Texture* src, const Rect& srcRect, const Rect& destRect) const {
+void Texture::blit(const BlitTarget* src, const Rect& srcRect, const Rect& destRect) const {
     blit(src, &srcRect.get(), &destRect.get());
 }
 
+void Texture::display(const Point& destPos) {
+    SDL_Rect destRect{destPos.getX(), destPos.getY(), getWidth(), getHeight()};
+
+    if (SDL_RenderCopy(&(*renderer_), texture_, nullptr, &destRect) != 0)
+        throw std::runtime_error("Erreur lors du display de la texture: " + std::string(SDL_GetError()));
+}

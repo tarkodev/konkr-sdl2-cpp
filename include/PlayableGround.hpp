@@ -2,6 +2,7 @@
 #define PLAYERTERRITORY_HPP
 
 #include "SDL.h"
+#include "BlitTarget.hpp"
 #include "Texture.hpp"
 #include "Player.hpp"
 #include "Ground.hpp"
@@ -22,7 +23,7 @@ public:
     void setOwner(Player *owner);
 
     const std::string getType() override;
-    void display(const Texture* target) override;
+    void display(const BlitTarget* target) override;
 
     bool hasFences() const;
     void displayFences(const Texture* target);

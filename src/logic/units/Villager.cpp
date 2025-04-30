@@ -15,7 +15,7 @@ void Villager::init()
 
 Villager::Villager(const Point& pos): Troop(pos) {}
 
-void Villager::display(const Texture* target)
+void Villager::display(const BlitTarget* target)
 {
     if (!sprite_ || !shadow) return;
     
