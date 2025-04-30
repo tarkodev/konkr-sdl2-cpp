@@ -20,6 +20,8 @@
 #include "logic/units/Knight.hpp"
 #include "logic/units/Hero.hpp"
 
+#include <ranges>
+#include <random>
 #include <cmath>
 #include <vector>
 #include <map>
@@ -33,12 +35,18 @@ SDL_Renderer* GameMap::renderer_ = nullptr;
 Texture* GameMap::selectSprite_ = nullptr;
 SDL_Cursor* GameMap::handCursor_ = nullptr;
 SDL_Cursor* GameMap::arrowCursor_ = nullptr;
+std::mt19937 GameMap::gen_{};
 
 void GameMap::init(SDL_Renderer *renderer) {
     renderer_ = renderer;
+
+    // Load sprites and cursors
     selectSprite_ = (new Texture(renderer_, "../assets/img/plate.png"))->convertAlpha(); //!temp
     handCursor_ = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
     arrowCursor_ = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
+
+    // Create random seed
+    gen_ = std::mt19937{ std::random_device{}() };
 }
 
 
@@ -479,21 +487,21 @@ void GameMap::refresh()
     elementsCalc_->fill(ColorUtils::toTransparent(ColorUtils::GREY));
 
     // Draw islands and cells
-    for (Cell* cell: *this) {
+    for (Cell* cell : *this) {
         // Draw island
-        if (auto* t = dynamic_cast<Ground*>(cell))
-            t->Ground::display(islandsCalc_);
+        if (auto* g = dynamic_cast<Ground*>(cell))
+            g->Ground::display(islandsCalc_);
 
         // Draw cell
         if (auto* disp = dynamic_cast<Displayer*>(cell))
             disp->display(platesCalc_);
 
         // Draw element
-        if (auto* pt = dynamic_cast<PlayableGround*>(cell)) {
-            pt->displaySelectable(selectablesCalc_);
-            pt->displayFences(fencesCalc_);
-            pt->displayElement(elementsCalc_);
-            pt->displayShield(elementsCalc_);
+        if (auto* pg = dynamic_cast<PlayableGround*>(cell)) {
+            pg->displaySelectable(selectablesCalc_);
+            pg->displayFences(fencesCalc_);
+            pg->displayElement(elementsCalc_);
+            pg->displayShield(elementsCalc_);
         }
     }
 
@@ -511,7 +519,7 @@ void GameMap::setProportionalSize(const Size size) {
     size_ = calcSize_ * ratio_;
 }
 
-void GameMap::endTurn() {
+void GameMap::nextPlayer() {
     if (players_.empty()) return;
 
     // Finish turn of current player
@@ -526,6 +534,9 @@ void GameMap::endTurn() {
 
         selectedPlayerNum_ %= players_.size();
     }
+
+    if (selectedPlayerNum_ == 0)
+        moveBandits();
 
     // Start turn of new current player
     movedTroops_.clear();
@@ -561,7 +572,7 @@ void GameMap::updateSelectedCell() {
 }
 
 //! Pour l'ajout de troupe depuis le shop
-//void GameMap::moveTroop(Troop* fromTroop, PlayableGround* to)
+//void GameMap::addTroop(Troop* fromTroop, PlayableGround* to)
 
 void GameMap::moveTroop(PlayableGround* from, PlayableGround* to) {
     if (!from || !to || from == to || !to->isSelectable()) return;
@@ -618,6 +629,51 @@ void GameMap::moveTroop(PlayableGround* from, PlayableGround* to) {
         }
     }
 }
+
+void GameMap::moveBandit(PlayableGround* from, PlayableGround* to) {
+    if (!from || !to || from == to) return;
+
+    // Get interesting elements
+    auto fromBandit = dynamic_cast<Bandit*>(from->getElement());
+    if (!fromBandit) return;
+    
+    if (to->getElement()) return;
+    
+    // Move bandit
+    from->setElement(nullptr);
+    to->setElement(fromBandit);
+}
+
+void GameMap::moveBandits() {
+    std::unordered_set<Bandit*> movedBandits;
+
+    for (Cell* cell : *this) {
+        auto* pg = dynamic_cast<PlayableGround*>(cell);
+        if (!pg) continue;
+
+        auto* bandit = dynamic_cast<Bandit*>(pg->getElement());
+        if (!bandit || movedBandits.find(bandit) != movedBandits.end()) continue;
+
+        // Get free neighbors
+        std::vector<PlayableGround*> candidates;
+        for (Cell* c : pg->getNeighbors())
+            if (auto* g = dynamic_cast<PlayableGround*>(c))
+                if (!g->getElement() && !g->hasFences())
+                    candidates.push_back(g);
+
+
+        // Random move bandit
+        if (!candidates.empty()) {
+            std::uniform_int_distribution<> dist(0, static_cast<int>(candidates.size()) - 1);
+            PlayableGround* dest = candidates[dist(gen_)];
+            moveBandit(pg, dest);
+            movedBandits.insert(bandit);
+        }
+    }
+
+    refreshElements();
+}
+
 
 bool GameMap::isSelectableTroop(PlayableGround* pg) {
     if (!pg) return false;
@@ -688,9 +744,8 @@ void GameMap::handleEvent(SDL_Event &event) {
                 selectedTroopCell_->setElement(selectedTroop_);
 
                 // Move troop
-                if (selectedCell_.has_value() && (*selectedCell_)) {
+                if (selectedCell_.has_value() && (*selectedCell_))
                     moveTroop(selectedTroopCell_, *selectedCell_);
-                }
     
                 // Remove possibilities
                 selectedTroopCell_->updateSelectable(0);

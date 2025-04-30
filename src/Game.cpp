@@ -183,7 +183,7 @@ void Game::handleEvents() {
                 else if (event.key.keysym.sym == SDLK_DOWN)
                     mapPos.addY(-10);
                 else if (event.key.keysym.sym == SDLK_RETURN)
-                    map_->endTurn();
+                    map_->nextPlayer();
 
                 map_->setPos(mapPos);
                 break;

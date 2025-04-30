@@ -14,3 +14,7 @@ void Cell::init(SDL_Renderer *renderer) {
 void Cell::setNeighbors(std::vector<Cell*> cellNeighbors) {
     neighbors = cellNeighbors;
 }
+
+const std::vector<Cell*> Cell::getNeighbors() const {
+    return neighbors;
+}

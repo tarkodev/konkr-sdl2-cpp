@@ -1,11 +1,8 @@
 #ifndef GAMEMAP_HPP
 #define GAMEMAP_HPP
 
+//! trier du plus bas au plus haut niveau (SDL est l'intermédiaire)
 #include "SDL.h"
-#include <memory>
-#include <utility>
-#include <optional>
-#include <vector>
 #include "HexagonGrid.hpp"
 #include "Texture.hpp"
 #include "Cell.hpp"
@@ -16,6 +13,13 @@
 #include "logic/Troop.hpp"
 #include "Displayer.hpp"
 #include "BlitTarget.hpp"
+
+#include <memory>
+#include <utility>
+#include <optional>
+#include <vector>
+#include <algorithm>
+#include <random>
 
 /**
  * @brief Classe représentant une carte de jeu.
@@ -46,12 +50,13 @@ public:
     void handleEvent(SDL_Event &event);
     void display(const BlitTarget* target) override;
 
-    void endTurn();
+    void nextPlayer();
 
     static void init(SDL_Renderer* renderer);
 
 private:
     static SDL_Renderer* renderer_;
+    static std::mt19937 gen_;
     static Texture* selectSprite_; //!temp
     static SDL_Cursor* handCursor_;
     static SDL_Cursor* arrowCursor_;
@@ -68,6 +73,8 @@ private:
     void refreshMain();
 
     void moveTroop(PlayableGround* from, PlayableGround* to);
+    void moveBandit(PlayableGround* from, PlayableGround* to);
+    void moveBandits();
 
     double ratio_ = 0;
 

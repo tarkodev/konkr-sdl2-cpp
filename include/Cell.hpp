@@ -15,6 +15,7 @@ public:
     virtual ~Cell() = default;
 
     void setNeighbors(std::vector<Cell*> neighbors);
+    const std::vector<Cell*> getNeighbors() const;
 
 protected:
     Cell() = default;
