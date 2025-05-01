@@ -20,6 +20,8 @@ public:
     int getCost()     const override { return COST; };
     int getUpkeep()   const override { return UPKEEP; };
 
+    void addCoins(int coins);
+
 protected:
     static constexpr int STRENGTH = 1;
     static constexpr int COST     = 0;
@@ -27,6 +29,7 @@ protected:
 
 private:
     static Texture* sprite_;
+    int treasury_ = 0;
 };
 
 #endif

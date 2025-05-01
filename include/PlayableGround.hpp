@@ -34,7 +34,8 @@ public:
     bool isLinked();
     void updateLinked();
     void link(Player* owner);
-
+    
+    void freeTroops();
     std::vector<Town*> getTowns();
     Town* getNearestTown();
     void updateIncome();
@@ -65,6 +66,7 @@ private:
     void updateSelectable(int strength, std::unordered_set<PlayableGround*>& visited);
     void getTowns(std::queue<PlayableGround*>& toVisit, std::unordered_set<PlayableGround*>& visited, std::vector<Town*>& towns);
     Town* getNearestTown(std::queue<PlayableGround*>& toVisit, std::unordered_set<PlayableGround*>& visited);
+    void freeTroops(std::unordered_set<PlayableGround*>& visited);
 
     void setSelectable(bool selectable);
 };

@@ -12,9 +12,14 @@ public:
 
     virtual ~Troop() = default;
 
+    bool isFree() const;
+    void setFree(bool free);
+
 protected:
     static Texture* shadow_;
     static Texture* lostSprite_;
+
+    bool free_ = false;
 
     Troop(const Point& pos);
 

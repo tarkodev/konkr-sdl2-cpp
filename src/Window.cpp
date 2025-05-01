@@ -15,6 +15,7 @@ Window::Window(const char* title, int width, int height) : initialized_(false) {
     // Init Window
     SDLWindow_.reset(SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN));
     if (!SDLWindow_) {
+        TTF_Quit();
         SDL_Quit();
         throw std::runtime_error(SDL_GetError());
     }
@@ -29,6 +30,7 @@ Window::Window(const char* title, int width, int height) : initialized_(false) {
     renderer_.reset(SDL_CreateRenderer(SDLWindow_.get(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC));
     if (!renderer_) {
         SDL_DestroyWindow(SDLWindow_.get());
+        TTF_Quit();
         SDL_Quit();
         throw std::runtime_error(SDL_GetError());
     }

@@ -73,7 +73,7 @@ GameMap::GameMap(const Point& pos, const Size size, const std::pair<int, int>& g
     }
 
     updateNeighbors();
-    startGame();
+    initGame();
 }
 
 GameMap::GameMap(const Point& pos, const Size size, const std::string mapFile)
@@ -87,7 +87,7 @@ GameMap::GameMap(const Point& pos, const Size size, const std::pair<int, int>& g
         throw std::runtime_error("Une map doit au moins être de taille 2x2.");
 
     loadMap(mapFile);
-    startGame();
+    initGame();
 }
 
 
@@ -254,7 +254,7 @@ void GameMap::loadMap(const std::string& mapFile) {
     updateNeighbors();
 }
 
-void GameMap::startGame() {
+void GameMap::initGame() {
     // Update links
     for (Cell* cell : *this)
         if (auto* pg = dynamic_cast<PlayableGround*>(cell))
@@ -263,10 +263,41 @@ void GameMap::startGame() {
 
     currentPlayer_ = players_[selectedPlayerNum_];
     for (Player *player : players_)
-        updateIncomes(player);
+        if (player != currentPlayer_)
+            updateIncomes(player);
 
     currentPlayer_->onTurnStart();
+    defrayBandits(currentPlayer_);
+    checkDeficits(currentPlayer_);
+    updateFreeTroops(currentPlayer_);
+    updateIncomes(currentPlayer_);
     refresh();
+}
+
+void GameMap::defrayBandits(Player* player) {
+    std::vector<Camp*> camps;
+    int nbBandits = 0;
+
+    for (Cell* cell : *this) {
+        if (auto* pg = dynamic_cast<PlayableGround*>(cell)) {
+            if (pg->getOwner() == player) {
+                if (auto* bandit = dynamic_cast<Bandit*>(pg->getElement()))
+                    nbBandits++;
+            }
+            else if (auto* camp = dynamic_cast<Camp*>(pg->getElement())) {
+                camps.push_back(camp);
+            }
+        }
+    }
+    
+    if (camps.size()) {
+        std::uniform_int_distribution<> dist(0, static_cast<int>(camps.size()) - 1);
+
+        for (int i = 0; i < nbBandits; ++i) {
+            Camp* chosenCamp = camps[dist(gen_)];
+            chosenCamp->addCoins(1);
+        }
+    }
 }
 
 
@@ -573,10 +604,43 @@ void GameMap::nextPlayer() {
     }
 
     // Start turn of new current player
-    movedTroops_.clear();
     currentPlayer_->onTurnStart();
+    defrayBandits(currentPlayer_);
+    checkDeficits(currentPlayer_);
+    updateFreeTroops(currentPlayer_);
     updateIncomes(currentPlayer_);
+
+    movedTroops_.clear();
     refreshElements();
+}
+
+void GameMap::checkDeficits(Player *player) {
+    int treasury = 0;
+    for (auto* pg : player->getTownCells()) {
+        if (auto* town = dynamic_cast<Town*>(pg->getElement())) {
+            treasury = town->getTreasury();
+            if (treasury >= 0) continue;
+
+            town->setTreasury(0);
+            for (auto* neighborTown : pg->getTowns()) {
+                if (neighborTown == town) continue;
+
+                int neighborTreasury = neighborTown->getTreasury();
+                if (neighborTreasury <= 0) {
+                    continue;
+                } else if (neighborTreasury > -treasury) {
+                    neighborTown->setTreasury(neighborTreasury + treasury);
+                    treasury = 0;
+                    break;
+                } else {
+                    treasury += neighborTreasury;
+                    neighborTown->setTreasury(0);
+                }
+            }
+            if (treasury < 0)
+                pg->freeTroops();
+        }
+    }
 }
 
 
@@ -640,6 +704,7 @@ void GameMap::moveTroop(PlayableGround* from, PlayableGround* to) {
         if (!to->getElement()) {
             from->setElement(nullptr);
             to->setElement(fromTroop);
+            updateIncomes(fromOwner);
         }
 
         else if (toTroop) {
@@ -813,12 +878,46 @@ void GameMap::display(const BlitTarget* target)
 }
 
 void GameMap::updateIncomes(Player *player) {
-    for (auto* pg : player->getTownCells())
-        if (auto* town = dynamic_cast<Town*>(pg->getElement()))
+    std::map<Town*, int>towns;
+    for (auto* pg : player->getTownCells()) {
+        if (auto* town = dynamic_cast<Town*>(pg->getElement())) {
             town->setIncome(0);
+            towns[town] = town->getTreasury();
+        }
+    }
 
-    for (Cell* cell : *this)
-        if (auto* pg = dynamic_cast<PlayableGround*>(cell))
-            if (pg->getOwner() == player)
+    for (Cell* cell : *this) {
+        if (auto* pg = dynamic_cast<PlayableGround*>(cell)) {
+            if (pg->getOwner() == player) {
                 pg->updateIncome();
+
+                auto *troop = dynamic_cast<Troop*>(pg->getElement());
+                if (troop && !dynamic_cast<Bandit*>(troop))
+                    troop->setFree(false);
+            }
+        }
+    }
+
+    for (PlayableGround* townCell : player->getTownCells()) {
+        Town* town = dynamic_cast<Town*>(townCell->getElement());
+        town->updateTreasury();
+    }
+    checkDeficits(player);
+
+    // restore treasures
+    for (auto [town, treasury] : towns)
+        town->setTreasury(treasury);
+}
+
+void GameMap::updateFreeTroops(Player *player) {
+    for (Cell* cell : *this) {
+        auto* pg = dynamic_cast<PlayableGround*>(cell);
+        if (!pg || pg->getOwner() != player) continue;
+
+        auto* troop = dynamic_cast<Troop*>(pg->getElement());
+        if (!troop || dynamic_cast<Bandit*>(troop) || !troop->isFree()) continue;
+
+        delete troop;
+        pg->setElement(new Bandit(pg->getPos()));
+    }
 }

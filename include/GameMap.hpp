@@ -72,9 +72,12 @@ private:
     bool isSelectableTroop(PlayableGround* pg);
     void updateCursor();
     void refreshMain();
-    void startGame();
+    void initGame();
+    void defrayBandits(Player *player);
+    void checkDeficits(Player *player);
 
     void updateLostElements();
+    void updateFreeTroops(Player *player);
     void moveTroop(PlayableGround* from, PlayableGround* to);
     void moveBandit(PlayableGround* from, PlayableGround* to);
     void moveBandits();

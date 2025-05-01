@@ -19,7 +19,15 @@ void Troop::displaySprite(const BlitTarget* target, const Texture* sprite)
 {
     if (!sprite || !shadow_ || !lostSprite_) return;
     
-    if (lost_) target->blit(lostSprite_, Point{pos_.getX() - lostSprite_->getWidth() / 2, pos_.getY() - lostSprite_->getHeight() / 2});
+    if (lost_ || free_) target->blit(lostSprite_, Point{pos_.getX() - lostSprite_->getWidth() / 2, pos_.getY() - lostSprite_->getHeight() / 2});
     target->blit(shadow_, Point{pos_.getX() - shadow_->getWidth() / 2, pos_.getY() - shadow_->getHeight() / 2});
     target->blit(sprite, Point{pos_.getX() - sprite->getWidth() / 2, pos_.getY() - sprite->getHeight() / 2});
+}
+
+void Troop::setFree(bool free) {
+    free_ = free;
+}
+
+bool Troop::isFree() const {
+    return free_;
 }

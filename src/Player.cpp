@@ -71,12 +71,6 @@ void Player::onTurnStart() {
         Town* town = dynamic_cast<Town*>(townCell->getElement());
         town->setSelected(true);
         town->updateTreasury();
-        //! Si un camp sur la map, le bandit doit ajouter le coin au camp (camp le plus proche)
-
-        if (town->getTreasury() < 0) {
-            // townCell->freeTroops();
-            town->setTreasury(0);
-        }
     }
 }
 

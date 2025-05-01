@@ -7,6 +7,8 @@
 #include "logic/Troop.hpp"
 #include <algorithm>
 #include <ranges>
+#include <queue>
+#include <tuple>
 
 FenceDisplayer PlayableGround::fenceDisplayer_ = FenceDisplayer{-1, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 std::vector<Texture*> PlayableGround::shieldSprites_ = std::vector<Texture*>();
@@ -210,9 +212,27 @@ void PlayableGround::updateLinked() {
     }
 }
 
-#include <queue>
-#include <tuple>
+void PlayableGround::freeTroops(std::unordered_set<PlayableGround*>& visited) {
+    if (visited.find(this) != visited.end()) return;
+    visited.insert(this);
 
+    if (owner_) {
+        for (Cell* n : neighbors) {
+            auto* pg = dynamic_cast<PlayableGround*>(n);
+            if (pg && pg->getOwner() == owner_)
+                pg->freeTroops(visited);
+        }
+    }
+
+    auto troop = dynamic_cast<Troop*>(element);
+    if (troop && !dynamic_cast<Bandit*>(troop))
+        troop->setFree(true);
+}
+
+void PlayableGround::freeTroops() {
+    std::unordered_set<PlayableGround*> visited;
+    freeTroops(visited);
+}
 
 // Return towns from nearest to further
 void PlayableGround::getTowns(std::queue<PlayableGround*>& toVisit, std::unordered_set<PlayableGround*>& visited, std::vector<Town*>& towns) {

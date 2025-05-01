@@ -15,6 +15,10 @@ void Camp::init()
 
 Camp::Camp(const Point& pos): GameElement(pos) {}
 
+void Camp::addCoins(int coins) {
+    treasury_ += coins;
+}
+
 void Camp::display(const BlitTarget* target)
 {
     if (!sprite_) return;
