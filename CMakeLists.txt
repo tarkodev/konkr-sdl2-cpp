@@ -27,6 +27,14 @@ if(APPLE)
         NO_DEFAULT_PATH
     )
     include_directories("${CMAKE_SOURCE_DIR}/lib_macos/SDL2_image/include")
+
+    # SDL2_ttf
+    find_library(SDL2_TTF_LIBRARY 
+        NAMES SDL2_ttf
+        PATHS "${CMAKE_SOURCE_DIR}/lib_macos/SDL2_ttf/lib"
+        NO_DEFAULT_PATH
+    )
+    include_directories("${CMAKE_SOURCE_DIR}/lib_macos/SDL2_ttf/include")
 else()
     # Sur Linux (Ubuntu), on utilise les bibliothèques système via pkg-config
     find_package(SDL2 REQUIRED)
@@ -35,13 +43,15 @@ else()
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(SDL2GFX REQUIRED SDL2_gfx)
     pkg_check_modules(SDL2IMAGE REQUIRED SDL2_image)
+    pkg_check_modules(SDL2TTF REQUIRED SDL2_ttf)
     
-    include_directories(${SDL2GFX_INCLUDE_DIRS} ${SDL2IMAGE_INCLUDE_DIRS})
+    include_directories(${SDL2GFX_INCLUDE_DIRS} ${SDL2IMAGE_INCLUDE_DIRS} ${SDL2TTF_INCLUDE_DIRS})
     
     # Les bibliothèques seront celles fournies par pkg-config
     set(SDL2_LIBRARIES SDL2::SDL2)
     set(SDL2_GFX_LIBRARY ${SDL2GFX_LIBRARIES})
     set(SDL2_IMAGE_LIBRARY ${SDL2IMAGE_LIBRARIES})
+    set(SDL2_TTF_LIBRARY ${SDL2TTF_LIBRARIES})
 endif()
 
 # Ajout des headers du projet
@@ -61,6 +71,7 @@ function(compilation)
             ${SDL2_LIBRARIES} 
             ${SDL2_GFX_LIBRARY}
             ${SDL2_IMAGE_LIBRARY}
+            ${SDL2_TTF_LIBRARY}
         )
     endif()
 endfunction()
@@ -70,6 +81,7 @@ set(SRC_FILES
     "${CMAKE_SOURCE_DIR}/src/Point.cpp"
     "${CMAKE_SOURCE_DIR}/src/Size.cpp"
     "${CMAKE_SOURCE_DIR}/src/Texture.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Font.cpp"
     "${CMAKE_SOURCE_DIR}/src/HexagonDisplayer.cpp"
     "${CMAKE_SOURCE_DIR}/src/FenceDisplayer.cpp"
     

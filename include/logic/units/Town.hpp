@@ -20,8 +20,14 @@ public:
     int getCost()     const override { return COST; };
     int getUpkeep()   const override { return UPKEEP; };
 
-    int getCoins() const { return coins_; }
-    void setCoins(int coins) { coins_ = coins; }
+    int getCapital() const { return coins_; }
+    void setCapital(int coins) { coins_ = coins; }
+    void updateCapital() { coins_ = nextCoins_; };
+    void resetNextCapital() { nextCoins_ = coins_; };
+
+    int getNextCapital() const { return nextCoins_; }
+    void setNextCapital(int coins) { nextCoins_ = coins; }
+    int addNextCoins(int coins);
 
     void setSelected(bool selected) { selected_ = selected; }
 
@@ -36,6 +42,7 @@ private:
 
     bool selected_ = false;
     int coins_ = 0;
+    int nextCoins_ = 0;
 };
 
 #endif

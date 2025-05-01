@@ -18,6 +18,7 @@
 #include "logic/units/Knight.hpp"
 #include "logic/units/Hero.hpp"
 #include "Button.hpp"
+#include "Font.hpp"
 
 #include <memory>
 #include <vector>
@@ -228,6 +229,11 @@ void Game::draw() {
     } else if (activeMenu_) {
         activeMenu_->display(&(*window_));
     }
+
+    Texture t(renderer_, Size{2, 2});
+    Font f(renderer_, "../assets/fonts/Really_No_2.ttf", 30); //! temp
+    t = f.render("machin", ColorUtils::RED); //! temp
+    window_->blit(&t, Point{0, 0});
     
     window_->refresh();
 }

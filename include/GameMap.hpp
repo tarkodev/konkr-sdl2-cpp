@@ -76,6 +76,7 @@ private:
     void moveTroop(PlayableGround* from, PlayableGround* to);
     void moveBandit(PlayableGround* from, PlayableGround* to);
     void moveBandits();
+    void updateNextCapitals(Player *player);
 
     double ratio_ = 0;
 

@@ -2,40 +2,41 @@
 #define FONT_HPP
 
 #include <string>
-#include <stdexcept>
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <memory>
+#include "SDL.h"
+#include "SDL2/SDL_ttf.h"
 #include "Texture.hpp"
 
 /**
- * @brief Encapsule TTF_Font* et permet de créer des textures à partir de texte.
+ * @brief Encapsulation de TTF_Font similaire à pygame.font.Font
+ *
+ * Exemple d'utilisation :
+ *   Font font(renderer, "./assets/fonts/arial.ttf", 24);
+ *   Texture textTexture = font.render("Hello, SDL!", {255,255,255,255});
+ *   textTexture.blit(...);
  */
 class Font {
 public:
-    /**
-     * @param file  Chemin vers le fichier .ttf
-     * @param ptsize  Taille en points
-     * @throws runtime_error si l'ouverture échoue
-     */
-    Font(const std::string& file, int ptsize);
-
+    Font(SDL_Renderer* renderer, const std::string& file, int pointSize);
     ~Font();
 
-    /// Accès direct au TTF_Font*
-    TTF_Font* get() const;
+    // Interdit copie, autorise move
+    Font(const Font&) = delete;
+    Font& operator=(const Font&) = delete;
+    Font(Font&&) noexcept;
+    Font& operator=(Font&&) noexcept;
 
     /**
-     * @brief Rend un texte en SDL_Texture via Texture.
-     * @param renderer  Renderer SDL
-     * @param text      Chaîne UTF-8
-     * @param color     Couleur du texte
-     * @return pointeur vers une Texture (à delete après usage)
-     * @throws runtime_error si rendu ou création échoue
+     * @brief Rend un texte en créant une texture (blended)
+     * @param text La chaîne à afficher (UTF-8)
+     * @param color Couleur RGBA du texte
+     * @return Une nouvelle Texture contenant le rendu du texte
      */
-    Texture* renderText(SDL_Renderer* renderer, const std::string& text, SDL_Color color) const;
+    Texture render(const std::string& text, SDL_Color color);
 
 private:
-    TTF_Font* font_;
+    SDL_Renderer* renderer_ = nullptr;
+    TTF_Font* font_ = nullptr;
 };
 
-#endif 
+#endif // FONT_HPP

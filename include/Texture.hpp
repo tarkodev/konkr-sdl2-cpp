@@ -38,6 +38,7 @@ public:
     Texture(SDL_Renderer *renderer, SDL_Texture* texture);
     Texture(SDL_Renderer *renderer, int w, int h);
     Texture(SDL_Renderer *renderer, const Size& size);
+    Texture(Texture&& o);
 
     /**
      * @brief Destructeur.
@@ -45,6 +46,9 @@ public:
      * Libère la texture associée.
      */
     ~Texture();
+
+    Texture& operator=(const Texture&) = delete;
+    Texture& operator=(Texture&&) noexcept;
 
 
     /**
@@ -106,7 +110,7 @@ public:
 
 private:
     SDL_Texture* texture_;
-    std::unique_ptr<SDL_Renderer, SDLRendererDeleter> renderer_; //! encapsuler le renderer dans une classe
+    SDL_Renderer* renderer_;
     Size size_;
     bool alpha_;
 

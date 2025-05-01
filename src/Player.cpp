@@ -58,19 +58,25 @@ bool Player::hasTowns() {
     return false;
 }
 
+std::unordered_set<PlayableGround*> Player::getTownCells() {
+    updateTowns();
+    return townCells_;
+}
+
 void Player::onTurnStart() {
+    updateTowns();
     selected_ = true;
+    
     for (PlayableGround* townCell : townCells_) {
         Town* town = dynamic_cast<Town*>(townCell->getElement());
         town->setSelected(true);
-        // sum = townCell->getNextCapital(false);
-        // if (sum < 0) {
-        //    townCell->freeTroops();
-        //    town->setCoins(0);
-        // } else {
-        //    //! Si un camp sur la map, le bandit doit ajouter le coin au camp (si plusieurs, choix aléatoire)
-        //    town->setCoins(sum);
-        // }
+        town->updateCapital();
+        //! Si un camp sur la map, le bandit doit ajouter le coin au camp (camp le plus proche)
+
+        if (town->getCapital() < 0) {
+            // townCell->freeTroops();
+            town->setCapital(0);
+        }
     }
 }
 

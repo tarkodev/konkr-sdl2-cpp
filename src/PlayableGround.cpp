@@ -210,6 +210,56 @@ void PlayableGround::updateLinked() {
     }
 }
 
+#include <queue>
+#include <tuple>
+
+// Return towns from nearest to further
+void PlayableGround::getTowns(std::queue<PlayableGround*>& toVisit, std::unordered_set<PlayableGround*>& visited, std::vector<Town*>& towns) {
+    if (!owner_ || visited.find(this) != visited.end()) return;
+    visited.insert(this);
+
+    // Add town to list
+    if (auto* town = dynamic_cast<Town*>(element))
+        towns.push_back(town);
+
+    // Add neighbors to visit
+    for (Cell* cell : neighbors) {
+        auto* ng = dynamic_cast<PlayableGround*>(cell);
+        if (ng && ng->getOwner() == owner_)
+            toVisit.push(ng);
+    }
+
+    // Visit next cells
+    while (!toVisit.empty()) {
+        auto pg = toVisit.front();
+        toVisit.pop();
+        pg->getTowns(toVisit, visited, towns);
+    }
+}
+
+std::vector<Town*> PlayableGround::getTowns() {
+    std::queue<PlayableGround*> toVisit;
+    std::unordered_set<PlayableGround*> visited;
+    std::vector<Town*> towns;
+
+    getTowns(toVisit, visited, towns);
+    return towns;
+}
+
+void PlayableGround::giveNextIncome() {
+    int income = element ? 1 - element->getUpkeep() : 1;
+    if (income == 0) return;
+    std::vector<Town*> towns = getTowns();
+
+    for (auto* town : towns) {
+        income = town->addNextCoins(income);
+        if (income == 0) return;
+    }
+
+    if (income < 0 && towns.size())
+        towns[0]->setNextCapital(towns[0]->getNextCapital() + income);
+}
+
 void PlayableGround::displayFences(const Texture* target) {
     if (!hasFences()) return;
 

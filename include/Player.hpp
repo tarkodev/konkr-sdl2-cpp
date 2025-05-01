@@ -26,6 +26,7 @@ public:
     void updateTowns();
     bool hasSelected() const { return selected_; };
     bool hasTowns();
+    std::unordered_set<PlayableGround*> getTownCells();
 
     void addTownCell(PlayableGround* town);
 

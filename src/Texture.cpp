@@ -42,6 +42,13 @@ Texture::Texture(SDL_Renderer *renderer, int w, int h): renderer_(renderer) {
 Texture::Texture(SDL_Renderer *renderer, const Size& size): 
     Texture(renderer, size.getWidth(), size.getHeight()) {}
 
+Texture::Texture(Texture&& o): texture_(o.texture_), renderer_(o.renderer_), size_(o.size_), alpha_(o.alpha_) {
+    o.texture_  = nullptr;
+    o.renderer_  = nullptr;
+    o.alpha_    = false;
+    o.size_     = Size{0, 0};
+}
+
 
 // Destructeur : libère la texture
 Texture::~Texture() {
@@ -49,6 +56,24 @@ Texture::~Texture() {
         SDL_DestroyTexture(texture_);
         texture_ = nullptr;
     }
+}
+
+Texture& Texture::operator=(Texture&& o) noexcept {
+    if (this != &o) {
+        if (texture_)
+            SDL_DestroyTexture(texture_);
+
+        texture_   = o.texture_;
+        renderer_  = o.renderer_;
+        size_      = o.size_;
+        alpha_     = o.alpha_;
+
+        o.texture_  = nullptr;
+        o.renderer_  = nullptr;
+        o.alpha_    = false;
+        o.size_     = Size{0, 0};
+    }
+    return *this;
 }
 
 void Texture::colorize(const SDL_Color& color) {

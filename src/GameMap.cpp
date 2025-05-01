@@ -88,7 +88,9 @@ GameMap::GameMap(const Point& pos, const Size size, const std::pair<int, int>& g
         throw std::runtime_error("Une map doit au moins être de taille 2x2.");
 
     loadMap(mapFile);
-    players_[selectedPlayerNum_]->onTurnStart(); //! Après un onTurnStart, refresh le calc elementsCalc_
+    for (Player *player : players_)
+            updateNextCapitals(player);
+    players_[selectedPlayerNum_]->onTurnStart();
     refresh();
 }
 
@@ -191,53 +193,53 @@ void GameMap::loadMap(const std::string& mapFile) {
 
                 case 'T': {
                     gameElt = new Town(pos);
-                    PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
-                    if (t && cellType != '0') {
-                        t->setElement(gameElt);
-                        t->getOwner()->addTownCell(t);
+                    PlayableGround* pg = dynamic_cast<PlayableGround*>(cell);
+                    if (pg && cellType != '0') {
+                        pg->setElement(gameElt);
+                        pg->getOwner()->addTownCell(pg);
                     }
                     break;
                 }
 
                 case 'C': {
                     gameElt = new Castle(pos);
-                    PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
-                    if (t && cellType != '0') t->setElement(gameElt);
+                    PlayableGround* pg = dynamic_cast<PlayableGround*>(cell);
+                    if (pg && cellType != '0') pg->setElement(gameElt);
                     break;
                 }
 
                 case 'A': {
                     gameElt = new Camp(pos);
-                    PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
-                    if (t && cellType == '0') t->setElement(gameElt);
+                    PlayableGround* pg = dynamic_cast<PlayableGround*>(cell);
+                    if (pg && cellType == '0') pg->setElement(gameElt);
                     break;
                 }
 
                 case 'V': {
                     gameElt = new Villager(pos);
-                    PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
-                    if (t && cellType != '0') t->setElement(gameElt);
+                    PlayableGround* pg = dynamic_cast<PlayableGround*>(cell);
+                    if (pg && cellType != '0') pg->setElement(gameElt);
                     break;
                 }
 
                 case 'P': {
                     gameElt = new Pikeman(pos);
-                    PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
-                    if (t && cellType != '0') t->setElement(gameElt);
+                    PlayableGround* pg = dynamic_cast<PlayableGround*>(cell);
+                    if (pg && cellType != '0') pg->setElement(gameElt);
                     break;
                 }
 
                 case 'K': {
                     gameElt = new Knight(pos);
-                    PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
-                    if (t && cellType != '0') t->setElement(gameElt);
+                    PlayableGround* pg = dynamic_cast<PlayableGround*>(cell);
+                    if (pg && cellType != '0') pg->setElement(gameElt);
                     break;
                 }
 
                 case 'H': {
                     gameElt = new Hero(pos);
-                    PlayableGround* t = dynamic_cast<PlayableGround*>(cell);
-                    if (t && cellType != '0') t->setElement(gameElt);
+                    PlayableGround* pg = dynamic_cast<PlayableGround*>(cell);
+                    if (pg && cellType != '0') pg->setElement(gameElt);
                     break;
                 }
 
@@ -554,12 +556,16 @@ void GameMap::nextPlayer() {
         selectedPlayerNum_ %= players_.size();
     }
 
-    if (selectedPlayerNum_ == 0)
+    if (selectedPlayerNum_ == 0) {
         moveBandits();
+        for (Player *player : players_)
+            updateNextCapitals(player);
+    }
 
     // Start turn of new current player
     movedTroops_.clear();
     players_[selectedPlayerNum_]->onTurnStart();
+    updateNextCapitals(players_[selectedPlayerNum_]);
     refreshElements();
 }
 
@@ -615,6 +621,8 @@ void GameMap::moveTroop(PlayableGround* from, PlayableGround* to) {
 
         // Give grounds to the new owner
         to->link(fromOwner);
+        updateNextCapitals(fromOwner);
+        if (toOwner) updateNextCapitals(toOwner);
     } 
     
     // Same Owner
@@ -644,6 +652,8 @@ void GameMap::moveTroop(PlayableGround* from, PlayableGround* to) {
 
                 from->setElement(nullptr);
                 to->setElement(troop);
+
+                updateNextCapitals(fromOwner);
             }
         }
     }
@@ -750,7 +760,7 @@ void GameMap::handleEvent(SDL_Event &event) {
                 if (selectedCell_.has_value() && (*selectedCell_)) {
                     auto town = dynamic_cast<Town*>((*selectedCell_)->getElement());
                     if (town) {
-                        //town->displayCoins()
+                        //town->displayCapital()
                     }
                 }
             }
@@ -765,7 +775,7 @@ void GameMap::handleEvent(SDL_Event &event) {
                 // Move troop
                 if (selectedCell_.has_value() && (*selectedCell_))
                     moveTroop(selectedTroopCell_, *selectedCell_);
-    
+
                 // Remove possibilities
                 selectedTroopCell_->updateSelectable(0);
                 selectedTroopCell_ = nullptr;
@@ -789,4 +799,15 @@ void GameMap::display(const BlitTarget* target)
 
     if (selectedTroop_)
         selectedTroop_->display(target);
+}
+
+void GameMap::updateNextCapitals(Player *player) {
+    for (auto* pg : player->getTownCells())
+        if (auto* town = dynamic_cast<Town*>(pg->getElement()))
+            town->resetNextCapital();
+
+    for (Cell* cell : *this)
+        if (auto* pg = dynamic_cast<PlayableGround*>(cell))
+            if (pg->getOwner() == player)
+                pg->giveNextIncome();
 }

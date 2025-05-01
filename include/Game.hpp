@@ -10,6 +10,7 @@
 #include "Overlay.hpp"
 #include "MainMenu.hpp"
 #include "MapSelectMenu.hpp"
+#include "Font.hpp"
 
 enum class ScreenState { MainMenu, MapSelect, InGame };
 

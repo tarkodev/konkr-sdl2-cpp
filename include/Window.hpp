@@ -42,11 +42,11 @@ public:
     
 private:
     bool initialized_;
-    Texture* calc_;
+    std::unique_ptr<Texture> calc_;
 
     Size size_ = {0, 0};
     std::unique_ptr<SDL_Window, SDLWindowDeleter> SDLWindow_;
-    std::unique_ptr<SDL_Renderer, SDLRendererDeleter> renderer_;
+    std::unique_ptr<SDL_Renderer, SDLRendererDeleter> renderer_; //! encapsuler le renderer dans une classe
 };
 
 #endif

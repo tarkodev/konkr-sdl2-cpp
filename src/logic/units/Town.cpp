@@ -17,6 +17,25 @@ void Town::init()
 
 Town::Town(const Point& pos): GameElement(pos) {}
 
+int Town::addNextCoins(int coins) {
+    if (coins >= 0) {
+        nextCoins_ += coins;
+        return 0;
+    }
+
+    if (nextCoins_ < 0)
+        return coins;
+
+        nextCoins_ += coins;
+    if (nextCoins_ < 0) {
+        coins = nextCoins_;
+        nextCoins_ = 0;
+        return coins;
+    }
+
+    return 0;
+}
+
 void Town::display(const BlitTarget* target)
 {
     if (!sprite_) return;

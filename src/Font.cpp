@@ -1,7 +1,10 @@
 #include "Font.hpp"
+#include <stdexcept>
 
-Font::Font(const std::string& file, int ptsize) {
-    font_ = TTF_OpenFont(file.c_str(), ptsize);
+Font::Font(SDL_Renderer* renderer, const std::string& file, int pointSize)
+  : renderer_(renderer)
+{
+    font_ = TTF_OpenFont(file.c_str(), pointSize);
     if (!font_) {
         throw std::runtime_error(std::string("TTF_OpenFont failed: ") + TTF_GetError());
     }
@@ -14,22 +17,34 @@ Font::~Font() {
     }
 }
 
-TTF_Font* Font::get() const {
-    return font_;
+Font::Font(Font&& o) noexcept
+  : renderer_(o.renderer_), font_(o.font_)
+{
+    o.font_ = nullptr;
 }
 
-Texture* Font::renderText(SDL_Renderer* renderer, const std::string& text, SDL_Color color) const {
+Font& Font::operator=(Font&& o) noexcept {
+    if (this != &o) {
+        if (font_) TTF_CloseFont(font_);
+        renderer_ = o.renderer_;
+        font_     = o.font_;
+        o.font_   = nullptr;
+    }
+    return *this;
+}
+
+Texture Font::render(const std::string& text, SDL_Color color) {
+    // Render on SDL_Surface
     SDL_Surface* surf = TTF_RenderUTF8_Blended(font_, text.c_str(), color);
-    if (!surf) {
+    if (!surf)
         throw std::runtime_error(std::string("TTF_RenderUTF8_Blended failed: ") + TTF_GetError());
-    }
 
-    SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf);
+    // Convert to SDL_Texture
+    SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer_, surf);
     SDL_FreeSurface(surf);
-    if (!tex) {
+    if (!tex)
         throw std::runtime_error(std::string("SDL_CreateTextureFromSurface failed: ") + SDL_GetError());
-    }
 
-    // Texture(renderer, SDL_Texture*) interroge automatiquement la taille
-    return new Texture(renderer, tex);
+    // return Texture
+    return Texture(renderer_, tex);
 }

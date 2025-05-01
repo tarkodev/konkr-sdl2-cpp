@@ -1,11 +1,16 @@
 #include "Window.hpp"
-#include <SDL.h>
+#include "SDL.h"
+#include "SDL2/SDL_ttf.h"
 #include <stdexcept>
 
 Window::Window(const char* title, int width, int height) : initialized_(false) {
     // Init SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
         throw std::runtime_error(SDL_GetError());
+
+    // Init SDL_ttf
+    if (TTF_Init() < 0)
+        throw std::runtime_error(TTF_GetError());
 
     // Init Window
     SDLWindow_.reset(SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN));
@@ -28,11 +33,12 @@ Window::Window(const char* title, int width, int height) : initialized_(false) {
         throw std::runtime_error(SDL_GetError());
     }
 
-    calc_ = new Texture(&(*renderer_), size_);
+    calc_ = std::make_unique<Texture>(renderer_.get(), size_);
     initialized_ = true;
 }
 
 Window::~Window() {
+    TTF_Quit();
     SDL_Quit();
 }
 
@@ -72,5 +78,5 @@ void Window::blit(const BlitTarget* src, const Rect& srcRect, const Rect& destRe
 
 void Window::refresh() {
     calc_->display();
-    SDL_RenderPresent(&(*renderer_));
+    SDL_RenderPresent(renderer_.get());
 }
