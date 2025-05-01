@@ -20,7 +20,7 @@
 #include "logic/units/Knight.hpp"
 #include "logic/units/Hero.hpp"
 #include "Font.hpp"
-#include "CapitalDisplayer.hpp"
+#include "TreasuryDisplayer.hpp"
 
 #include <ranges>
 #include <random>
@@ -36,7 +36,6 @@
 Texture* GameMap::selectSprite_ = nullptr;
 SDL_Cursor* GameMap::handCursor_ = nullptr;
 SDL_Cursor* GameMap::arrowCursor_ = nullptr;
-std::unique_ptr<Font> GameMap::capitalFont_ = nullptr;
 std::mt19937 GameMap::gen_{};
 
 void GameMap::init() {
@@ -44,9 +43,6 @@ void GameMap::init() {
     selectSprite_ = (new Texture(renderer_, "../assets/img/plate.png"))->convertAlpha(); //!temp
     handCursor_ = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
     arrowCursor_ = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
-
-    // Load Font
-    capitalFont_ = std::make_unique<Font>(Font{renderer_, "../assets/fonts/Really_No_2.ttf", 30});
 
     // Create random seed
     gen_ = std::mt19937{ std::random_device{}() };
@@ -77,7 +73,7 @@ GameMap::GameMap(const Point& pos, const Size size, const std::pair<int, int>& g
     }
 
     updateNeighbors();
-    refresh();
+    startGame();
 }
 
 GameMap::GameMap(const Point& pos, const Size size, const std::string mapFile)
@@ -91,10 +87,7 @@ GameMap::GameMap(const Point& pos, const Size size, const std::pair<int, int>& g
         throw std::runtime_error("Une map doit au moins être de taille 2x2.");
 
     loadMap(mapFile);
-    for (Player *player : players_)
-            updateNextCapitals(player);
-    players_[selectedPlayerNum_]->onTurnStart();
-    refresh();
+    startGame();
 }
 
 
@@ -171,8 +164,6 @@ void GameMap::loadMap(const std::string& mapFile) {
                     if (!std::isdigit(cellType))
                         throw std::runtime_error("Caractère inattendu: " + std::to_string(cellType));
 
-                    //! mettre au propre
-                    //! (JSP où dans le code: ne pas oublier de set la somme par défaut de chqque town)
                     int playerId = cellType - '0';
                     if (players.find(playerId) == players.end()) {
                         players[playerId] = new Player(std::string("Player ") + std::to_string(playerId), ColorUtils::getGroundColor(playerId));
@@ -261,12 +252,21 @@ void GameMap::loadMap(const std::string& mapFile) {
         throw std::runtime_error("Le fichier de map n'a pas assez de lignes (attendu " + std::to_string(getHeight()) + ")");
 
     updateNeighbors();
+}
 
+void GameMap::startGame() {
     // Update links
     for (Cell* cell : *this)
         if (auto* pg = dynamic_cast<PlayableGround*>(cell))
             pg->updateLinked();
-    //! update state de la map (ex: hexagone/troupe/castle pas relié à une town(mettre nullptr/bandit/camp))
+    updateLostElements();
+
+    currentPlayer_ = players_[selectedPlayerNum_];
+    for (Player *player : players_)
+        updateIncomes(player);
+
+    currentPlayer_->onTurnStart();
+    refresh();
 }
 
 
@@ -463,6 +463,9 @@ void GameMap::refreshElements() {
         }
     }
 
+    if (townToShowTreasury_)
+        townToShowTreasury_->displayTreasury(elementsCalc_);
+
     refreshMain();
 }
 
@@ -547,28 +550,32 @@ void GameMap::nextPlayer() {
 
     // Finish turn of current player
     updateLostElements();
-    players_[selectedPlayerNum_]->onTurnEnd();
+    currentPlayer_->onTurnEnd();
+
+    // Set the new current player
     selectedPlayerNum_ = (selectedPlayerNum_ + 1) % players_.size();
+    currentPlayer_ = players_[selectedPlayerNum_];
 
     // Search next player
-    while (!players_[selectedPlayerNum_]->hasTowns()) {
-        delete players_[selectedPlayerNum_];
+    while (!currentPlayer_->hasTowns()) {
+        delete currentPlayer_;
         players_.erase(players_.begin() + selectedPlayerNum_);
         if (players_.empty()) return;
 
         selectedPlayerNum_ %= players_.size();
+        currentPlayer_ = players_[selectedPlayerNum_];
     }
 
     if (selectedPlayerNum_ == 0) {
         moveBandits();
         for (Player *player : players_)
-            updateNextCapitals(player);
+            updateIncomes(player);
     }
 
     // Start turn of new current player
     movedTroops_.clear();
-    players_[selectedPlayerNum_]->onTurnStart();
-    updateNextCapitals(players_[selectedPlayerNum_]);
+    currentPlayer_->onTurnStart();
+    updateIncomes(currentPlayer_);
     refreshElements();
 }
 
@@ -624,8 +631,8 @@ void GameMap::moveTroop(PlayableGround* from, PlayableGround* to) {
 
         // Give grounds to the new owner
         to->link(fromOwner);
-        updateNextCapitals(fromOwner);
-        if (toOwner) updateNextCapitals(toOwner);
+        updateIncomes(fromOwner);
+        if (toOwner) updateIncomes(toOwner);
     } 
     
     // Same Owner
@@ -656,7 +663,7 @@ void GameMap::moveTroop(PlayableGround* from, PlayableGround* to) {
                 from->setElement(nullptr);
                 to->setElement(troop);
 
-                updateNextCapitals(fromOwner);
+                updateIncomes(fromOwner);
             }
         }
     }
@@ -754,20 +761,20 @@ void GameMap::handleEvent(SDL_Event &event) {
         case SDL_MOUSEMOTION: {
             Point mousePos{event.motion.x, event.motion.y};
             selectCell(mousePos - pos_);
+            townToShowTreasury_ = nullptr;
 
             if (selectedTroop_) {
-                refreshElements();
                 selectedTroop_->setPos(mousePos);
             }
             else {
                 updateCursor();
-                capitalDisplayer_.reset();
                 if (selectedCell_.has_value() && (*selectedCell_)) {
                     auto town = dynamic_cast<Town*>((*selectedCell_)->getElement());
                     if (town)
-                        capitalDisplayer_.emplace(*capitalFont_, mousePos, town->getCapital(), town->getNextCapital());
+                        townToShowTreasury_ = town;
                 }
             }
+            refreshElements();
 
             break;
         }
@@ -803,18 +810,15 @@ void GameMap::display(const BlitTarget* target)
 
     if (selectedTroop_)
         selectedTroop_->display(target);
-
-    if (capitalDisplayer_.has_value())
-        capitalDisplayer_->display(target);
 }
 
-void GameMap::updateNextCapitals(Player *player) {
+void GameMap::updateIncomes(Player *player) {
     for (auto* pg : player->getTownCells())
         if (auto* town = dynamic_cast<Town*>(pg->getElement()))
-            town->resetNextCapital();
+            town->setIncome(0);
 
     for (Cell* cell : *this)
         if (auto* pg = dynamic_cast<PlayableGround*>(cell))
             if (pg->getOwner() == player)
-                pg->giveNextIncome();
+                pg->updateIncome();
 }

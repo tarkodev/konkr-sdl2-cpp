@@ -85,7 +85,7 @@ set(SRC_FILES
     "${CMAKE_SOURCE_DIR}/src/Displayer.cpp"
     "${CMAKE_SOURCE_DIR}/src/HexagonDisplayer.cpp"
     "${CMAKE_SOURCE_DIR}/src/FenceDisplayer.cpp"
-    "${CMAKE_SOURCE_DIR}/src/CapitalDisplayer.cpp"
+    "${CMAKE_SOURCE_DIR}/src/TreasuryDisplayer.cpp"
     
     "${CMAKE_SOURCE_DIR}/src/logic/GameElement.cpp"
     "${CMAKE_SOURCE_DIR}/src/logic/Troop.cpp"

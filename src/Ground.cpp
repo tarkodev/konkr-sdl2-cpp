@@ -13,7 +13,7 @@ const std::string Ground::getType() {
 
 void Ground::init() {
     if (!renderer_)
-        std::runtime_error("Cell not initialized");
+        throw std::runtime_error("Displayer not initialized");
 
     // Load island
     Texture* island = (new Texture(renderer_, "../assets/img/hexagon.png"))->convertAlpha();

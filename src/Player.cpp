@@ -70,12 +70,12 @@ void Player::onTurnStart() {
     for (PlayableGround* townCell : townCells_) {
         Town* town = dynamic_cast<Town*>(townCell->getElement());
         town->setSelected(true);
-        town->updateCapital();
+        town->updateTreasury();
         //! Si un camp sur la map, le bandit doit ajouter le coin au camp (camp le plus proche)
 
-        if (town->getCapital() < 0) {
+        if (town->getTreasury() < 0) {
             // townCell->freeTroops();
-            town->setCapital(0);
+            town->setTreasury(0);
         }
     }
 }

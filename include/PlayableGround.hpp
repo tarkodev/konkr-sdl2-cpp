@@ -36,7 +36,8 @@ public:
     void link(Player* owner);
 
     std::vector<Town*> getTowns();
-    void giveNextIncome();
+    Town* getNearestTown();
+    void updateIncome();
 
     GameElement* getElement();
     void setElement(GameElement* elt);
@@ -63,6 +64,7 @@ private:
     void link(Player* owner, std::unordered_set<PlayableGround*>& visited);
     void updateSelectable(int strength, std::unordered_set<PlayableGround*>& visited);
     void getTowns(std::queue<PlayableGround*>& toVisit, std::unordered_set<PlayableGround*>& visited, std::vector<Town*>& towns);
+    Town* getNearestTown(std::queue<PlayableGround*>& toVisit, std::unordered_set<PlayableGround*>& visited);
 
     void setSelectable(bool selectable);
 };

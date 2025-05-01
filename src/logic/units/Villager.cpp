@@ -6,7 +6,7 @@ Texture* Villager::sprite_ = nullptr;
 void Villager::init()
 {
     if (!renderer_)
-        std::runtime_error("GameElement not initialized");
+        throw std::runtime_error("Displayer not initialized");
 
     if (sprite_) return;
     sprite_ = (new Texture(renderer_, "../assets/img/villager.png"))->convertAlpha();

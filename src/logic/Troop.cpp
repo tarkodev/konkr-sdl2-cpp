@@ -5,7 +5,7 @@ Texture* Troop::lostSprite_ = nullptr;
 
 void Troop::init() {
     if (!renderer_)
-        std::runtime_error("Displayer not initialized");
+        throw std::runtime_error("Displayer not initialized");
 
     if (shadow_) return;
     shadow_ = (new Texture(renderer_, "../assets/img/shadow.png"))->convertAlpha();

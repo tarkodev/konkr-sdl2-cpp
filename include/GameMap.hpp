@@ -14,7 +14,7 @@
 #include "Displayer.hpp"
 #include "BlitTarget.hpp"
 #include "Font.hpp"
-#include "CapitalDisplayer.hpp"
+#include "TreasuryDisplayer.hpp"
 
 #include <memory>
 #include <utility>
@@ -61,7 +61,6 @@ private:
     static Texture* selectSprite_; //!temp
     static SDL_Cursor* handCursor_;
     static SDL_Cursor* arrowCursor_;
-    static std::unique_ptr<Font> capitalFont_;
 
     GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize, const std::string mapFile);
     void loadMap(const std::string& mapFile);
@@ -73,19 +72,22 @@ private:
     bool isSelectableTroop(PlayableGround* pg);
     void updateCursor();
     void refreshMain();
+    void startGame();
 
     void updateLostElements();
     void moveTroop(PlayableGround* from, PlayableGround* to);
     void moveBandit(PlayableGround* from, PlayableGround* to);
     void moveBandits();
-    void updateNextCapitals(Player *player);
+    void updateIncomes(Player *player);
 
     double ratio_ = 0;
 
-    std::optional<PlayableGround*> selectedCell_; //! devrait être un std::optional<PlayableGround>
+    std::optional<PlayableGround*> selectedCell_; //! devrait être un std::optional<PlayableGround> ?
+    Town* townToShowTreasury_;
     bool hasSelection_ = false;
 
-    std::vector<Player *> players_;
+    std::vector<Player*> players_;
+    Player* currentPlayer_;
 
     std::unordered_set<Troop *> movedTroops_;
     Troop* selectedTroop_ = nullptr;
@@ -94,7 +96,6 @@ private:
 
     Size size_;
     Size calcSize_;
-    std::optional<CapitalDisplayer> capitalDisplayer_;
     Texture* islandsCalc_ = nullptr; //! tout passer en unique_ptr
     Texture* platesCalc_ = nullptr;
     Texture* selectablesCalc_ = nullptr;

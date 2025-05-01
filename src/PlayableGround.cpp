@@ -19,7 +19,7 @@ const std::string PlayableGround::getType() {
 
 void PlayableGround::init() {
     if (!renderer_)
-        throw std::runtime_error("Cell not initialized");
+        throw std::runtime_error("Displayer not initialized");
 
     // Load fence
     Texture* fenceTop = (new Texture(renderer_, "../assets/img/fence_top.png"))->convertAlpha();
@@ -213,6 +213,7 @@ void PlayableGround::updateLinked() {
 #include <queue>
 #include <tuple>
 
+
 // Return towns from nearest to further
 void PlayableGround::getTowns(std::queue<PlayableGround*>& toVisit, std::unordered_set<PlayableGround*>& visited, std::vector<Town*>& towns) {
     if (!owner_ || visited.find(this) != visited.end()) return;
@@ -246,18 +247,44 @@ std::vector<Town*> PlayableGround::getTowns() {
     return towns;
 }
 
-void PlayableGround::giveNextIncome() {
-    int income = element ? 1 - element->getUpkeep() : 1;
-    if (income == 0) return;
-    std::vector<Town*> towns = getTowns();
+Town* PlayableGround::getNearestTown(std::queue<PlayableGround*>& toVisit, std::unordered_set<PlayableGround*>& visited) {
+    if (!owner_ || visited.find(this) != visited.end()) return nullptr;
+    visited.insert(this);
 
-    for (auto* town : towns) {
-        income = town->addNextCoins(income);
-        if (income == 0) return;
+    // Add town to list
+    if (auto* town = dynamic_cast<Town*>(element))
+        return town;
+
+    // Add neighbors to visit
+    for (Cell* cell : neighbors) {
+        auto* ng = dynamic_cast<PlayableGround*>(cell);
+        if (ng && ng->getOwner() == owner_)
+            toVisit.push(ng);
     }
 
-    if (income < 0 && towns.size())
-        towns[0]->setNextCapital(towns[0]->getNextCapital() + income);
+    // Visit next cells
+    Town* town = nullptr;
+    while (!toVisit.empty() && !town) {
+        auto pg = toVisit.front();
+        toVisit.pop();
+        town = pg->getNearestTown(toVisit, visited);
+    }
+
+    return town;
+}
+
+Town* PlayableGround::getNearestTown() {
+    std::queue<PlayableGround*> toVisit;
+    std::unordered_set<PlayableGround*> visited;
+    return getNearestTown(toVisit, visited);
+}
+
+void PlayableGround::updateIncome() {
+    int income = element ? 1 - element->getUpkeep() : 1;
+    if (income == 0) return;
+
+    if (auto* town = getNearestTown())
+        town->addIncome(income);
 }
 
 void PlayableGround::displayFences(const Texture* target) {

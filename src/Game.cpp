@@ -20,6 +20,7 @@
 #include "Button.hpp"
 #include "Font.hpp"
 #include "Displayer.hpp"
+#include "TreasuryDisplayer.hpp"
 
 #include <memory>
 #include <vector>
@@ -45,12 +46,13 @@ Game::Game()
     Ground::init();
     Forest::init();
     PlayableGround::init();
+    TreasuryDisplayer::init();
 
     Troop::init();
-    Bandit::init();
     Town::init();
     Castle::init();
     Camp::init();
+    Bandit::init();
     Villager::init();
     Pikeman::init();
     Knight::init();
@@ -229,11 +231,6 @@ void Game::draw() {
     } else if (activeMenu_) {
         activeMenu_->display(&(*window_));
     }
-
-    Texture t(renderer_, Size{2, 2});
-    Font f(renderer_, "../assets/fonts/Really_No_2.ttf", 30); //! temp
-    t = f.render("machin", ColorUtils::RED); //! temp
-    window_->blit(&t, Point{0, 0});
     
     window_->refresh();
 }
