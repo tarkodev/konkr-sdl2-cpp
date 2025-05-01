@@ -5,11 +5,11 @@ Texture* Hero::sprite_ = nullptr;
 
 void Hero::init()
 {
-    if (!renderer)
+    if (!renderer_)
         std::runtime_error("GameElement not initialized");
         
     if (sprite_) return;
-    sprite_ = (new Texture(renderer, "../assets/img/hero.png"))->convertAlpha();
+    sprite_ = (new Texture(renderer_, "../assets/img/hero.png"))->convertAlpha();
 }
 
 

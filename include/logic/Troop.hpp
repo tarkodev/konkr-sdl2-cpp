@@ -19,9 +19,6 @@ protected:
     Troop(const Point& pos);
 
     void displaySprite(const BlitTarget* target, const Texture* sprite);
-
-private:
-    static SDL_Renderer* renderer_;
 };
 
 #endif

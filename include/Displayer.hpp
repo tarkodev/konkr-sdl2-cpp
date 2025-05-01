@@ -7,15 +7,23 @@
 
 class Displayer {
 public:
-    Displayer(const Point& pos = {0, 0}): pos_(pos) {}
+    static void init(SDL_Renderer *renderer);
+    
+    Displayer(const Point& pos = {0, 0});
+
     virtual ~Displayer() = default;
+    
     virtual void display(const BlitTarget* target) = 0; //! display est const ?
+    
     virtual const Size getSize() const = 0;
-    virtual void setPos(const Point& pos) { pos_ = pos; }
-    virtual Point getPos() const { return pos_; }
+    
+    virtual Point getPos() const;
+    virtual void setPos(const Point& pos);
 
 protected:
-    //! Check si toutes classe enfant de Display on size_ et ajouter si c'est le cas (et implémenter direct getSize)
+    static SDL_Renderer* renderer_;
+
+    //! Check si toutes classe enfant de Display ont size_ et ajouter size_ ici directement si c'est le cas (et implémenter direct getSize)
     Point pos_;
 };
 

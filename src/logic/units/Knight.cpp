@@ -5,11 +5,11 @@ Texture* Knight::sprite_ = nullptr;
 
 void Knight::init()
 {
-    if (!renderer)
+    if (!renderer_)
         std::runtime_error("GameElement not initialized");
         
     if (sprite_) return;
-    sprite_ = (new Texture(renderer, "../assets/img/knight.png"))->convertAlpha();
+    sprite_ = (new Texture(renderer_, "../assets/img/knight.png"))->convertAlpha();
 }
 
 

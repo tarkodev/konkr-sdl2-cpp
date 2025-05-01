@@ -19,6 +19,8 @@
 #include "logic/units/Pikeman.hpp"
 #include "logic/units/Knight.hpp"
 #include "logic/units/Hero.hpp"
+#include "Font.hpp"
+#include "CapitalDisplayer.hpp"
 
 #include <ranges>
 #include <random>
@@ -31,19 +33,20 @@
 #include <cctype>
 
 
-SDL_Renderer* GameMap::renderer_ = nullptr;
 Texture* GameMap::selectSprite_ = nullptr;
 SDL_Cursor* GameMap::handCursor_ = nullptr;
 SDL_Cursor* GameMap::arrowCursor_ = nullptr;
+std::unique_ptr<Font> GameMap::capitalFont_ = nullptr;
 std::mt19937 GameMap::gen_{};
 
-void GameMap::init(SDL_Renderer *renderer) {
-    renderer_ = renderer;
-
+void GameMap::init() {
     // Load sprites and cursors
     selectSprite_ = (new Texture(renderer_, "../assets/img/plate.png"))->convertAlpha(); //!temp
     handCursor_ = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
     arrowCursor_ = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
+
+    // Load Font
+    capitalFont_ = std::make_unique<Font>(Font{renderer_, "../assets/fonts/Really_No_2.ttf", 30});
 
     // Create random seed
     gen_ = std::mt19937{ std::random_device{}() };
@@ -749,19 +752,20 @@ void GameMap::handleEvent(SDL_Event &event) {
         }
 
         case SDL_MOUSEMOTION: {
-            selectCell(Point{event.motion.x, event.motion.y} - pos_);
+            Point mousePos{event.motion.x, event.motion.y};
+            selectCell(mousePos - pos_);
 
             if (selectedTroop_) {
                 refreshElements();
-                selectedTroop_->setPos(Point{static_cast<int>(event.motion.x), static_cast<int>(event.motion.y)});
+                selectedTroop_->setPos(mousePos);
             }
             else {
                 updateCursor();
+                capitalDisplayer_.reset();
                 if (selectedCell_.has_value() && (*selectedCell_)) {
                     auto town = dynamic_cast<Town*>((*selectedCell_)->getElement());
-                    if (town) {
-                        //town->displayCapital()
-                    }
+                    if (town)
+                        capitalDisplayer_.emplace(*capitalFont_, mousePos, town->getCapital(), town->getNextCapital());
                 }
             }
 
@@ -799,6 +803,9 @@ void GameMap::display(const BlitTarget* target)
 
     if (selectedTroop_)
         selectedTroop_->display(target);
+
+    if (capitalDisplayer_.has_value())
+        capitalDisplayer_->display(target);
 }
 
 void GameMap::updateNextCapitals(Player *player) {

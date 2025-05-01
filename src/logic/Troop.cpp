@@ -4,12 +4,12 @@ Texture* Troop::shadow_ = nullptr;
 Texture* Troop::lostSprite_ = nullptr;
 
 void Troop::init() {
-    if (!renderer)
-        std::runtime_error("GameElement not initialized");
+    if (!renderer_)
+        std::runtime_error("Displayer not initialized");
 
     if (shadow_) return;
-    shadow_ = (new Texture(renderer, "../assets/img/shadow.png"))->convertAlpha();
-    lostSprite_ = (new Texture(renderer, "../assets/img/lost.png"))->convertAlpha();
+    shadow_ = (new Texture(renderer_, "../assets/img/shadow.png"))->convertAlpha();
+    lostSprite_ = (new Texture(renderer_, "../assets/img/lost.png"))->convertAlpha();
 }
 
 

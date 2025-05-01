@@ -9,8 +9,7 @@
 
 class HexagonDisplayer: public GenericDisplayer {
 public:
-    HexagonDisplayer(SDL_Renderer* renderer,
-                   double hexagonRadius,
+    HexagonDisplayer(double hexagonRadius,
                    Texture* hexagonTexture,
                    Texture* linkTexture,
                    Texture* linkBottomLeftTexture,
@@ -31,7 +30,6 @@ public:
 private:
     double radius_;
     double innerRadius_;
-    SDL_Renderer* renderer_;
     Texture* hexagon_;
     Texture* link_;
     Texture* linkBottomLeft_;

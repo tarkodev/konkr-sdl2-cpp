@@ -1,13 +1,6 @@
 // Overlay.cpp
 #include "Overlay.hpp"
 
-
-SDL_Renderer* Overlay::renderer_ = nullptr;
-
-void Overlay::init(SDL_Renderer *renderer) {
-    renderer_ = renderer;
-}
-
 Overlay::Overlay() = default;
 
 Overlay::~Overlay() {

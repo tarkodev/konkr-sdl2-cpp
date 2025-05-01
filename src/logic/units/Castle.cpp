@@ -5,11 +5,11 @@ Texture* Castle::sprite_ = nullptr;
 
 void Castle::init()
 {
-    if (!renderer)
+    if (!renderer_)
         std::runtime_error("GameElement not initialized");
         
     if (sprite_) return;
-    sprite_ = (new Texture(renderer, "../assets/img/castle.png"))->convertAlpha();
+    sprite_ = (new Texture(renderer_, "../assets/img/castle.png"))->convertAlpha();
 }
 
 

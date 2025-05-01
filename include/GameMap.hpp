@@ -13,6 +13,8 @@
 #include "logic/Troop.hpp"
 #include "Displayer.hpp"
 #include "BlitTarget.hpp"
+#include "Font.hpp"
+#include "CapitalDisplayer.hpp"
 
 #include <memory>
 #include <utility>
@@ -29,6 +31,8 @@
  */
 class GameMap : public HexagonGrid<Cell*>, public Displayer {
 public:
+    static void init();
+    
     GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize);
     GameMap(const Point& pos, const Size size, const std::string mapFile);
 
@@ -52,14 +56,12 @@ public:
 
     void nextPlayer();
 
-    static void init(SDL_Renderer* renderer);
-
 private:
-    static SDL_Renderer* renderer_;
     static std::mt19937 gen_;
     static Texture* selectSprite_; //!temp
     static SDL_Cursor* handCursor_;
     static SDL_Cursor* arrowCursor_;
+    static std::unique_ptr<Font> capitalFont_;
 
     GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize, const std::string mapFile);
     void loadMap(const std::string& mapFile);
@@ -80,7 +82,7 @@ private:
 
     double ratio_ = 0;
 
-    std::optional<PlayableGround*> selectedCell_;
+    std::optional<PlayableGround*> selectedCell_; //! devrait être un std::optional<PlayableGround>
     bool hasSelection_ = false;
 
     std::vector<Player *> players_;
@@ -92,7 +94,8 @@ private:
 
     Size size_;
     Size calcSize_;
-    Texture* islandsCalc_ = nullptr;
+    std::optional<CapitalDisplayer> capitalDisplayer_;
+    Texture* islandsCalc_ = nullptr; //! tout passer en unique_ptr
     Texture* platesCalc_ = nullptr;
     Texture* selectablesCalc_ = nullptr;
     Texture* fencesCalc_ = nullptr;

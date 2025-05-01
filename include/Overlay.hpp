@@ -13,8 +13,6 @@
  */
 class Overlay: public Displayer {
 public:
-    static void init(SDL_Renderer *renderer);
-
     Overlay();
     ~Overlay();
 
@@ -28,8 +26,6 @@ public:
     const Size getSize() const override { return Size{100, 100}; }; //! Changer quand MenuBase aura une size_
 
 private:
-    static SDL_Renderer* renderer_; //! Voir s'il est nécessaire
-
     std::vector<Button*> buttons_;
 };
 

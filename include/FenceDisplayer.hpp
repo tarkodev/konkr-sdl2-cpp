@@ -9,7 +9,7 @@
 
 class FenceDisplayer: public GenericDisplayer {
 public:
-    FenceDisplayer(SDL_Renderer* renderer, double hexagonRadius, 
+    FenceDisplayer(double hexagonRadius, 
         Texture* fenceTop, Texture* fenceTopLeft, Texture* fenceTopRight, 
         Texture* fenceBottom, Texture* fenceBottomLeft, Texture* fenceBottomRight,
         Texture* fenceLinkTop, Texture* fenceLinkTopLeft, Texture* fenceLinkTopRight, 
@@ -23,12 +23,9 @@ public:
     void display(const BlitTarget* target, const Point& pos) override;
     void display(const BlitTarget* target, const Point& pos, const std::vector<bool>& neighbors);
 
-    FenceDisplayer copy();
-
 private:
     double radius_;
     double innerRadius_;
-    SDL_Renderer* renderer_;
     Texture* top_;
     Texture* topLeft_;
     Texture* topRight_;

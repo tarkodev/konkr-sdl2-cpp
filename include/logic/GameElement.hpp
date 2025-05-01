@@ -12,9 +12,6 @@ class Player;
  */
 class GameElement : public Displayer {
 public:
-    /** Charge le sprite commun à la classe (à appeler une seule fois). */
-    static void init(SDL_Renderer* renderer);
-
     virtual ~GameElement() = default;
 
     /* --- Accesseurs génériques --- */
@@ -38,9 +35,6 @@ protected:
 
     Player* owner_;
     bool lost_ = false;
-
-    /* --- Ressources graphiques partagées --- */
-    static SDL_Renderer* renderer;
 };
 
 #endif

@@ -52,8 +52,8 @@ private:
 
     Player* oldOwner_ = nullptr;
     Player* owner_ = nullptr;
-    HexagonDisplayer plate_ = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
-    HexagonDisplayer lostPlate_ = HexagonDisplayer{nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr};
+    HexagonDisplayer plate_ = HexagonDisplayer{-1, nullptr, nullptr, nullptr, nullptr, nullptr};
+    HexagonDisplayer lostPlate_ = HexagonDisplayer{-1, nullptr, nullptr, nullptr, nullptr, nullptr};
     GameElement* element = nullptr;
     bool hasPlate_ = false;
     bool selectable_ = false;

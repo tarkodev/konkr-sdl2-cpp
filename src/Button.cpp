@@ -2,12 +2,6 @@
 #include "Button.hpp"
 #include <SDL.h>
 
-SDL_Renderer* Button::renderer_ = nullptr;
-
-void Button::init(SDL_Renderer *renderer) {
-    renderer_ = renderer;
-}
-
 Button::Button(Texture* normal,
                Texture* hover,
                Texture* pressed,

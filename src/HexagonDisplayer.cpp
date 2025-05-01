@@ -2,9 +2,8 @@
 #include "HexagonUtils.hpp"
 #include "HexagonDisplayer.hpp"
 
-HexagonDisplayer::HexagonDisplayer(SDL_Renderer* renderer, double hexagonRadius, Texture* hexagonTexture, Texture* linkTexture, Texture* linkBottomLeftTexture, Texture* linkBottomTexture, Texture* linkBottomRightTexture)
-    : renderer_(renderer),
-      radius_(hexagonRadius),
+HexagonDisplayer::HexagonDisplayer(double hexagonRadius, Texture* hexagonTexture, Texture* linkTexture, Texture* linkBottomLeftTexture, Texture* linkBottomTexture, Texture* linkBottomRightTexture)
+    : radius_(hexagonRadius),
       innerRadius_(HexagonUtils::radiusToInner(hexagonRadius)),
       hexagon_(hexagonTexture),
       link_(linkTexture),
@@ -53,7 +52,7 @@ void HexagonDisplayer::display(const BlitTarget* target) {
 }
 
 HexagonDisplayer HexagonDisplayer::copy() {
-    return HexagonDisplayer{renderer_, radius_, hexagon_->copy(), link_->copy(), linkBottomLeft_->copy(), linkBottom_->copy(), linkBottomRight_->copy()};
+    return HexagonDisplayer{radius_, hexagon_->copy(), link_->copy(), linkBottomLeft_->copy(), linkBottom_->copy(), linkBottomRight_->copy()};
 }
 
 void HexagonDisplayer::colorize(const SDL_Color& color) {

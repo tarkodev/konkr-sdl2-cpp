@@ -19,8 +19,6 @@ class Button: public Displayer {
 public:
     using Callback = std::function<void()>;
 
-    static void init(SDL_Renderer *renderer);
-
     /**
      * @param normal    Texture d'affichage normal (définit la taille du bouton)
      * @param hover     Texture au survol (nullptr = pas de changement)
@@ -44,8 +42,6 @@ public:
     const Size getSize() const override { return bounds_.getSize(); };
 
 private:
-    static SDL_Renderer* renderer_;
-
     Texture* texNormal_;
     Texture* texHover_;
     Texture* texPressed_;

@@ -6,12 +6,12 @@ Texture* Town::selectSprite_ = nullptr;
 
 void Town::init()
 {
-    if (!renderer)
+    if (!renderer_)
         std::runtime_error("GameElement not initialized");
 
     if (sprite_) return;
-    sprite_ = (new Texture(renderer, "../assets/img/town.png"))->convertAlpha();
-    selectSprite_ = (new Texture(renderer, "../assets/img/bgtown.png"))->convertAlpha();
+    sprite_ = (new Texture(renderer_, "../assets/img/town.png"))->convertAlpha();
+    selectSprite_ = (new Texture(renderer_, "../assets/img/bgtown.png"))->convertAlpha();
 }
 
 

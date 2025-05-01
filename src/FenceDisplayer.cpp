@@ -2,10 +2,10 @@
 #include "HexagonUtils.hpp"
 
 
-FenceDisplayer::FenceDisplayer(SDL_Renderer* renderer, double hexagonRadius, 
+FenceDisplayer::FenceDisplayer(double hexagonRadius, 
     Texture* fenceTop, Texture* fenceTopLeft, Texture* fenceTopRight, Texture* fenceBottom, Texture* fenceBottomLeft, Texture* fenceBottomRight,
     Texture* fenceLinkTop, Texture* fenceLinkTopLeft, Texture* fenceLinkTopRight, Texture* fenceLinkBottom, Texture* fenceLinkBottomLeft, Texture* fenceLinkBottomRight
-) : renderer_(renderer), radius_(hexagonRadius), innerRadius_(HexagonUtils::radiusToInner(hexagonRadius)),
+) : radius_(hexagonRadius), innerRadius_(HexagonUtils::radiusToInner(hexagonRadius)),
       top_(fenceTop), topLeft_(fenceTopLeft), topRight_(fenceTopRight), 
       bottom_(fenceBottom), bottomLeft_(fenceBottomLeft), bottomRight_(fenceBottomRight), 
       linkTop_(fenceLinkTop), linkTopLeft_(fenceLinkTopLeft), linkTopRight_(fenceLinkTopRight), 
@@ -103,15 +103,4 @@ void FenceDisplayer::display(const BlitTarget* target, const Point& pos) {
 
 void FenceDisplayer::display(const BlitTarget* target) {
     display(target, pos_, {false, false, false, false, false, false});
-}
-
-
-FenceDisplayer FenceDisplayer::copy() {
-    return FenceDisplayer{
-        renderer_, radius_,
-        top_->copy(), topLeft_->copy(), topRight_->copy(),
-        bottom_->copy(), bottomLeft_->copy(), bottomRight_->copy(),
-        linkTop_->copy(), linkTopLeft_->copy(), linkTopRight_->copy(),
-        linkBottom_->copy(), linkBottomLeft_->copy(), linkBottomRight_->copy()
-    };
 }

@@ -11,11 +11,11 @@ static const struct { const char* label; const char* file; } MAPS[] = {
 
 
 //! faire fonction init pour passer le renderer
-MapSelectMenu::MapSelectMenu(SDL_Renderer* r, Game& app) : renderer_(r), app_(app)
+MapSelectMenu::MapSelectMenu(Game& app) : app_(app)
 {
     int y = 120;
     for(auto m : MAPS){
-        Texture* t = new Texture(r, std::string("../assets/map/")+m.label+".png");
+        Texture* t = new Texture(renderer_, std::string("../assets/map/")+m.label+".png");
         auto* b = new Button(t,nullptr,nullptr, Point{200,y});
         if (m.file[0])   // 3 cartes fournies
             b->setCallback([this,m](){

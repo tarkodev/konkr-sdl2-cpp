@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <ranges>
 
-FenceDisplayer PlayableGround::fenceDisplayer_ = FenceDisplayer{ nullptr, -1, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+FenceDisplayer PlayableGround::fenceDisplayer_ = FenceDisplayer{-1, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 std::vector<Texture*> PlayableGround::shieldSprites_ = std::vector<Texture*>();
 Texture* PlayableGround::selectableSprite_ = nullptr;
 
@@ -36,7 +36,7 @@ void PlayableGround::init() {
     Texture* fenceLinkBottomRight = (new Texture(renderer_, "../assets/img/fence_link_bottom_right.png"))->convertAlpha();
 
     // Set displayer of territory
-    fenceDisplayer_ = FenceDisplayer{renderer_, Ground::getRadius(), 
+    fenceDisplayer_ = FenceDisplayer{Ground::getRadius(), 
         fenceTop, fenceTopLeft, fenceTopRight, 
         fenceBottom, fenceBottomLeft, fenceBottomRight,
         fenceLinkTop, fenceLinkTopLeft, fenceLinkTopRight,

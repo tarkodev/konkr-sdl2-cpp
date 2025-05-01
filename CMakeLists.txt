@@ -82,8 +82,10 @@ set(SRC_FILES
     "${CMAKE_SOURCE_DIR}/src/Size.cpp"
     "${CMAKE_SOURCE_DIR}/src/Texture.cpp"
     "${CMAKE_SOURCE_DIR}/src/Font.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Displayer.cpp"
     "${CMAKE_SOURCE_DIR}/src/HexagonDisplayer.cpp"
     "${CMAKE_SOURCE_DIR}/src/FenceDisplayer.cpp"
+    "${CMAKE_SOURCE_DIR}/src/CapitalDisplayer.cpp"
     
     "${CMAKE_SOURCE_DIR}/src/logic/GameElement.cpp"
     "${CMAKE_SOURCE_DIR}/src/logic/Troop.cpp"

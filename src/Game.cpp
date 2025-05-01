@@ -19,6 +19,7 @@
 #include "logic/units/Hero.hpp"
 #include "Button.hpp"
 #include "Font.hpp"
+#include "Displayer.hpp"
 
 #include <memory>
 #include <vector>
@@ -40,12 +41,11 @@ Game::Game()
     maxHexSize_ = windowSize_ * 0.13;
 
     // Init each class to initialize
-    Cell::init(renderer_);
+    Displayer::init(renderer_);
     Ground::init();
     Forest::init();
     PlayableGround::init();
 
-    GameElement::init(renderer_);
     Troop::init();
     Bandit::init();
     Town::init();
@@ -58,7 +58,7 @@ Game::Game()
 
     Player::init(renderer_);
 
-    GameMap::init(renderer_);
+    GameMap::init();
     
 
     openMainMenu();
@@ -240,12 +240,12 @@ void Game::draw() {
 
 void Game::openMapSelect() {
     screen_ = ScreenState::MapSelect;
-    activeMenu_ = std::make_unique<MapSelectMenu>(renderer_, *this);
+    activeMenu_ = std::make_unique<MapSelectMenu>(*this);
 }
 
 void Game::openMainMenu() {
     screen_     = ScreenState::MainMenu;
-    activeMenu_ = std::make_unique<MainMenu>(renderer_, *this);
+    activeMenu_ = std::make_unique<MainMenu>(*this);
 }
 
 void Game::startGameWithMap(const std::string& file) {

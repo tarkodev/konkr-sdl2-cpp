@@ -5,11 +5,11 @@ Texture* Pikeman::sprite_ = nullptr;
 
 void Pikeman::init()
 {
-    if (!renderer)
+    if (!renderer_)
         std::runtime_error("GameElement not initialized");
         
     if (sprite_) return;
-    sprite_ = (new Texture(renderer, "../assets/img/pikeman.png"))->convertAlpha();
+    sprite_ = (new Texture(renderer_, "../assets/img/pikeman.png"))->convertAlpha();
 }
 
 

@@ -5,11 +5,11 @@ Texture* Bandit::sprite_ = nullptr;
 
 void Bandit::init()
 {
-    if (!renderer)
+    if (!renderer_)
         std::runtime_error("GameElement not initialized");
         
     if (sprite_) return;
-    sprite_ = (new Texture(renderer, "../assets/img/bandit.png"))->convertAlpha();
+    sprite_ = (new Texture(renderer_, "../assets/img/bandit.png"))->convertAlpha();
 }
 
 
