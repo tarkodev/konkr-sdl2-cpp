@@ -29,6 +29,8 @@ private:
     std::unique_ptr<Texture> treasuryTex_;
     int treasury_;
     int income_;
+
+    void refreshTexture();
 };
 
 #endif

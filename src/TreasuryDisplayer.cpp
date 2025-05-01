@@ -25,17 +25,21 @@ TreasuryDisplayer::TreasuryDisplayer(
     if (!bg_)
         throw std::runtime_error("TreasuryDisplayer not initialized");
 
-        treasuryTex_ = std::make_unique<Texture>(font_->render(std::to_string(treasury), ColorUtils::BLACK));
+    refreshTexture();
+}
+
+void TreasuryDisplayer::refreshTexture() {
+    treasuryTex_ = std::make_unique<Texture>(font_->render(std::to_string(treasury_) + " + " + std::to_string(income_) + " -> " + std::to_string(treasury_ + income_), income_ < 0 ? ColorUtils::DARK_RED : ColorUtils::BLACK));
 }
 
 void TreasuryDisplayer::setTreasury(int treasury) {
     treasury_ = treasury;
-    treasuryTex_ = std::make_unique<Texture>(font_->render(std::to_string(treasury_) + " + " + std::to_string(income_) + " -> " + std::to_string(treasury_ + income_), ColorUtils::BLACK));
+    refreshTexture();
 }
 
 void TreasuryDisplayer::setIncome(int income) {
     income_ = income;
-    treasuryTex_ = std::make_unique<Texture>(font_->render(std::to_string(treasury_) + " + " + std::to_string(income_) + " -> " + std::to_string(treasury_ + income_), ColorUtils::BLACK));
+    refreshTexture();
 }
 
 
