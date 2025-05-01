@@ -191,13 +191,13 @@ void Game::handleEvents() {
                     map_->nextPlayer();
                 else {
                     if (event.key.keysym.sym == SDLK_LEFT)
-                        mapPos_.addX(10);
+                        mapPos_.addX(30);
                     else if (event.key.keysym.sym == SDLK_RIGHT)
-                        mapPos_.addX(-10);
+                        mapPos_.addX(-30);
                     else if (event.key.keysym.sym == SDLK_UP)
-                        mapPos_.addY(10);
+                        mapPos_.addY(30);
                     else if (event.key.keysym.sym == SDLK_DOWN)
-                        mapPos_.addY(-10);
+                        mapPos_.addY(-30);
 
                     updateMapPos();
                 }

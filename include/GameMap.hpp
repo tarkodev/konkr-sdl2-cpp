@@ -49,7 +49,7 @@ public:
     void refreshElements();
     void refresh();
 
-    bool hasTroopSelected() {return selectedTroopCell_ != nullptr;};
+    bool hasTroopSelected() {return selectedTroop_ != nullptr;};
 
     void handleEvent(SDL_Event &event);
     void display(const BlitTarget* target) override;
@@ -95,6 +95,7 @@ private:
     std::unordered_set<Troop *> movedTroops_;
     Troop* selectedTroop_ = nullptr;
     PlayableGround* selectedTroopCell_ = nullptr;
+    PlayableGround* selectedNewTroopCell_ = nullptr;
     int selectedPlayerNum_ = 0;
 
     Size size_;

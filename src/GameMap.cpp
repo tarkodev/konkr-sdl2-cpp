@@ -697,7 +697,7 @@ void GameMap::moveTroop(PlayableGround* from, PlayableGround* to) {
         to->link(fromOwner);
         updateIncomes(fromOwner);
         if (toOwner) updateIncomes(toOwner);
-    } 
+    }
     
     // Same Owner
     else {
@@ -805,22 +805,50 @@ void GameMap::handleEvent(SDL_Event &event) {
     //! Voir si faire fonction pour chaque event
     switch (event.type) {
         case SDL_MOUSEBUTTONDOWN: {
+            Point mousePos{event.motion.x, event.motion.y};
+            selectedNewTroopCell_ = nullptr;
             selectedTroopCell_ = nullptr;
             selectedTroop_ = nullptr;
-            if (!selectedCell_.has_value() || !isSelectableTroop(*selectedCell_))
+            if (!selectedCell_.has_value() || !dynamic_cast<PlayableGround*>(*selectedCell_))
                 break;
             
-            // Select element
-            selectedTroopCell_ = *selectedCell_;
-            selectedTroop_ = dynamic_cast<Troop*>(selectedTroopCell_->getElement());
+            if (isSelectableTroop(*selectedCell_)) {
+                // Select element
+                selectedTroopCell_ = *selectedCell_;
+                selectedTroop_ = dynamic_cast<Troop*>(selectedTroopCell_->getElement());
+                selectedTroop_->setPos(mousePos);
 
-            selectedTroopCell_->updateSelectable(selectedTroop_->getStrength());
-            selectedTroopCell_->setElement(nullptr);
-            
-            refreshElements();
-            refreshSelectables();
+                selectedTroopCell_->updateSelectable(selectedTroop_->getStrength());
+                selectedTroopCell_->setElement(nullptr);
+                
+                refreshElements();
+                refreshSelectables();
+            } else {
+                auto* town = dynamic_cast<Town*>((*selectedCell_)->getElement());
+                if (town && (*selectedCell_)->getOwner() == currentPlayer_) {
+                    std::vector<Town *> towns = (*selectedCell_)->getTowns();
 
-            // No break
+                    int treasury = 0;
+                    for (auto* t : towns)
+                        treasury += t->getTreasury();
+                    
+                    Villager* v = new Villager((*selectedCell_)->getPos());
+                    if (treasury >= v->getCost()) {
+                        selectedNewTroopCell_ = new PlayableGround(Point{0, 0});
+                        selectedNewTroopCell_->setOwner(currentPlayer_);
+
+                        selectedTroop_ = v;
+                        selectedTroop_->setPos(mousePos);
+                        (*selectedCell_)->updateSelectable(v->getStrength());
+
+                        refreshElements();
+                        refreshSelectables();
+                    } else {
+                        delete v;
+                    }
+                }
+            }
+            break;
         }
 
         case SDL_MOUSEMOTION: {
@@ -828,9 +856,8 @@ void GameMap::handleEvent(SDL_Event &event) {
             selectCell(mousePos - pos_);
             townToShowTreasury_ = nullptr;
 
-            if (selectedTroop_) {
+            if (selectedTroop_)
                 selectedTroop_->setPos(mousePos);
-            }
             else {
                 updateCursor();
                 if (selectedCell_.has_value() && (*selectedCell_)) {
@@ -845,19 +872,61 @@ void GameMap::handleEvent(SDL_Event &event) {
         }
 
         case SDL_MOUSEBUTTONUP: {
-            if (selectedTroopCell_ && selectedTroop_) {
-                selectedTroopCell_->setElement(selectedTroop_);
+            if (selectedTroop_) {
+                // Move Troop
+                if (selectedTroopCell_) {
+                    selectedTroopCell_->setElement(selectedTroop_);
 
-                // Move troop
-                if (selectedCell_.has_value() && (*selectedCell_))
-                    moveTroop(selectedTroopCell_, *selectedCell_);
+                    // Move troop
+                    if (selectedCell_.has_value() && (*selectedCell_))
+                        moveTroop(selectedTroopCell_, *selectedCell_);
 
-                // Remove possibilities
-                selectedTroopCell_->updateSelectable(0);
+                    // Remove possibilities
+                    selectedTroopCell_->updateSelectable(0);
+                }
+
+                // Buy Troop
+                else if (selectedNewTroopCell_) {
+                    if (selectedCell_.has_value() && (*selectedCell_)) {
+                        if (auto pg = dynamic_cast<PlayableGround *>(*selectedCell_)) {
+                            selectedNewTroopCell_->setElement(selectedTroop_);
+                            int cost = selectedTroop_->getCost();
+
+                            // Move troop
+                            moveTroop(selectedNewTroopCell_, *selectedCell_);
+
+                            if (!selectedNewTroopCell_->getElement()) {
+                                for (auto* t : (*selectedCell_)->getTowns()) {
+                                    int treasury = t->getTreasury();
+                                    if (treasury > cost) {
+                                        t->setTreasury(treasury - cost);
+                                        break;
+                                    } else {
+                                        cost -= treasury;
+                                        t->setTreasury(0);
+                                    }
+                                }
+                            } else {
+                                delete selectedTroop_;
+                            }
+
+                            // Remove possibilities
+                            (*selectedCell_)->updateSelectable(0);
+                            delete selectedNewTroopCell_;
+                        } else {
+                            delete selectedTroop_;
+                        }
+                    } else {
+                        delete selectedTroop_;
+                    }
+                }
+
+                selectedNewTroopCell_ = nullptr;
                 selectedTroopCell_ = nullptr;
                 selectedTroop_ = nullptr;
                 refresh();
             }
+
             updateCursor();
             break;
         }
