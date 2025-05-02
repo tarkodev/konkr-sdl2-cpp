@@ -13,9 +13,9 @@ public:
     explicit Town(const Point& pos);
 
     /* Displayer */
-    void display(const BlitTarget* target) override;
+    void display(const std::shared_ptr<BlitTarget>& target) override;
 
-    void displayTreasury(const BlitTarget* target);
+    void displayTreasury(const std::shared_ptr<BlitTarget>& target);
 
     /* --- Accesseurs génériques --- */
     int getStrength() const override;
@@ -38,10 +38,10 @@ protected:
     static constexpr int UPKEEP   = 0;
 
 private:
-    static Texture* sprite_;
-    static Texture* selectSprite_;
+    static std::shared_ptr<Texture> sprite_;
+    static std::shared_ptr<Texture> selectSprite_;
 
-    std::unique_ptr<TreasuryDisplayer> treasuryDisplayer_;
+    TreasuryDisplayer treasuryDisplayer_;
     bool selected_ = false;
     int treasury_ = 0;
     int income_ = 0;

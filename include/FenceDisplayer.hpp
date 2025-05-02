@@ -10,33 +10,33 @@
 class FenceDisplayer: public GenericDisplayer {
 public:
     FenceDisplayer(double hexagonRadius, 
-        Texture* fenceTop, Texture* fenceTopLeft, Texture* fenceTopRight, 
-        Texture* fenceBottom, Texture* fenceBottomLeft, Texture* fenceBottomRight,
-        Texture* fenceLinkTop, Texture* fenceLinkTopLeft, Texture* fenceLinkTopRight, 
-        Texture* fenceLinkBottom, Texture* fenceLinkBottomLeft, Texture* fenceLinkBottomRight
+        const std::shared_ptr<Texture>& fenceTop, const std::shared_ptr<Texture>& fenceTopLeft, const std::shared_ptr<Texture>& fenceTopRight, 
+        const std::shared_ptr<Texture>& fenceBottom, const std::shared_ptr<Texture>& fenceBottomLeft, const std::shared_ptr<Texture>& fenceBottomRight,
+        const std::shared_ptr<Texture>& fenceLinkTop, const std::shared_ptr<Texture>& fenceLinkTopLeft, const std::shared_ptr<Texture>& fenceLinkTopRight, 
+        const std::shared_ptr<Texture>& fenceLinkBottom, const std::shared_ptr<Texture>& fenceLinkBottomLeft, const std::shared_ptr<Texture>& fenceLinkBottomRight
     );
 
     ~FenceDisplayer();
 
-    void display(const BlitTarget* target) override;
-    void display(const BlitTarget* target, const Point& pos) override;
-    void display(const BlitTarget* target, const Point& pos, const std::vector<bool>& neighbors);
+    void display(const std::shared_ptr<BlitTarget>& target) override;
+    void display(const std::shared_ptr<BlitTarget>& target, const Point& pos) override;
+    void display(const std::shared_ptr<BlitTarget>& target, const Point& pos, const std::vector<bool>& neighbors);
 
 private:
     double radius_;
     double innerRadius_;
-    Texture* top_;
-    Texture* topLeft_;
-    Texture* topRight_;
-    Texture* bottom_;
-    Texture* bottomLeft_;
-    Texture* bottomRight_;
-    Texture* linkTop_;
-    Texture* linkTopLeft_;
-    Texture* linkTopRight_;
-    Texture* linkBottom_;
-    Texture* linkBottomLeft_;
-    Texture* linkBottomRight_;
+    std::shared_ptr<Texture> top_;
+    std::shared_ptr<Texture> topLeft_;
+    std::shared_ptr<Texture> topRight_;
+    std::shared_ptr<Texture> bottom_;
+    std::shared_ptr<Texture> bottomLeft_;
+    std::shared_ptr<Texture> bottomRight_;
+    std::shared_ptr<Texture> linkTop_;
+    std::shared_ptr<Texture> linkTopLeft_;
+    std::shared_ptr<Texture> linkTopRight_;
+    std::shared_ptr<Texture> linkBottom_;
+    std::shared_ptr<Texture> linkBottomLeft_;
+    std::shared_ptr<Texture> linkBottomRight_;
 };
 
 #endif

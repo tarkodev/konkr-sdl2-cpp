@@ -23,8 +23,8 @@ protected:
     void draw() override;
 
 private:
-    std::unique_ptr<Texture> bg_;
-    std::unique_ptr<Texture> logo_;
+    std::shared_ptr<Texture> bg_;
+    std::shared_ptr<Texture> logo_;
 
     std::unique_ptr<Button> expeditionBtn_;
     std::unique_ptr<Button> howToPlayBtn_;

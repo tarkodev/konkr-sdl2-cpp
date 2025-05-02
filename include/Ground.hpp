@@ -19,7 +19,7 @@ public:
     static const double getInnerRadius();
 
     const std::string getType() override;
-    void display(const BlitTarget* target) override;
+    void display(const std::shared_ptr<BlitTarget>& target) override;
 
 protected:
     Ground(const Point& pos);

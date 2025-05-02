@@ -51,7 +51,7 @@ public:
     bool hasTroopSelected() {return selectedTroop_ != nullptr;};
 
     void handleEvent(SDL_Event &event);
-    void display(const BlitTarget* target) override;
+    void display(const std::shared_ptr<BlitTarget>& target) override;
 
     void nextPlayer();
 
@@ -60,7 +60,7 @@ public:
 
 private:
     static std::mt19937 gen_;
-    static Texture* selectSprite_; //!temp
+    static std::shared_ptr<Texture> selectSprite_; //!temp
     static SDL_Cursor* handCursor_;
     static SDL_Cursor* arrowCursor_;
 
@@ -101,12 +101,12 @@ private:
     int selectedPlayerNum_ = 0;
 
     Size calcSize_;
-    Texture* islandsCalc_ = nullptr; //! tout passer en unique_ptr
-    Texture* platesCalc_ = nullptr;
-    Texture* selectablesCalc_ = nullptr;
-    Texture* fencesCalc_ = nullptr;
-    Texture* elementsCalc_ = nullptr;
-    Texture* calc_ = nullptr;
+    std::shared_ptr<Texture> islandsCalc_ = nullptr;
+    std::shared_ptr<Texture> platesCalc_ = nullptr;
+    std::shared_ptr<Texture> selectablesCalc_ = nullptr;
+    std::shared_ptr<Texture> fencesCalc_ = nullptr;
+    std::shared_ptr<Texture> elementsCalc_ = nullptr;
+    std::shared_ptr<Texture> calc_ = nullptr;
 };
 
 #endif

@@ -12,7 +12,7 @@ public:
     explicit Pikeman(const Point& pos);
 
     /* Displayer */
-    void display(const BlitTarget* target) override;
+    void display(const std::shared_ptr<BlitTarget>& target) override;
 
     /* --- Accesseurs génériques --- */
     int getStrength() const override { return STRENGTH; };
@@ -25,7 +25,7 @@ protected:
     static constexpr int UPKEEP   = 6;
 
 private:
-    static Texture* sprite_;
+    static std::shared_ptr<Texture> sprite_;
 };
 
 #endif

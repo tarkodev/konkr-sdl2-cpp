@@ -1,7 +1,7 @@
 #include "logic/units/Bandit.hpp"
 #include "Texture.hpp"
 
-Texture* Bandit::sprite_ = nullptr;
+std::shared_ptr<Texture> Bandit::sprite_ = nullptr;
 
 void Bandit::init()
 {
@@ -9,13 +9,13 @@ void Bandit::init()
         throw std::runtime_error("Displayer not initialized");
         
     if (sprite_) return;
-    sprite_ = (new Texture(renderer_, "../assets/img/bandit.png"))->convertAlpha();
+    sprite_ = std::make_shared<Texture>(renderer_, "../assets/img/bandit.png");
 }
 
 
 Bandit::Bandit(const Point& pos): Troop(pos, sprite_->getSize()) {}
 
-void Bandit::display(const BlitTarget* target)
+void Bandit::display(const std::shared_ptr<BlitTarget>& target)
 {
     Troop::displaySprite(target, sprite_);
 }

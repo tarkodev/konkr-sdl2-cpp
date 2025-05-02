@@ -1,8 +1,8 @@
 #include "logic/units/Town.hpp"
 #include "Texture.hpp"
 
-Texture* Town::sprite_ = nullptr;
-Texture* Town::selectSprite_ = nullptr;
+std::shared_ptr<Texture> Town::sprite_ = nullptr;
+std::shared_ptr<Texture> Town::selectSprite_ = nullptr;
 
 void Town::init()
 {
@@ -10,18 +10,14 @@ void Town::init()
         throw std::runtime_error("Displayer not initialized");
 
     if (sprite_) return;
-    sprite_ = (new Texture(renderer_, "../assets/img/town.png"))->convertAlpha();
-    selectSprite_ = (new Texture(renderer_, "../assets/img/bgtown.png"))->convertAlpha();
+    sprite_ = std::make_shared<Texture>(renderer_, "../assets/img/town.png");
+    selectSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/bgtown.png");
 }
 
 
-Town::Town(const Point& pos): GameElement(pos, sprite_->getSize()) {
-    Point treasuryPos{
-        pos_.getX(),
-        pos_.getY() + sprite_->getHeight() / 2
-    };
-    treasuryDisplayer_ = std::make_unique<TreasuryDisplayer>(treasuryPos, 0, 0);
-}
+Town::Town(const Point& pos)
+    : GameElement(pos, sprite_->getSize()), treasuryDisplayer_(Point{pos.getX(), pos.getY() + sprite_->getHeight() / 2})
+{}
 
 
 int Town::getStrength() const {
@@ -43,12 +39,12 @@ int Town::getTreasury() const {
 
 void Town::setTreasury(int treasury) {
     treasury_ = treasury;
-    treasuryDisplayer_->setTreasury(treasury_);
+    treasuryDisplayer_.setTreasury(treasury_);
 }
 
 void Town::updateTreasury() {
     treasury_ += income_;
-    treasuryDisplayer_->setTreasury(treasury_);
+    treasuryDisplayer_.setTreasury(treasury_);
 };
 
 int Town::getIncome() const {
@@ -57,19 +53,19 @@ int Town::getIncome() const {
 
 void Town::setIncome(int income) {
     income_ = income;
-    treasuryDisplayer_->setIncome(income_);
+    treasuryDisplayer_.setIncome(income_);
 }
 
 void Town::addIncome(int coins) {
     income_ += coins;
-    treasuryDisplayer_->setIncome(income_);
+    treasuryDisplayer_.setIncome(income_);
 }
 
 void Town::setSelected(bool selected) {
     selected_ = selected;
 }
 
-void Town::display(const BlitTarget* target)
+void Town::display(const std::shared_ptr<BlitTarget>& target)
 {
     if (!sprite_) return;
 
@@ -79,7 +75,7 @@ void Town::display(const BlitTarget* target)
     target->blit(sprite_, Point{pos_.getX()-sprite_->getWidth()/2, pos_.getY()-sprite_->getHeight()/2});
 }
 
-void Town::displayTreasury(const BlitTarget* target)
+void Town::displayTreasury(const std::shared_ptr<BlitTarget>& target)
 {
-    treasuryDisplayer_->display(target);
+    treasuryDisplayer_.display(target);
 }

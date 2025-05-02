@@ -24,13 +24,13 @@ public:
     void setOwner(Player *owner);
 
     const std::string getType() override;
-    void display(const BlitTarget* target) override;
+    void display(const std::shared_ptr<BlitTarget>& target) override;
 
     bool hasFences() const;
-    void displayFences(const Texture* target);
-    void displayElement(const Texture* target);
-    void displayShield(const Texture* target);
-    void displaySelectable(const Texture* target);
+    void displayFences(const std::shared_ptr<Texture>& target);
+    void displayElement(const std::shared_ptr<Texture>& target);
+    void displayShield(const std::shared_ptr<Texture>& target);
+    void displaySelectable(const std::shared_ptr<Texture>& target);
 
     bool isLinked();
     void updateLinked();
@@ -50,8 +50,8 @@ public:
 
 private:
     static FenceDisplayer fenceDisplayer_;
-    static std::vector<Texture*> shieldSprites_;
-    static Texture* selectableSprite_;
+    static std::vector<std::shared_ptr<Texture>> shieldSprites_;
+    static std::shared_ptr<Texture> selectableSprite_;
 
     Player* oldOwner_ = nullptr;
     Player* owner_ = nullptr;

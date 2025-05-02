@@ -4,7 +4,8 @@
 
 #include "SDL.h"
 #include <vector>
-#include <SDL.h>
+#include <memory>
+#include "Point.hpp"
 #include "Displayer.hpp"
 #include "Button.hpp"
 
@@ -13,19 +14,29 @@
  */
 class Overlay: public Displayer {
 public:
-    Overlay();
-    ~Overlay();
+    Overlay(const Point& pos);
 
-    /// Ajoute un bouton (Overlay prend la propriété et le delete en destructeur)
-    void addButton(Button* button);
+    ~Overlay() = default;
 
-    /// Doit être appelé depuis votre boucle SDL_PollEvent
     void handleEvent(const SDL_Event& e);
 
-    void display(const BlitTarget* target) override;
+    void display(const std::shared_ptr<BlitTarget>& target) override;
+
+    bool backRequested() { return backRequested_; };
+    bool nextRequested() { return nextRequested_; };
+    bool undoRequested() { return undoRequested_; };
+    bool buyTroopRequested() { return buyTroopRequested_; };
 
 private:
-    std::vector<Button*> buttons_;
+    std::shared_ptr<Texture> bg_;
+    std::vector<Button> buttons_;
+
+    Point bgPos_;
+
+    bool backRequested_ = false;
+    bool nextRequested_ = false;
+    bool undoRequested_ = false;
+    bool buyTroopRequested_ = false;
 };
 
 #endif // OVERLAY_HPP

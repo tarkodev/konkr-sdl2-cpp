@@ -1,27 +1,28 @@
 #ifndef HEXAGONDISPLAYER_HPP
 #define HEXAGONDISPLAYER_HPP
 
-#include <vector>
 #include "SDL.h"
 #include "BlitTarget.hpp"
 #include "Texture.hpp"
 #include "GenericDisplayer.hpp"
+#include <vector>
+#include <memory>
 
 class HexagonDisplayer: public GenericDisplayer {
 public:
     HexagonDisplayer(double hexagonRadius,
-                   Texture* hexagonTexture,
-                   Texture* linkTexture,
-                   Texture* linkBottomLeftTexture,
-                   Texture* linkBottomTexture,
-                   Texture* linkBottomRightTexture);
+                     const std::shared_ptr<Texture> hexagonTexture,
+                     const std::shared_ptr<Texture> linkTexture,
+                     const std::shared_ptr<Texture> linkBottomLeftTexture,
+                     const std::shared_ptr<Texture> linkBottomTexture,
+                     const std::shared_ptr<Texture> linkBottomRightTexture);
 
     ~HexagonDisplayer();
 
-    void display(const BlitTarget* target) override;
-    void display(const BlitTarget* target, const Point& pos) override;
+    void display(const std::shared_ptr<BlitTarget>& target) override;
+    void display(const std::shared_ptr<BlitTarget>& target, const Point& pos) override;
 
-    void display(const BlitTarget* target, const Point& pos, const std::vector<bool>& neighbors);
+    void display(const std::shared_ptr<BlitTarget>& target, const Point& pos, const std::vector<bool>& neighbors);
 
     HexagonDisplayer copy();
     void colorize(const SDL_Color& color);
@@ -29,11 +30,11 @@ public:
 private:
     double radius_;
     double innerRadius_;
-    Texture* hexagon_;
-    Texture* link_;
-    Texture* linkBottomLeft_;
-    Texture* linkBottom_;
-    Texture* linkBottomRight_;
+    std::shared_ptr<Texture> hexagon_;
+    std::shared_ptr<Texture> link_;
+    std::shared_ptr<Texture> linkBottomLeft_;
+    std::shared_ptr<Texture> linkBottom_;
+    std::shared_ptr<Texture> linkBottomRight_;
 };
 
 #endif

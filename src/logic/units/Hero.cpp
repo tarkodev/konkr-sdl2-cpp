@@ -1,7 +1,7 @@
 #include "logic/units/Hero.hpp"
 #include "Texture.hpp"
 
-Texture* Hero::sprite_ = nullptr;
+std::shared_ptr<Texture> Hero::sprite_ = nullptr;
 
 void Hero::init()
 {
@@ -9,13 +9,13 @@ void Hero::init()
         throw std::runtime_error("Displayer not initialized");
         
     if (sprite_) return;
-    sprite_ = (new Texture(renderer_, "../assets/img/hero.png"))->convertAlpha();
+    sprite_ = std::make_shared<Texture>(renderer_, "../assets/img/hero.png");
 }
 
 
 Hero::Hero(const Point& pos): Troop(pos, sprite_->getSize()) {}
 
-void Hero::display(const BlitTarget* target)
+void Hero::display(const std::shared_ptr<BlitTarget>& target)
 {
     Troop::displaySprite(target, sprite_);
 }

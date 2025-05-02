@@ -1,21 +1,22 @@
 #include "logic/Troop.hpp"
+#include <memory>
 
-Texture* Troop::shadow_ = nullptr;
-Texture* Troop::lostSprite_ = nullptr;
+std::shared_ptr<Texture> Troop::shadow_ = nullptr;
+std::shared_ptr<Texture> Troop::lostSprite_ = nullptr;
 
 void Troop::init() {
     if (!renderer_)
         throw std::runtime_error("Displayer not initialized");
 
     if (shadow_) return;
-    shadow_ = (new Texture(renderer_, "../assets/img/shadow.png"))->convertAlpha();
-    lostSprite_ = (new Texture(renderer_, "../assets/img/lost.png"))->convertAlpha();
+    shadow_ = std::make_shared<Texture>(renderer_, "../assets/img/shadow.png");
+    lostSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/lost.png");
 }
 
 
 Troop::Troop(const Point& pos, const Size& size) : GameElement(pos, size) {}
 
-void Troop::displaySprite(const BlitTarget* target, const Texture* sprite)
+void Troop::displaySprite(const std::shared_ptr<BlitTarget>& target, const std::shared_ptr<Texture>& sprite)
 {
     if (!sprite || !shadow_ || !lostSprite_) return;
     

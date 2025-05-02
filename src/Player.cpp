@@ -12,11 +12,11 @@ void Player::init(const std::shared_ptr<SDL_Renderer>& renderer) {
     renderer_ = renderer;
 
     // Load plate
-    Texture* plate = (new Texture(renderer_, "../assets/img/plate.png"))->convertAlpha();
-    Texture* plateLink = (new Texture(renderer_, "../assets/img/plate_link.png"))->convertAlpha();
-    Texture* plateLinkBottomLeft = (new Texture(renderer_, "../assets/img/plate_link_bottom_left.png"))->convertAlpha();
-    Texture* plateLinkBottom = (new Texture(renderer_, "../assets/img/plate_link_bottom.png"))->convertAlpha();
-    Texture* plateLinkBottomRight = (new Texture(renderer_, "../assets/img/plate_link_bottom_right.png"))->convertAlpha();
+    std::shared_ptr<Texture> plate = std::make_shared<Texture>(renderer_, "../assets/img/plate.png");
+    std::shared_ptr<Texture> plateLink = std::make_shared<Texture>(renderer_, "../assets/img/plate_link.png");
+    std::shared_ptr<Texture> plateLinkBottomLeft = std::make_shared<Texture>(renderer_, "../assets/img/plate_link_bottom_left.png");
+    std::shared_ptr<Texture> plateLinkBottom = std::make_shared<Texture>(renderer_, "../assets/img/plate_link_bottom.png");
+    std::shared_ptr<Texture> plateLinkBottomRight = std::make_shared<Texture>(renderer_, "../assets/img/plate_link_bottom_right.png");
 
     plateDisplayer = HexagonDisplayer{Ground::getRadius(), plate, plateLink, plateLinkBottomLeft, plateLinkBottom, plateLinkBottomRight};
 }

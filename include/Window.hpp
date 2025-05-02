@@ -30,13 +30,13 @@ public:
 
     void fill(const SDL_Color& color) const;
 
-    void blit(const BlitTarget* src) const override;
-    void blit(const BlitTarget* src, const Point& destPos) const override;
-    void blit(const BlitTarget* src, const Size& destSize) const override;
-    void blit(const BlitTarget* src, const Rect& destRect) const override;
-    void blit(const BlitTarget* src, const Rect& srcRect, const Point& destPos) const override;
-    void blit(const BlitTarget* src, const Rect& srcRect, const Size& destSize) const override;
-    void blit(const BlitTarget* src, const Rect& srcRect, const Rect& destRect) const override;
+    void blit(const std::shared_ptr<BlitTarget>& src) const override;
+    void blit(const std::shared_ptr<BlitTarget>& src, const Point& destPos) const override;
+    void blit(const std::shared_ptr<BlitTarget>& src, const Size& destSize) const override;
+    void blit(const std::shared_ptr<BlitTarget>& src, const Rect& destRect) const override;
+    void blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Point& destPos) const override;
+    void blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Size& destSize) const override;
+    void blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Rect& destRect) const override;
 
     void refresh();
     

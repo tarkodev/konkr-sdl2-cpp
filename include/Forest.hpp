@@ -14,12 +14,12 @@ public:
     Forest(const Point& pos);
 
     const std::string getType() override;
-    void display(const BlitTarget* target) override;
+    void display(const std::shared_ptr<BlitTarget>& target) override;
 
     static void init();
 
 protected:
-    static Texture* forest_;
+    static std::shared_ptr<Texture> forest_;
 };
 
 #endif

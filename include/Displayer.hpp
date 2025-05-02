@@ -13,7 +13,7 @@ public:
 
     virtual ~Displayer() = default;
     
-    virtual void display(const BlitTarget* target) = 0; //! display est const ?
+    virtual void display(const std::shared_ptr<BlitTarget>& target) = 0; //! display est const ?
     
     virtual Point getPos() const;
     virtual void setPos(const Point& pos);

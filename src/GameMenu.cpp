@@ -17,7 +17,8 @@ GameMenu::GameMenu(const std::shared_ptr<Window>& window, const std::string& map
     createMap(mapPath);
 
     // Create Overlay
-    overlay_ = std::make_unique<Overlay>();
+    overlay_ = std::make_unique<Overlay>(Point{0, 0});
+    overlay_->setPos(Point{windowSize_.getWidth() / 2, windowSize_.getHeight()} - overlay_->getSize() / 2);
 }
 
 void GameMenu::createMap(const std::string& mapPath) {
@@ -144,8 +145,8 @@ void GameMenu::handleEvents(){
 void GameMenu::draw() {
     window_->fill(ColorUtils::SEABLUE);
     
-    map_->display(window_.get());
-    overlay_->display(window_.get());
+    map_->display(window_);
+    overlay_->display(window_);
 
     window_->refresh();
 }

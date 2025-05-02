@@ -20,7 +20,7 @@ public:
     virtual int getUpkeep()   const = 0;
 
     /* --- Displayer --- */
-    virtual void display(const BlitTarget* target) override = 0;
+    virtual void display(const std::shared_ptr<BlitTarget>& target) override = 0;
 
     virtual bool isLost() const { return lost_; };
     virtual void lost() { lost_ = true; };

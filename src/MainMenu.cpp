@@ -5,12 +5,10 @@
 
 MainMenu::MainMenu(const std::shared_ptr<Window>& window): MenuBase{window} {
     // Background of menu
-    bg_ = std::make_unique<Texture>(window_->getRenderer(), "../assets/img/main_bg.png");
-    bg_->convertAlpha();
+    bg_ = std::make_shared<Texture>(window_->getRenderer(), "../assets/img/main_bg.png");
     
     // Logo
-    logo_ = std::make_unique<Texture>(window_->getRenderer(), "../assets/img/logo.png");
-    logo_->convertAlpha();
+    logo_ = std::make_shared<Texture>(window_->getRenderer(), "../assets/img/logo.png");
 
     // Expedition button
     expeditionBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/expeditions.png");
@@ -54,11 +52,11 @@ void MainMenu::handleEvents(){
 void MainMenu::draw() {
     window_->fill(ColorUtils::SEABLUE);
 
-    window_->blit(bg_.get());
-    window_->blit(logo_.get(), logoPos_);
-    expeditionBtn_->display(window_.get());
-    howToPlayBtn_->display(window_.get());
-    exitBtn_->display(window_.get());
+    window_->blit(bg_);
+    window_->blit(logo_, logoPos_);
+    expeditionBtn_->display(window_);
+    howToPlayBtn_->display(window_);
+    exitBtn_->display(window_);
 
     window_->refresh();
 }

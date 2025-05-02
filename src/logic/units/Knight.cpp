@@ -1,7 +1,7 @@
 #include "logic/units/Knight.hpp"
 #include "Texture.hpp"
 
-Texture* Knight::sprite_ = nullptr;
+std::shared_ptr<Texture> Knight::sprite_ = nullptr;
 
 void Knight::init()
 {
@@ -9,13 +9,13 @@ void Knight::init()
         throw std::runtime_error("Displayer not initialized");
         
     if (sprite_) return;
-    sprite_ = (new Texture(renderer_, "../assets/img/knight.png"))->convertAlpha();
+    sprite_ = std::make_shared<Texture>(renderer_, "../assets/img/knight.png");
 }
 
 
 Knight::Knight(const Point& pos): Troop(pos, sprite_->getSize()) {}
 
-void Knight::display(const BlitTarget* target)
+void Knight::display(const std::shared_ptr<BlitTarget>& target)
 {
     Troop::displaySprite(target, sprite_);
 }

@@ -33,14 +33,14 @@
 #include <cctype>
 
 
-Texture* GameMap::selectSprite_ = nullptr;
+std::shared_ptr<Texture> GameMap::selectSprite_ = nullptr;
 SDL_Cursor* GameMap::handCursor_ = nullptr;
 SDL_Cursor* GameMap::arrowCursor_ = nullptr;
 std::mt19937 GameMap::gen_{};
 
 void GameMap::init() {
     // Load sprites and cursors
-    selectSprite_ = (new Texture(renderer_, "../assets/img/plate.png"))->convertAlpha(); //!temp
+    selectSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/plate.png"); //!temp
     handCursor_ = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
     arrowCursor_ = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
 
@@ -353,70 +353,23 @@ void GameMap::createCalcs() {
     calcSize_ = {static_cast<int>(cx), static_cast<int>(cy)};
     setProportionalSize(size_);
 
-    // Delete islands sprite if already exists
-    if (islandsCalc_) {
-        delete islandsCalc_;
-        islandsCalc_ = nullptr;
-    }
+    // Create calc for islands
+    islandsCalc_ = std::make_shared<Texture>(renderer_, calcSize_);
 
-    // Create sprite for islands
-    islandsCalc_ = new Texture(renderer_, calcSize_);
-    islandsCalc_->convertAlpha();
+    // Create calc for plates
+    platesCalc_ = std::make_shared<Texture>(renderer_, calcSize_);
 
+    // Create calc for selectables
+    selectablesCalc_ = std::make_shared<Texture>(renderer_, calcSize_);
 
-    // Delete cells sprite if already exists
-    if (platesCalc_) {
-        delete platesCalc_;
-        platesCalc_ = nullptr;
-    }
+    // Create calc for fences
+    fencesCalc_ = std::make_shared<Texture>(renderer_, calcSize_);
 
-    // Create sprite for elements
-    platesCalc_ = new Texture(renderer_, calcSize_);
-    platesCalc_->convertAlpha();
+    // Create calc for elements
+    elementsCalc_ = std::make_shared<Texture>(renderer_, calcSize_);
 
-
-    // Delete cells sprite if already exists
-    if (selectablesCalc_) {
-        delete selectablesCalc_;
-        selectablesCalc_ = nullptr;
-    }
-
-    // Create sprite for elements
-    selectablesCalc_ = new Texture(renderer_, calcSize_);
-    selectablesCalc_->convertAlpha();
-
-
-    // Delete elements sprite if already exists
-    if (fencesCalc_) {
-        delete fencesCalc_;
-        fencesCalc_ = nullptr;
-    }
-
-    // Create sprite for elements
-    fencesCalc_ = new Texture(renderer_, calcSize_);
-    fencesCalc_->convertAlpha();
-
-
-    // Delete elements sprite if already exists
-    if (elementsCalc_) {
-        delete elementsCalc_;
-        elementsCalc_ = nullptr;
-    }
-
-    // Create sprite for elements
-    elementsCalc_ = new Texture(renderer_, calcSize_);
-    elementsCalc_->convertAlpha();
-
-
-    // Delete elements sprite if already exists
-    if (calc_) {
-        delete calc_;
-        calc_ = nullptr;
-    }
-
-    // Create sprite for elements
-    calc_ = new Texture(renderer_, calcSize_);
-    calc_->convertAlpha();
+    // Create main calc
+    calc_ = std::make_shared<Texture>(renderer_, calcSize_);
 }
 
 
@@ -929,7 +882,7 @@ void GameMap::handleEvent(SDL_Event &event) {
     }
 }
 
-void GameMap::display(const BlitTarget* target)
+void GameMap::display(const std::shared_ptr<BlitTarget>& target)
 {
     if (!islandsCalc_ || !platesCalc_ || !selectablesCalc_ || !fencesCalc_ || !elementsCalc_)
         refresh();

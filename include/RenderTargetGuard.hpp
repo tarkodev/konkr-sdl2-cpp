@@ -5,12 +5,12 @@
 
 class RenderTargetGuard {
 public:
-    RenderTargetGuard(const std::shared_ptr<SDL_Renderer>& renderer, SDL_Texture* newTarget)
+    RenderTargetGuard(const std::shared_ptr<SDL_Renderer>& renderer, const std::shared_ptr<SDL_Texture> newTarget)
         : renderer_(renderer), oldTarget_(SDL_GetRenderTarget(renderer.get())) {
-        SDL_SetRenderTarget(renderer.get(), newTarget);
+        SDL_SetRenderTarget(renderer.get(), newTarget.get());
     }
     
-    RenderTargetGuard(const std::shared_ptr<SDL_Renderer>& renderer, Texture* newTarget)
+    RenderTargetGuard(const std::shared_ptr<SDL_Renderer>& renderer, const std::shared_ptr<Texture> newTarget)
         : renderer_(renderer), oldTarget_(SDL_GetRenderTarget(renderer.get())) {
         SDL_SetRenderTarget(renderer.get(), newTarget->get());
     }

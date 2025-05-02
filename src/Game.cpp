@@ -53,49 +53,8 @@ Game::Game() {
     Player::init(renderer);
     GameMap::init();
 
+    // Select the current menu
     menu_.reset(new MainMenu(window_));
-
-    //! A déplacer dans Overlay pour le chargement des textures
-    // Après avoir créé vos textures :
-    /*
-    Texture* undoTex  = new Texture(renderer_, "../assets/img/undo.png");
-    Button* undoBtn = new Button(undoTex, nullptr, nullptr, Point{150,100});
-    undoBtn->setCallback([](){
-        std::cout << "Undo button clicked!" << std::endl;
-    });
-
-    Texture* turnTex  = new Texture(renderer_, "../assets/img/turn.png");
-    Button* turnBtn = new Button(turnTex, nullptr, nullptr, Point{150,200});
-    turnBtn->setCallback([](){
-        std::cout << "Turn button clicked!" << std::endl;
-    });
-
-    Texture* nextTex  = new Texture(renderer_, "../assets/img/next.png");
-    Button* nextBtn = new Button(nextTex, nullptr, nullptr, Point{150,300});
-    nextBtn->setCallback([](){
-        std::cout << "Next button clicked!" << std::endl;
-    });
-
-    Texture* skipTex  = new Texture(renderer_, "../assets/img/skip.png");
-    Button* skipBtn = new Button(skipTex, nullptr, nullptr, Point{150,400});
-    skipBtn->setCallback([](){
-        std::cout << "Skip button clicked!" << std::endl;
-    });
-
-    Texture* backTex = new Texture(renderer_, "../assets/img/back.png");
-    Button* backBtn = new Button(backTex, nullptr, nullptr, Point{150, 500});
-    backBtn->setCallback([this]() {
-        this->openMapSelect();
-    });
-    overlay_.addButton(backBtn);
-
-
-    overlay_.addButton(undoBtn);
-    overlay_.addButton(turnBtn);
-    overlay_.addButton(nextBtn);
-    overlay_.addButton(skipBtn);
-    */
-    //! A déplacer dans Overlay pour le chargement des textures
 }
 
 Game::~Game() = default;

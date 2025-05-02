@@ -1,6 +1,7 @@
 #include "Ground.hpp"
 #include "ColorUtils.hpp"
 #include "HexagonUtils.hpp"
+#include <memory>
 
 HexagonDisplayer Ground::islandDisplayer = HexagonDisplayer{-1, nullptr, nullptr, nullptr, nullptr, nullptr};
 double Ground::islandRadius = 0;
@@ -16,11 +17,11 @@ void Ground::init() {
         throw std::runtime_error("Displayer not initialized");
 
     // Load island
-    Texture* island = (new Texture(renderer_, "../assets/img/hexagon.png"))->convertAlpha();
-    Texture* link = (new Texture(renderer_, "../assets/img/hexagon_link.png"))->convertAlpha();
-    Texture* linkBottomLeft = (new Texture(renderer_, "../assets/img/hexagon_link_bottom_left.png"))->convertAlpha();
-    Texture* linkBottom = (new Texture(renderer_, "../assets/img/hexagon_link_bottom.png"))->convertAlpha();
-    Texture* linkBottomRight = (new Texture(renderer_, "../assets/img/hexagon_link_bottom_right.png"))->convertAlpha();
+    std::shared_ptr<Texture> island = std::make_shared<Texture>(renderer_, "../assets/img/hexagon.png");
+    std::shared_ptr<Texture> link = std::make_shared<Texture>(renderer_, "../assets/img/hexagon_link.png");
+    std::shared_ptr<Texture> linkBottomLeft = std::make_shared<Texture>(renderer_, "../assets/img/hexagon_link_bottom_left.png");
+    std::shared_ptr<Texture> linkBottom = std::make_shared<Texture>(renderer_, "../assets/img/hexagon_link_bottom.png");
+    std::shared_ptr<Texture> linkBottomRight = std::make_shared<Texture>(renderer_, "../assets/img/hexagon_link_bottom_right.png");
 
     // Get radius of hexagon of island
     islandInnerRadius = island->getWidth() / 2;
@@ -45,7 +46,7 @@ const double Ground::getInnerRadius() {
 
 Ground::Ground(const Point& pos): Displayer(pos, getIslandSize()) {}
 
-void Ground::display(const BlitTarget* target) {
+void Ground::display(const std::shared_ptr<BlitTarget>& target) {
     std::vector<bool> GroundNeighbors{
         static_cast<bool>(dynamic_cast<Ground*>(neighbors[0])),
         static_cast<bool>(dynamic_cast<Ground*>(neighbors[1])),

@@ -11,8 +11,8 @@
 #include <tuple>
 
 FenceDisplayer PlayableGround::fenceDisplayer_ = FenceDisplayer{-1, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
-std::vector<Texture*> PlayableGround::shieldSprites_ = std::vector<Texture*>();
-Texture* PlayableGround::selectableSprite_ = nullptr;
+std::vector<std::shared_ptr<Texture>> PlayableGround::shieldSprites_ = std::vector<std::shared_ptr<Texture>>();
+std::shared_ptr<Texture> PlayableGround::selectableSprite_ = nullptr;
 
 const std::string PlayableGround::TYPE = "PlayableGround";
 const std::string PlayableGround::getType() {
@@ -24,18 +24,18 @@ void PlayableGround::init() {
         throw std::runtime_error("Displayer not initialized");
 
     // Load fence
-    Texture* fenceTop = (new Texture(renderer_, "../assets/img/fence_top.png"))->convertAlpha();
-    Texture* fenceTopLeft = (new Texture(renderer_, "../assets/img/fence_top_left.png"))->convertAlpha();
-    Texture* fenceTopRight = (new Texture(renderer_, "../assets/img/fence_top_right.png"))->convertAlpha();
-    Texture* fenceBottom = (new Texture(renderer_, "../assets/img/fence_bottom.png"))->convertAlpha();
-    Texture* fenceBottomLeft = (new Texture(renderer_, "../assets/img/fence_bottom_left.png"))->convertAlpha();
-    Texture* fenceBottomRight = (new Texture(renderer_, "../assets/img/fence_bottom_right.png"))->convertAlpha();
-    Texture* fenceLinkTop = (new Texture(renderer_, "../assets/img/fence_link_top.png"))->convertAlpha();
-    Texture* fenceLinkTopLeft = (new Texture(renderer_, "../assets/img/fence_link_top_left.png"))->convertAlpha();
-    Texture* fenceLinkTopRight = (new Texture(renderer_, "../assets/img/fence_link_top_right.png"))->convertAlpha();
-    Texture* fenceLinkBottom = (new Texture(renderer_, "../assets/img/fence_link_bottom.png"))->convertAlpha();
-    Texture* fenceLinkBottomLeft = (new Texture(renderer_, "../assets/img/fence_link_bottom_left.png"))->convertAlpha();
-    Texture* fenceLinkBottomRight = (new Texture(renderer_, "../assets/img/fence_link_bottom_right.png"))->convertAlpha();
+    std::shared_ptr<Texture> fenceTop = std::make_shared<Texture>(renderer_, "../assets/img/fence_top.png");
+    std::shared_ptr<Texture> fenceTopLeft = std::make_shared<Texture>(renderer_, "../assets/img/fence_top_left.png");
+    std::shared_ptr<Texture> fenceTopRight = std::make_shared<Texture>(renderer_, "../assets/img/fence_top_right.png");
+    std::shared_ptr<Texture> fenceBottom = std::make_shared<Texture>(renderer_, "../assets/img/fence_bottom.png");
+    std::shared_ptr<Texture> fenceBottomLeft = std::make_shared<Texture>(renderer_, "../assets/img/fence_bottom_left.png");
+    std::shared_ptr<Texture> fenceBottomRight = std::make_shared<Texture>(renderer_, "../assets/img/fence_bottom_right.png");
+    std::shared_ptr<Texture> fenceLinkTop = std::make_shared<Texture>(renderer_, "../assets/img/fence_link_top.png");
+    std::shared_ptr<Texture> fenceLinkTopLeft = std::make_shared<Texture>(renderer_, "../assets/img/fence_link_top_left.png");
+    std::shared_ptr<Texture> fenceLinkTopRight = std::make_shared<Texture>(renderer_, "../assets/img/fence_link_top_right.png");
+    std::shared_ptr<Texture> fenceLinkBottom = std::make_shared<Texture>(renderer_, "../assets/img/fence_link_bottom.png");
+    std::shared_ptr<Texture> fenceLinkBottomLeft = std::make_shared<Texture>(renderer_, "../assets/img/fence_link_bottom_left.png");
+    std::shared_ptr<Texture> fenceLinkBottomRight = std::make_shared<Texture>(renderer_, "../assets/img/fence_link_bottom_right.png");
 
     // Set displayer of territory
     fenceDisplayer_ = FenceDisplayer{Ground::getRadius(), 
@@ -46,13 +46,13 @@ void PlayableGround::init() {
     };
 
     // Load sprites of shields
-    shieldSprites_.push_back((new Texture(renderer_, "../assets/img/shield1.png"))->convertAlpha());
-    shieldSprites_.push_back((new Texture(renderer_, "../assets/img/shield2.png"))->convertAlpha());
-    shieldSprites_.push_back((new Texture(renderer_, "../assets/img/shield3.png"))->convertAlpha());
-    shieldSprites_.push_back((new Texture(renderer_, "../assets/img/shield3.png"))->convertAlpha());
+    shieldSprites_.push_back(std::make_shared<Texture>(renderer_, "../assets/img/shield1.png"));
+    shieldSprites_.push_back(std::make_shared<Texture>(renderer_, "../assets/img/shield2.png"));
+    shieldSprites_.push_back(std::make_shared<Texture>(renderer_, "../assets/img/shield3.png"));
+    shieldSprites_.push_back(std::make_shared<Texture>(renderer_, "../assets/img/shield3.png"));
 
     // Load selectable sprite
-    selectableSprite_ = (new Texture(renderer_, "../assets/img/selectable.png"))->convertAlpha();
+    selectableSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/selectable.png");
     selectableSprite_->colorize(ColorUtils::YELLOW);
 }
 
@@ -91,7 +91,7 @@ Player* PlayableGround::getOldOwner() {
     return oldOwner_;
 }
 
-void PlayableGround::display(const BlitTarget* target) {
+void PlayableGround::display(const std::shared_ptr<BlitTarget>& target) {
     if (!hasPlate_) return;
 
     std::vector<bool> similarNeighbors;
@@ -307,7 +307,7 @@ void PlayableGround::updateIncome() {
         town->addIncome(income);
 }
 
-void PlayableGround::displayFences(const Texture* target) {
+void PlayableGround::displayFences(const std::shared_ptr<Texture>& target) {
     if (!hasFences()) return;
 
     std::vector<bool> similarNeighborsWithFences;
@@ -323,11 +323,11 @@ void PlayableGround::displayFences(const Texture* target) {
     fenceDisplayer_.display(target, pos_, similarNeighborsWithFences);
 }
 
-void PlayableGround::displayElement(const Texture* target) {
+void PlayableGround::displayElement(const std::shared_ptr<Texture>& target) {
     if (element) element->display(target);
 }
 
-void PlayableGround::displayShield(const Texture* target) {
+void PlayableGround::displayShield(const std::shared_ptr<Texture>& target) {
     if (element) return;
 
     int shield = getShield();
@@ -341,7 +341,7 @@ void PlayableGround::displayShield(const Texture* target) {
     }
 }
 
-void PlayableGround::displaySelectable(const Texture* target) {
+void PlayableGround::displaySelectable(const std::shared_ptr<Texture>& target) {
     if (!selectable_ || (owner_ && owner_->hasSelected())) return;
 
     target->blit(selectableSprite_, Point{

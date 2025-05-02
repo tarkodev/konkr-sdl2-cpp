@@ -16,14 +16,14 @@ public:
     void setFree(bool free);
 
 protected:
-    static Texture* shadow_;
-    static Texture* lostSprite_;
+    static std::shared_ptr<Texture> shadow_;
+    static std::shared_ptr<Texture> lostSprite_;
 
     bool free_ = false;
 
     Troop(const Point& pos, const Size& size);
 
-    void displaySprite(const BlitTarget* target, const Texture* sprite);
+    void displaySprite(const std::shared_ptr<BlitTarget>& target, const std::shared_ptr<Texture>& sprite);
 };
 
 #endif

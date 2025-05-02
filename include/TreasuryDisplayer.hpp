@@ -12,20 +12,20 @@ class TreasuryDisplayer: public Displayer {
 public:
     static void init();
     
-    TreasuryDisplayer(const Point& pos, int treasury, int income);
+    TreasuryDisplayer(const Point& pos, int treasury = 0, int income = 0);
 
     ~TreasuryDisplayer() = default;
 
     void setTreasury(int treasury);
     void setIncome(int income);
 
-    void display(const BlitTarget* target) override;
+    void display(const std::shared_ptr<BlitTarget>& target) override;
 
 private:
-    static std::unique_ptr<Texture> bg_;
-    static std::unique_ptr<Font> font_;
+    static std::shared_ptr<Texture> bg_;
+    static std::shared_ptr<Font> font_;
 
-    std::unique_ptr<Texture> treasuryTex_;
+    std::shared_ptr<Texture> treasuryTex_;
     int treasury_;
     int income_;
 

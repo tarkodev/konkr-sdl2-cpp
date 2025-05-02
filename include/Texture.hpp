@@ -17,7 +17,7 @@
  * Fournit des méthodes pour charger la texture depuis un fichier, la copier sur le renderer,
  * appliquer un "color mod" (colorize) et obtenir ses dimensions.
  */
-class Texture: public BlitTarget {
+class Texture: public BlitTarget, public std::enable_shared_from_this<Texture> {
 public:
     /**
      * @brief Construit une texture à partir d'un fichier image.
@@ -27,7 +27,7 @@ public:
      * Lève une std::runtime_error si le chargement échoue.
      */
     Texture(const std::shared_ptr<SDL_Renderer>& renderer, const std::string& file);
-    Texture(const std::shared_ptr<SDL_Renderer>& renderer, SDL_Texture* texture);
+    Texture(const std::shared_ptr<SDL_Renderer>& renderer, const std::shared_ptr<SDL_Texture>& texture);
     Texture(const std::shared_ptr<SDL_Renderer>& renderer, int w, int h);
     Texture(const std::shared_ptr<SDL_Renderer>& renderer, const Size& size);
     Texture(Texture&& o);
@@ -48,7 +48,7 @@ public:
      * 
      * Lève une std::runtime_error en cas d'erreur lors du rendu.
      */
-    Texture* copy();
+    std::shared_ptr<Texture> copy();
 
     /**
      * @brief Applique un modulateur de couleur à la texture.
@@ -84,29 +84,29 @@ public:
      */
     int getHeight() const;
 
-    Texture* convertAlpha();
+    void convertAlpha();
 
-    Texture* removeAlpha();
+    void removeAlpha();
 
     void fill(const SDL_Color& color) const;
 
-    void blit(const BlitTarget* src) const override;
-    void blit(const BlitTarget* src, const Point& destPos) const override;
-    void blit(const BlitTarget* src, const Size& destSize) const override;
-    void blit(const BlitTarget* src, const Rect& destRect) const override;
-    void blit(const BlitTarget* src, const Rect& srcRect, const Point& destPos) const override;
-    void blit(const BlitTarget* src, const Rect& srcRect, const Size& destSize) const override;
-    void blit(const BlitTarget* src, const Rect& srcRect, const Rect& destRect) const override;
+    void blit(const std::shared_ptr<BlitTarget>& src) const override;
+    void blit(const std::shared_ptr<BlitTarget>& src, const Point& destPos) const override;
+    void blit(const std::shared_ptr<BlitTarget>& src, const Size& destSize) const override;
+    void blit(const std::shared_ptr<BlitTarget>& src, const Rect& destRect) const override;
+    void blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Point& destPos) const override;
+    void blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Size& destSize) const override;
+    void blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Rect& destRect) const override;
 
     void display(const Point& destPos = Point{0, 0});
 
 private:
-    SDL_Texture* texture_;
+    std::shared_ptr<SDL_Texture> texture_;
     std::shared_ptr<SDL_Renderer> renderer_;
     Size size_;
     bool alpha_;
 
-    void blit(const BlitTarget* src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const;
+    void blit(const std::shared_ptr<BlitTarget>& src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const;
 };
 
 #endif // TEXTURE_HPP

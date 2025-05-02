@@ -32,12 +32,12 @@ public:
     void handleEvent(const SDL_Event& e);
     void setCallback(Callback cb);
 
-    void display(const BlitTarget* target) override;
+    void display(const std::shared_ptr<BlitTarget>& target) override;
 
 private:
-    std::unique_ptr<Texture> sprite_;
-    std::unique_ptr<Texture> hoverSprite_;
-    std::unique_ptr<Texture> pressedSprite_;
+    std::shared_ptr<Texture> sprite_;
+    std::shared_ptr<Texture> hoverSprite_;
+    std::shared_ptr<Texture> pressedSprite_;
 
     Callback callback_ = nullptr;
     bool     isHover_ = false;

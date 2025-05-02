@@ -1,7 +1,7 @@
 #include "logic/units/Castle.hpp"
 #include "Texture.hpp"
 
-Texture* Castle::sprite_ = nullptr;
+std::shared_ptr<Texture> Castle::sprite_ = nullptr;
 
 void Castle::init()
 {
@@ -9,13 +9,13 @@ void Castle::init()
         throw std::runtime_error("Displayer not initialized");
         
     if (sprite_) return;
-    sprite_ = (new Texture(renderer_, "../assets/img/castle.png"))->convertAlpha();
+    sprite_ = std::make_shared<Texture>(renderer_, "../assets/img/castle.png");
 }
 
 
 Castle::Castle(const Point& pos): GameElement(pos, sprite_->getSize()) {}
 
-void Castle::display(const BlitTarget* target)
+void Castle::display(const std::shared_ptr<BlitTarget>& target)
 {
     if (!sprite_) return;
     target->blit(sprite_, Point{pos_.getX()-sprite_->getWidth()/2,

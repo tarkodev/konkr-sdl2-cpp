@@ -62,7 +62,7 @@ void MapsMenu::draw() {
     window_->fill(ColorUtils::SEABLUE);
 
     for(auto& button : buttons_)
-        button.display(window_.get());
+        button.display(window_);
 
     window_->refresh();
 }

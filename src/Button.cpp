@@ -6,14 +6,14 @@ Button::Button(const Point& pos, const std::string& normal, const std::string& h
     : Displayer(pos)
 {
     // Create sprites
-    sprite_ = std::make_unique<Texture>(renderer_, normal);
+    sprite_ = std::make_shared<Texture>(renderer_, normal);
     size_ = sprite_->getSize();
 
     if (!hover.empty())
-        hoverSprite_ = std::make_unique<Texture>(renderer_, hover);
+        hoverSprite_ = std::make_shared<Texture>(renderer_, hover);
 
     if (!pressed.empty())
-        pressedSprite_ = std::make_unique<Texture>(renderer_, pressed);
+        pressedSprite_ = std::make_shared<Texture>(renderer_, pressed);
 }
 
 void Button::setCallback(Callback cb) {
@@ -46,11 +46,11 @@ void Button::handleEvent(const SDL_Event& e) {
     }
 }
 
-void Button::display(const BlitTarget* target) {
+void Button::display(const std::shared_ptr<BlitTarget>& target) {
     if (isPressed_ && pressedSprite_)
-        target->blit(pressedSprite_.get(), pos_ - (pressedSprite_->getSize() / 2));
+        target->blit(pressedSprite_, pos_ - (pressedSprite_->getSize() / 2));
     else if (isHover_ && hoverSprite_)
-        target->blit(pressedSprite_.get(), pos_ - (hoverSprite_->getSize() / 2));
+        target->blit(pressedSprite_, pos_ - (hoverSprite_->getSize() / 2));
     else
-        target->blit(sprite_.get(), pos_ - (sprite_->getSize() / 2));
+        target->blit(sprite_, pos_ - (sprite_->getSize() / 2));
 }

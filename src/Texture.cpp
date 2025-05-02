@@ -7,35 +7,39 @@
 // Constructeur : charge la texture depuis le fichier
 Texture::Texture(const std::shared_ptr<SDL_Renderer>& renderer, const std::string& file): renderer_(renderer)
 {
-    texture_ = IMG_LoadTexture(renderer.get(), file.c_str());
-    if (!texture_)
+    SDL_Texture* texture = IMG_LoadTexture(renderer.get(), file.c_str());
+    if (!texture)
         throw std::runtime_error("Failed to load texture from " + file + ": " + std::string(SDL_GetError()));
 
     int w, h;
-    if (SDL_QueryTexture(texture_, nullptr, nullptr, &w, &h) != 0)
+    if (SDL_QueryTexture(texture, nullptr, nullptr, &w, &h) != 0)
         throw std::runtime_error("Failed to get size of texture: " + std::string(SDL_GetError()));
 
+    texture_ = std::shared_ptr<SDL_Texture>(texture, SDL_DestroyTexture);
+
+    convertAlpha();
     size_ = {w, h};
 }
 
-Texture::Texture(const std::shared_ptr<SDL_Renderer>& renderer, SDL_Texture* texture): renderer_(renderer) {
+Texture::Texture(const std::shared_ptr<SDL_Renderer>& renderer, const std::shared_ptr<SDL_Texture>& texture): renderer_(renderer) {
     texture_ = texture;
     if (!texture_)
         throw std::runtime_error("Texture isn't defined: " + std::string(SDL_GetError()));
 
     int w, h;
-    if (SDL_QueryTexture(texture_, nullptr, nullptr, &w, &h) != 0)
+    if (SDL_QueryTexture(texture_.get(), nullptr, nullptr, &w, &h) != 0)
         throw std::runtime_error("Failed to get size of texture: " + std::string(SDL_GetError()));
 
+    convertAlpha();
     size_ = {w, h};
-
 }
 
 Texture::Texture(const std::shared_ptr<SDL_Renderer>& renderer, int w, int h): renderer_(renderer) {
-    texture_ = SDL_CreateTexture(renderer.get(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, w, h);
+    texture_ = std::shared_ptr<SDL_Texture>(SDL_CreateTexture(renderer.get(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, w, h), SDL_DestroyTexture);
     if (!texture_)
         throw std::runtime_error("Failed to create texture: " + std::string(SDL_GetError()));
 
+    convertAlpha();
     size_ = {w, h};
 }
 
@@ -51,18 +55,10 @@ Texture::Texture(Texture&& o): texture_(o.texture_), renderer_(o.renderer_), siz
 
 
 // Destructeur : libère la texture
-Texture::~Texture() {
-    if (texture_) {
-        SDL_DestroyTexture(texture_);
-        texture_ = nullptr;
-    }
-}
+Texture::~Texture() = default;
 
 Texture& Texture::operator=(Texture&& o) noexcept {
     if (this != &o) {
-        if (texture_)
-            SDL_DestroyTexture(texture_);
-
         texture_   = o.texture_;
         renderer_  = o.renderer_;
         size_      = o.size_;
@@ -77,20 +73,16 @@ Texture& Texture::operator=(Texture&& o) noexcept {
 }
 
 void Texture::colorize(const SDL_Color& color) {
-    SDL_Texture* currentTarget = SDL_GetRenderTarget(renderer_.get());
-    SDL_SetRenderTarget(renderer_.get(), texture_);
-
-    SDL_SetTextureColorMod(texture_, color.r, color.g, color.b);
-    
-    SDL_SetRenderTarget(renderer_.get(), currentTarget);
+    RenderTargetGuard target(renderer_, texture_);
+    SDL_SetTextureColorMod(texture_.get(), color.r, color.g, color.b);
 }
 
-Texture* Texture::copy() {
-    Texture* copy = new Texture(renderer_, size_);
+std::shared_ptr<Texture> Texture::copy() {
+    std::shared_ptr<Texture> copy = std::make_shared<Texture>(renderer_, size_);
     if (alpha_) copy->convertAlpha();
 
     copy->fill(ColorUtils::TRANSPARENT);
-    copy->blit(this);
+    copy->blit(shared_from_this());
 
     return copy;
 }
@@ -108,23 +100,21 @@ int Texture::getHeight() const {
 }
 
 SDL_Texture* Texture::get() const {
-    return texture_;
+    return texture_.get();
 }
 
-Texture* Texture::convertAlpha() {
-    if (!alpha_ && SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_BLEND) != 0)
+void Texture::convertAlpha() {
+    if (!alpha_ && SDL_SetTextureBlendMode(texture_.get(), SDL_BLENDMODE_BLEND) != 0)
         throw std::runtime_error("Failed to set blend mode of texture: " + std::string(SDL_GetError()));
 
     alpha_ = true;
-    return this;
 }
 
-Texture* Texture::removeAlpha() {
-    if (alpha_ && SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_NONE) != 0)
+void Texture::removeAlpha() {
+    if (alpha_ && SDL_SetTextureBlendMode(texture_.get(), SDL_BLENDMODE_NONE) != 0)
         throw std::runtime_error("Failed to reset blend mode of texture: " + std::string(SDL_GetError()));
 
     alpha_ = false;
-    return this;
 }
 
 void Texture::fill(const SDL_Color& color) const {
@@ -136,7 +126,7 @@ void Texture::fill(const SDL_Color& color) const {
 }
 
 
-void Texture::blit(const BlitTarget* src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const {
+void Texture::blit(const std::shared_ptr<BlitTarget>& src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const {
     RenderTargetGuard target(renderer_, texture_);
 
     if (SDL_RenderCopy(renderer_.get(), src->get(), srcRect, destRect) != 0)
@@ -144,41 +134,41 @@ void Texture::blit(const BlitTarget* src, const SDL_Rect* srcRect, const SDL_Rec
 }
 
 
-void Texture::blit(const BlitTarget* src) const {
+void Texture::blit(const std::shared_ptr<BlitTarget>& src) const {
     blit(src, nullptr, nullptr);
 }
 
-void Texture::blit(const BlitTarget* src, const Point& destPos) const {
+void Texture::blit(const std::shared_ptr<BlitTarget>& src, const Point& destPos) const {
     Rect destRect(destPos, src->getSize());
     blit(src, nullptr, &destRect.get());
 }
 
-void Texture::blit(const BlitTarget* src, const Size& destSize) const {
+void Texture::blit(const std::shared_ptr<BlitTarget>& src, const Size& destSize) const {
     Rect destRect({0, 0}, destSize);
     blit(src, nullptr, &destRect.get());
 }
 
-void Texture::blit(const BlitTarget* src, const Rect& destRect) const {
+void Texture::blit(const std::shared_ptr<BlitTarget>& src, const Rect& destRect) const {
     blit(src, nullptr, &destRect.get());
 }
 
-void Texture::blit(const BlitTarget* src, const Rect& srcRect, const Point& destPos) const {
+void Texture::blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Point& destPos) const {
     Rect destRect(destPos, src->getSize());
     blit(src, &srcRect.get(), &destRect.get());
 }
 
-void Texture::blit(const BlitTarget* src, const Rect& srcRect, const Size& destSize) const {
+void Texture::blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Size& destSize) const {
     Rect destRect({0, 0}, destSize);
     blit(src, &srcRect.get(), &destRect.get());
 }
 
-void Texture::blit(const BlitTarget* src, const Rect& srcRect, const Rect& destRect) const {
+void Texture::blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Rect& destRect) const {
     blit(src, &srcRect.get(), &destRect.get());
 }
 
 void Texture::display(const Point& destPos) {
     SDL_Rect destRect{destPos.getX(), destPos.getY(), getWidth(), getHeight()};
 
-    if (SDL_RenderCopy(renderer_.get(), texture_, nullptr, &destRect) != 0)
+    if (SDL_RenderCopy(renderer_.get(), texture_.get(), nullptr, &destRect) != 0)
         throw std::runtime_error("Erreur lors du display de la texture: " + std::string(SDL_GetError()));
 }

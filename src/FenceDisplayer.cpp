@@ -3,8 +3,8 @@
 
 
 FenceDisplayer::FenceDisplayer(double hexagonRadius, 
-    Texture* fenceTop, Texture* fenceTopLeft, Texture* fenceTopRight, Texture* fenceBottom, Texture* fenceBottomLeft, Texture* fenceBottomRight,
-    Texture* fenceLinkTop, Texture* fenceLinkTopLeft, Texture* fenceLinkTopRight, Texture* fenceLinkBottom, Texture* fenceLinkBottomLeft, Texture* fenceLinkBottomRight
+    const std::shared_ptr<Texture>& fenceTop, const std::shared_ptr<Texture>& fenceTopLeft, const std::shared_ptr<Texture>& fenceTopRight, const std::shared_ptr<Texture>& fenceBottom, const std::shared_ptr<Texture>& fenceBottomLeft, const std::shared_ptr<Texture>& fenceBottomRight,
+    const std::shared_ptr<Texture>& fenceLinkTop, const std::shared_ptr<Texture>& fenceLinkTopLeft, const std::shared_ptr<Texture>& fenceLinkTopRight, const std::shared_ptr<Texture>& fenceLinkBottom, const std::shared_ptr<Texture>& fenceLinkBottomLeft, const std::shared_ptr<Texture>& fenceLinkBottomRight
 ) : GenericDisplayer({static_cast<int>(HexagonUtils::radiusToInner(hexagonRadius) * 2), static_cast<int>(hexagonRadius * 2)}), 
       radius_(hexagonRadius), innerRadius_(HexagonUtils::radiusToInner(hexagonRadius)),
       top_(fenceTop), topLeft_(fenceTopLeft), topRight_(fenceTopRight), 
@@ -17,7 +17,7 @@ FenceDisplayer::~FenceDisplayer()
 {}
 
 
-void FenceDisplayer::display(const BlitTarget* target, const Point& pos, const std::vector<bool>& neighbors) {
+void FenceDisplayer::display(const std::shared_ptr<BlitTarget>& target, const Point& pos, const std::vector<bool>& neighbors) {
     auto [x, y] = pos.get();
 
     if (!neighbors[5] && !neighbors[0]) {
@@ -93,10 +93,10 @@ void FenceDisplayer::display(const BlitTarget* target, const Point& pos, const s
     }
 }
 
-void FenceDisplayer::display(const BlitTarget* target, const Point& pos) {
+void FenceDisplayer::display(const std::shared_ptr<BlitTarget>& target, const Point& pos) {
     display(target, pos, {false, false, false, false, false, false});
 }
 
-void FenceDisplayer::display(const BlitTarget* target) {
+void FenceDisplayer::display(const std::shared_ptr<BlitTarget>& target) {
     display(target, pos_, {false, false, false, false, false, false});
 }
