@@ -3,9 +3,9 @@
 #include "BlitTarget.hpp"
 #include "Texture.hpp"
 
-SDL_Renderer* Displayer::renderer_ = nullptr;
+std::shared_ptr<SDL_Renderer> Displayer::renderer_ = nullptr;
 
-void Displayer::init(SDL_Renderer *renderer) {
+void Displayer::init(const std::shared_ptr<SDL_Renderer>& renderer) {
     renderer_ = renderer;
 }
 

@@ -5,9 +5,9 @@
 #include <sstream>
 
 // Constructeur : charge la texture depuis le fichier
-Texture::Texture(SDL_Renderer* renderer, const std::string& file): renderer_(renderer)
+Texture::Texture(const std::shared_ptr<SDL_Renderer>& renderer, const std::string& file): renderer_(renderer)
 {
-    texture_ = IMG_LoadTexture(renderer, file.c_str());
+    texture_ = IMG_LoadTexture(renderer.get(), file.c_str());
     if (!texture_)
         throw std::runtime_error("Failed to load texture from " + file + ": " + std::string(SDL_GetError()));
 
@@ -18,7 +18,7 @@ Texture::Texture(SDL_Renderer* renderer, const std::string& file): renderer_(ren
     size_ = {w, h};
 }
 
-Texture::Texture(SDL_Renderer *renderer, SDL_Texture* texture): renderer_(renderer) {
+Texture::Texture(const std::shared_ptr<SDL_Renderer>& renderer, SDL_Texture* texture): renderer_(renderer) {
     texture_ = texture;
     if (!texture_)
         throw std::runtime_error("Texture isn't defined: " + std::string(SDL_GetError()));
@@ -31,15 +31,15 @@ Texture::Texture(SDL_Renderer *renderer, SDL_Texture* texture): renderer_(render
 
 }
 
-Texture::Texture(SDL_Renderer *renderer, int w, int h): renderer_(renderer) {
-    texture_ = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, w, h);
+Texture::Texture(const std::shared_ptr<SDL_Renderer>& renderer, int w, int h): renderer_(renderer) {
+    texture_ = SDL_CreateTexture(renderer.get(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, w, h);
     if (!texture_)
         throw std::runtime_error("Failed to create texture: " + std::string(SDL_GetError()));
 
     size_ = {w, h};
 }
 
-Texture::Texture(SDL_Renderer *renderer, const Size& size): 
+Texture::Texture(const std::shared_ptr<SDL_Renderer>& renderer, const Size& size): 
     Texture(renderer, size.getWidth(), size.getHeight()) {}
 
 Texture::Texture(Texture&& o): texture_(o.texture_), renderer_(o.renderer_), size_(o.size_), alpha_(o.alpha_) {
@@ -77,16 +77,16 @@ Texture& Texture::operator=(Texture&& o) noexcept {
 }
 
 void Texture::colorize(const SDL_Color& color) {
-    SDL_Texture* currentTarget = SDL_GetRenderTarget(&(*renderer_));
-    SDL_SetRenderTarget(&(*renderer_), texture_);
+    SDL_Texture* currentTarget = SDL_GetRenderTarget(renderer_.get());
+    SDL_SetRenderTarget(renderer_.get(), texture_);
 
     SDL_SetTextureColorMod(texture_, color.r, color.g, color.b);
     
-    SDL_SetRenderTarget(&(*renderer_), currentTarget);
+    SDL_SetRenderTarget(renderer_.get(), currentTarget);
 }
 
 Texture* Texture::copy() {
-    Texture* copy = new Texture(&(*renderer_), size_);
+    Texture* copy = new Texture(renderer_, size_);
     if (alpha_) copy->convertAlpha();
 
     copy->fill(ColorUtils::TRANSPARENT);
@@ -128,18 +128,18 @@ Texture* Texture::removeAlpha() {
 }
 
 void Texture::fill(const SDL_Color& color) const {
-    RenderTargetGuard target(&(*renderer_), texture_);
+    RenderTargetGuard target(renderer_, texture_);
 
-    if (SDL_SetRenderDrawColor(&(*renderer_), color.r, color.g, color.b, color.a) != 0 ||
-        SDL_RenderClear(&(*renderer_)) != 0)
+    if (SDL_SetRenderDrawColor(renderer_.get(), color.r, color.g, color.b, color.a) != 0 ||
+        SDL_RenderClear(renderer_.get()) != 0)
         throw std::runtime_error("Erreur lors du fill de la texture: " + std::string(SDL_GetError()));
 }
 
 
 void Texture::blit(const BlitTarget* src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const {
-    RenderTargetGuard target(&(*renderer_), texture_);
+    RenderTargetGuard target(renderer_, texture_);
 
-    if (SDL_RenderCopy(&(*renderer_), src->get(), srcRect, destRect) != 0)
+    if (SDL_RenderCopy(renderer_.get(), src->get(), srcRect, destRect) != 0)
         throw std::runtime_error("Erreur lors du blitting de la texture: " + std::string(SDL_GetError()));
 }
 
@@ -179,6 +179,6 @@ void Texture::blit(const BlitTarget* src, const Rect& srcRect, const Rect& destR
 void Texture::display(const Point& destPos) {
     SDL_Rect destRect{destPos.getX(), destPos.getY(), getWidth(), getHeight()};
 
-    if (SDL_RenderCopy(&(*renderer_), texture_, nullptr, &destRect) != 0)
+    if (SDL_RenderCopy(renderer_.get(), texture_, nullptr, &destRect) != 0)
         throw std::runtime_error("Erreur lors du display de la texture: " + std::string(SDL_GetError()));
 }

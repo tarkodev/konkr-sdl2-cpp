@@ -16,6 +16,9 @@ Size::Size(const SDL_Point& p) : size_{p.x, p.y} {}
 // Constructeur à partir d'un Size
 Size::Size(const Size& s) : size_{s.getWidth(), s.getHeight()} {}
 
+// Constructeur à partir d'un Point
+Size::Size(const Point& s) : size_{s.getX(), s.getY()} {}
+
 // Accesseurs
 int Size::getWidth() const { return size_.x; }
 int Size::getHeight() const { return size_.y; }
@@ -31,6 +34,10 @@ SDL_Point& Size::get() { return size_; }
 // Opérateur d'addition : retourne une somme de points
 Size Size::operator+(const Size& other) const {
     return Size(size_.x + other.getWidth(), size_.y + other.getHeight());
+}
+
+Point Size::operator+(const Point& other) const {
+    return Point(size_.x + other.getX(), size_.y + other.getY());
 }
 
 // Opérateur d'addition : retourne une somme de points

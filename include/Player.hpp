@@ -15,7 +15,7 @@ using namespace ColorUtils;
 
 class Player {
 public:
-    static void init(SDL_Renderer *renderer);
+    static void init(const std::shared_ptr<SDL_Renderer>& renderer);
 
     Player(const std::string& name_, const GroundColor& color);
     ~Player();
@@ -34,7 +34,7 @@ public:
     void onTurnEnd();
 
 private:
-    static SDL_Renderer *renderer_;
+    static std::shared_ptr<SDL_Renderer> renderer_;
     static HexagonDisplayer plateDisplayer;
     
     std::string name_;

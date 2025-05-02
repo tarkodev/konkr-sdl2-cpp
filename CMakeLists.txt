@@ -115,7 +115,8 @@ set(SRC_FILES
     "${CMAKE_SOURCE_DIR}/src/Overlay.cpp"
     "${CMAKE_SOURCE_DIR}/src/MenuBase.cpp"
     "${CMAKE_SOURCE_DIR}/src/MainMenu.cpp"
-    "${CMAKE_SOURCE_DIR}/src/MapSelectMenu.cpp"
+    "${CMAKE_SOURCE_DIR}/src/MapsMenu.cpp"
+    "${CMAKE_SOURCE_DIR}/src/GameMenu.cpp"
     "${CMAKE_SOURCE_DIR}/src/Game.cpp"
     "${CMAKE_SOURCE_DIR}/src/main.cpp"
 )

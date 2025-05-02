@@ -1,15 +1,15 @@
-#ifndef MAPSELECTMENU_HPP
-#define MAPSELECTMENU_HPP
+#ifndef MAPSMENU_HPP
+#define MAPSMENU_HPP
 
 #include "MenuBase.hpp"
 
 class MainMenu;
 
-class MapSelectMenu : public MenuBase {
+class MapsMenu : public MenuBase {
 public:
-    MapSelectMenu(const std::shared_ptr<Window>& window);
+    MapsMenu(const std::shared_ptr<Window>& window);
 
-    ~MapSelectMenu() = default;
+    ~MapsMenu() = default;
 
     std::shared_ptr<MenuBase> run() override;
 

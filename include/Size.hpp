@@ -23,6 +23,9 @@ public:
     // Constructeur à partir d'un Size
     Size(const Size& s);
 
+    // Constructeur à partir d'un Point
+    Size(const Point& p);
+
     // Accesseurs
     int getWidth() const;
     int getHeight() const;
@@ -37,6 +40,7 @@ public:
 
     // Opérateur d'addition : retourne une somme de points
     Size operator+(const Size& other) const;
+    Point operator+(const Point& other) const;
 
     // Opérateur d'addition : retourne une somme de points
     Point operator-(const Point& other) const;

@@ -11,14 +11,6 @@
 #include <stdexcept>
 #include <memory>
 
-
-//! Plus utiliser quand Renderer sera encapsulé dans une classe
-struct SDLRendererDeleter {
-    void operator()(SDL_Renderer* renderer) const {
-        if (renderer) SDL_DestroyRenderer(renderer);
-    }
-};
-
 /**
  * @brief Classe qui encapsule une SDL_Texture*.
  *
@@ -34,10 +26,10 @@ public:
      *
      * Lève une std::runtime_error si le chargement échoue.
      */
-    Texture(SDL_Renderer* renderer, const std::string& file);
-    Texture(SDL_Renderer *renderer, SDL_Texture* texture);
-    Texture(SDL_Renderer *renderer, int w, int h);
-    Texture(SDL_Renderer *renderer, const Size& size);
+    Texture(const std::shared_ptr<SDL_Renderer>& renderer, const std::string& file);
+    Texture(const std::shared_ptr<SDL_Renderer>& renderer, SDL_Texture* texture);
+    Texture(const std::shared_ptr<SDL_Renderer>& renderer, int w, int h);
+    Texture(const std::shared_ptr<SDL_Renderer>& renderer, const Size& size);
     Texture(Texture&& o);
 
     /**
@@ -110,7 +102,7 @@ public:
 
 private:
     SDL_Texture* texture_;
-    SDL_Renderer* renderer_;
+    std::shared_ptr<SDL_Renderer> renderer_;
     Size size_;
     bool alpha_;
 

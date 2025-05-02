@@ -17,7 +17,7 @@
  */
 class Font {
 public:
-    Font(SDL_Renderer* renderer, const std::string& file, int pointSize);
+    Font(const std::shared_ptr<SDL_Renderer>& renderer, const std::string& file, int pointSize);
     ~Font();
 
     // Interdit copie, autorise move
@@ -35,7 +35,7 @@ public:
     Texture render(const std::string& text, SDL_Color color);
 
 private:
-    SDL_Renderer* renderer_ = nullptr;
+    std::shared_ptr<SDL_Renderer> renderer_ = nullptr;
     TTF_Font* font_ = nullptr;
 };
 

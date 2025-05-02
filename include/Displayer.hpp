@@ -7,7 +7,7 @@
 
 class Displayer {
 public:
-    static void init(SDL_Renderer *renderer);
+    static void init(const std::shared_ptr<SDL_Renderer>& renderer);
     
     Displayer(const Point& pos = {0, 0}, const Size& size = {0, 0});
 
@@ -24,7 +24,7 @@ public:
 
 
 protected:
-    static SDL_Renderer* renderer_;
+    static std::shared_ptr<SDL_Renderer> renderer_;
 
     Size size_;
     Point pos_;

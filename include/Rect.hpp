@@ -77,6 +77,12 @@ public:
                p.getY() >= rect_.y && p.getY() < rect_.y + rect_.h;
     }
 
+    // Détermine si un point (x, y) est contenu dans le rectangle
+    bool contains(Size& s) const {
+        return s.getWidth() >= rect_.x && s.getWidth() < rect_.x + rect_.w &&
+               s.getHeight() >= rect_.y && s.getHeight() < rect_.y + rect_.h;
+    }
+
     // Surcharge de l'opérateur << pour un affichage simple
     friend std::ostream& operator<<(std::ostream& os, const Rect& r) {
         os << "Rect(" << r.rect_.x << ", " << r.rect_.y 

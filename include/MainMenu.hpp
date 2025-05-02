@@ -1,12 +1,14 @@
 #ifndef MAINMENU_HPP
 #define MAINMENU_HPP
+
+#include "Point.hpp"
 #include "MenuBase.hpp"
 #include "Window.hpp"
 #include "Texture.hpp"
 #include "Button.hpp"
 #include <memory>
 
-class MapSelectMenu;
+class MapsMenu;
 
 class MainMenu : public MenuBase {
 public:
@@ -27,6 +29,8 @@ private:
     std::unique_ptr<Button> expeditionBtn_;
     std::unique_ptr<Button> howToPlayBtn_;
     std::unique_ptr<Button> exitBtn_;
+
+    Point logoPos_;
 };
 
 #endif

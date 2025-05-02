@@ -19,12 +19,10 @@ struct SDLWindowDeleter {
  */
 class Window: public BlitTarget {
 public:
-    Window(const char* title, int width, int height);
+    Window(const char* title, const Size& size);
     ~Window();
-    
-    bool isInitialized() const { return initialized_; }
 
-    SDL_Renderer* getRenderer() const { return renderer_.get(); }
+    std::shared_ptr<SDL_Renderer> getRenderer() const { return renderer_; }
     Size getSize() const override { return size_; }
     int getWidth() const { return size_.getWidth(); }
     int getHeight() const { return size_.getHeight(); }
@@ -43,12 +41,11 @@ public:
     void refresh();
     
 private:
-    bool initialized_;
     std::unique_ptr<Texture> calc_;
 
     Size size_ = {0, 0};
     std::unique_ptr<SDL_Window, SDLWindowDeleter> SDLWindow_;
-    std::unique_ptr<SDL_Renderer, SDLRendererDeleter> renderer_; //! encapsuler le renderer dans une classe
+    std::shared_ptr<SDL_Renderer> renderer_; //! encapsuler le renderer dans une classe
 };
 
 #endif

@@ -1,7 +1,7 @@
 #include "SDL.h"
 #include "ColorUtils.hpp"
 #include "MainMenu.hpp"
-#include "MapSelectMenu.hpp"
+#include "MapsMenu.hpp"
 
 MainMenu::MainMenu(const std::shared_ptr<Window>& window): MenuBase{window} {
     // Background of menu
@@ -16,7 +16,7 @@ MainMenu::MainMenu(const std::shared_ptr<Window>& window): MenuBase{window} {
     expeditionBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/expeditions.png");
     expeditionBtn_->setCallback([this]() {
         loop_ = false;
-        nextMenu_ = std::make_shared<MapSelectMenu>(window_);
+        nextMenu_ = std::make_shared<MapsMenu>(window_);
     });
 
     // How to play button
@@ -32,9 +32,11 @@ MainMenu::MainMenu(const std::shared_ptr<Window>& window): MenuBase{window} {
     });
 
     Size center{static_cast<int>(window_->getWidth() * 0.75), static_cast<int>(window_->getHeight() / 2)};
-    expeditionBtn_->setPos(center - Point{0, static_cast<int>(howToPlayBtn_->getHeight() * 0.75 + expeditionBtn_->getHeight() / 2)});
+    double gap = howToPlayBtn_->getHeight() * 0.75;
+    expeditionBtn_->setPos(center - Point{0, static_cast<int>(gap + expeditionBtn_->getHeight() / 2)});
     howToPlayBtn_->setPos(center);
-    exitBtn_->setPos(center - Point{0, -(static_cast<int>(howToPlayBtn_->getHeight() * 0.75 + exitBtn_->getHeight() / 2))});
+    exitBtn_->setPos(center + Point{0, static_cast<int>(gap + exitBtn_->getHeight() / 2)});
+    logoPos_ = expeditionBtn_->getPos() - Point{static_cast<int>(logo_->getWidth() / 2), expeditionBtn_->getHeight() + logo_->getHeight()};
 }
 
 void MainMenu::handleEvents(){
@@ -53,7 +55,7 @@ void MainMenu::draw() {
     window_->fill(ColorUtils::SEABLUE);
 
     window_->blit(bg_.get());
-    window_->blit(logo_.get(), expeditionBtn_->getPos() - Point{static_cast<int>(logo_->getWidth() / 2), expeditionBtn_->getHeight() + logo_->getHeight()});
+    window_->blit(logo_.get(), logoPos_);
     expeditionBtn_->display(window_.get());
     howToPlayBtn_->display(window_.get());
     exitBtn_->display(window_.get());

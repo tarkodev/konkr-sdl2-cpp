@@ -6,9 +6,9 @@
 #include "PlayableGround.hpp"
 
 HexagonDisplayer Player::plateDisplayer = HexagonDisplayer{-1, nullptr, nullptr, nullptr, nullptr, nullptr};
-SDL_Renderer* Player::renderer_ = nullptr;
+std::shared_ptr<SDL_Renderer> Player::renderer_ = nullptr;
 
-void Player::init(SDL_Renderer *renderer) {
+void Player::init(const std::shared_ptr<SDL_Renderer>& renderer) {
     renderer_ = renderer;
 
     // Load plate
