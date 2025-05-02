@@ -20,7 +20,7 @@ TreasuryDisplayer::TreasuryDisplayer(
     const Point& pos,
     int treasury, 
     int nextTreasury
-) : Displayer(pos), treasury_(treasury), income_(nextTreasury)
+) : Displayer(pos, bg_->getSize()), treasury_(treasury), income_(nextTreasury)
 {
     if (!bg_)
         throw std::runtime_error("TreasuryDisplayer not initialized");
@@ -40,11 +40,6 @@ void TreasuryDisplayer::setTreasury(int treasury) {
 void TreasuryDisplayer::setIncome(int income) {
     income_ = income;
     refreshTexture();
-}
-
-
-const Size TreasuryDisplayer::getSize() const {
-    return bg_->getSize();
 }
 
 void TreasuryDisplayer::display(const BlitTarget* target) {

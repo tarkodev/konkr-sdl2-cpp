@@ -3,7 +3,8 @@
 #include "HexagonDisplayer.hpp"
 
 HexagonDisplayer::HexagonDisplayer(double hexagonRadius, Texture* hexagonTexture, Texture* linkTexture, Texture* linkBottomLeftTexture, Texture* linkBottomTexture, Texture* linkBottomRightTexture)
-    : radius_(hexagonRadius),
+    : GenericDisplayer(hexagonTexture ? hexagonTexture->getSize() : Size{0, 0}),
+      radius_(hexagonRadius),
       innerRadius_(HexagonUtils::radiusToInner(hexagonRadius)),
       hexagon_(hexagonTexture),
       link_(linkTexture),
@@ -14,11 +15,6 @@ HexagonDisplayer::HexagonDisplayer(double hexagonRadius, Texture* hexagonTexture
 
 HexagonDisplayer::~HexagonDisplayer()
 {}
-
-
-const Size HexagonDisplayer::getSize() const {
-    return hexagon_->getSize();
-}
 
 
 void HexagonDisplayer::display(const BlitTarget* target, const Point& pos, const std::vector<bool>& neighbors) {

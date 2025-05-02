@@ -1,5 +1,5 @@
-#ifndef PLAYERTERRITORY_HPP
-#define PLAYERTERRITORY_HPP
+#ifndef PLAYABLEGROUND_HPP
+#define PLAYABLEGROUND_HPP
 
 #include "SDL.h"
 #include "BlitTarget.hpp"
@@ -9,6 +9,7 @@
 #include "logic/GameElement.hpp"
 #include "FenceDisplayer.hpp"
 #include <unordered_set>
+#include <queue>
 
 class PlayableGround: public Ground {
 public:

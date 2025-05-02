@@ -21,13 +21,12 @@ public:
 
     /* --- Displayer --- */
     virtual void display(const BlitTarget* target) override = 0;
-    virtual const Size getSize() const override = 0;
 
     virtual bool isLost() const { return lost_; };
     virtual void lost() { lost_ = true; };
 
 protected:
-    GameElement(const Point& pos);
+    GameElement(const Point& pos, const Size& size);
 
     static constexpr int STRENGTH = 0;
     static constexpr int COST     = 0;

@@ -13,7 +13,7 @@ void Knight::init()
 }
 
 
-Knight::Knight(const Point& pos): Troop(pos) {}
+Knight::Knight(const Point& pos): Troop(pos, sprite_->getSize()) {}
 
 void Knight::display(const BlitTarget* target)
 {

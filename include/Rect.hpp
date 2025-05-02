@@ -38,10 +38,10 @@ public:
     // Modificateurs
     void setX(int x) { rect_.x = x; }
     void setY(int y) { rect_.y = y; }
-    void getPos(Point pos) { rect_.x = pos.getX(); rect_.y = pos.getY(); }
+    void setPos(Point pos) { rect_.x = pos.getX(); rect_.y = pos.getY(); }
     void setWidth(int w) { rect_.w = w; }
     void setHeight(int h) { rect_.h = h; }
-    void getPos(Size size) { rect_.w = size.getWidth(); rect_.h = size.getHeight(); }
+    void setPos(Size size) { rect_.w = size.getWidth(); rect_.h = size.getHeight(); }
 
     // Ajuste la taille en respectant un ratio (pour redimensionnement proportionnel)
     void scale(double factor) {
@@ -69,6 +69,12 @@ public:
     bool contains(int x, int y) const {
         return x >= rect_.x && x < rect_.x + rect_.w &&
                y >= rect_.y && y < rect_.y + rect_.h;
+    }
+
+    // Détermine si un point (x, y) est contenu dans le rectangle
+    bool contains(Point& p) const {
+        return p.getX() >= rect_.x && p.getX() < rect_.x + rect_.w &&
+               p.getY() >= rect_.y && p.getY() < rect_.y + rect_.h;
     }
 
     // Surcharge de l'opérateur << pour un affichage simple

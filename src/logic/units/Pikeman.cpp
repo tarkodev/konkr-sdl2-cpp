@@ -13,7 +13,7 @@ void Pikeman::init()
 }
 
 
-Pikeman::Pikeman(const Point& pos): Troop(pos) {}
+Pikeman::Pikeman(const Point& pos): Troop(pos, sprite_->getSize()) {}
 
 void Pikeman::display(const BlitTarget* target)
 {

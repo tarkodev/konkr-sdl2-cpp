@@ -18,7 +18,6 @@ public:
 
     ~FenceDisplayer();
 
-    const Size getSize() const override;
     void display(const BlitTarget* target) override;
     void display(const BlitTarget* target, const Point& pos) override;
     void display(const BlitTarget* target, const Point& pos, const std::vector<bool>& neighbors);

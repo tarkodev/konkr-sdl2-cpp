@@ -5,7 +5,8 @@
 FenceDisplayer::FenceDisplayer(double hexagonRadius, 
     Texture* fenceTop, Texture* fenceTopLeft, Texture* fenceTopRight, Texture* fenceBottom, Texture* fenceBottomLeft, Texture* fenceBottomRight,
     Texture* fenceLinkTop, Texture* fenceLinkTopLeft, Texture* fenceLinkTopRight, Texture* fenceLinkBottom, Texture* fenceLinkBottomLeft, Texture* fenceLinkBottomRight
-) : radius_(hexagonRadius), innerRadius_(HexagonUtils::radiusToInner(hexagonRadius)),
+) : GenericDisplayer({static_cast<int>(HexagonUtils::radiusToInner(hexagonRadius) * 2), static_cast<int>(hexagonRadius * 2)}), 
+      radius_(hexagonRadius), innerRadius_(HexagonUtils::radiusToInner(hexagonRadius)),
       top_(fenceTop), topLeft_(fenceTopLeft), topRight_(fenceTopRight), 
       bottom_(fenceBottom), bottomLeft_(fenceBottomLeft), bottomRight_(fenceBottomRight), 
       linkTop_(fenceLinkTop), linkTopLeft_(fenceLinkTopLeft), linkTopRight_(fenceLinkTopRight), 
@@ -14,11 +15,6 @@ FenceDisplayer::FenceDisplayer(double hexagonRadius,
 
 FenceDisplayer::~FenceDisplayer()
 {}
-
-
-const Size FenceDisplayer::getSize() const {
-    return {static_cast<int>(innerRadius_ * 2), static_cast<int>(radius_ * 2)};
-}
 
 
 void FenceDisplayer::display(const BlitTarget* target, const Point& pos, const std::vector<bool>& neighbors) {

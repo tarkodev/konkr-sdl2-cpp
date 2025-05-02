@@ -1,44 +1,79 @@
+#include "SDL.h"
+#include "ColorUtils.hpp"
 #include "MainMenu.hpp"
-#include "Game.hpp"
-#include <SDL.h>
+#include "MapSelectMenu.hpp"
 
-MainMenu::MainMenu(Game& app): app_(app) {
-    // Bouton Logo (ne fait rien)
-    Texture* logoTex = new Texture(renderer_, "../assets/img/konkr.png");
-    auto* logoBtn = new Button(logoTex, nullptr, nullptr, Point{200, 50}); // position en haut
-    logoBtn->setCallback([]() {});  // aucun effet
-    buttons_.push_back(logoBtn);
+MainMenu::MainMenu(const std::shared_ptr<Window>& window): MenuBase{window} {
+    // Background of menu
+    bg_ = std::make_unique<Texture>(window_->getRenderer(), "../assets/img/main_bg.png");
+    bg_->convertAlpha();
+    
+    // Logo
+    logo_ = std::make_unique<Texture>(window_->getRenderer(), "../assets/img/logo.png");
+    logo_->convertAlpha();
 
-    Texture* expedTex = new Texture(renderer_, "../assets/img/expeditions.png");
-    auto*    expedBtn = new Button(expedTex,nullptr,nullptr, Point{200,300});
-    expedBtn->setCallback([this](){
-        app_.requestAction(PendingAction::OpenMapSelect);   // ★ remplace l’ancien appel direct
+    // Expedition button
+    expeditionBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/expeditions.png");
+    expeditionBtn_->setCallback([this]() {
+        loop_ = false;
+        nextMenu_ = std::make_shared<MapSelectMenu>(window_);
     });
-    buttons_.push_back(expedBtn);
 
-    Texture* howTex   = new Texture(renderer_, "../assets/img/howtoplay.png");
-    auto*    howBtn   = new Button(howTex,nullptr,nullptr, Point{200,400});
-    howBtn->setCallback([](){
+    // How to play button
+    howToPlayBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/howtoplay.png");
+    howToPlayBtn_->setCallback([]() {
         SDL_OpenURL("https://www.konkr.io/how-to-play/");
     });
-    buttons_.push_back(howBtn);
 
-    // bouton Quitter 
-    Texture* exitTex = new Texture(renderer_, "../assets/img/exit.png");
-    auto* exitBtn = new Button(exitTex, nullptr, nullptr, Point{200, 500});
-    exitBtn->setCallback([](){
-        // Envoie un SDL_QUIT pour sortir proprement de la boucle de Game::run()
-        SDL_Event evt;
-        evt.type = SDL_QUIT;
-        SDL_PushEvent(&evt);
+    // Quit button
+    exitBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/exit.png");
+    exitBtn_->setCallback([this]() {
+        loop_ = false;
     });
-    buttons_.push_back(exitBtn);
-}
-MainMenu::~MainMenu() { for(auto* b:buttons_) delete b; }
-void MainMenu::handleEvent(const SDL_Event& e){
-    for(auto* b:buttons_) b->handleEvent(e);
+
+    Size center{static_cast<int>(window_->getWidth() * 0.75), static_cast<int>(window_->getHeight() / 2)};
+    expeditionBtn_->setPos(center - Point{0, static_cast<int>(howToPlayBtn_->getHeight() * 0.75 + expeditionBtn_->getHeight() / 2)});
+    howToPlayBtn_->setPos(center);
+    exitBtn_->setPos(center - Point{0, -(static_cast<int>(howToPlayBtn_->getHeight() * 0.75 + exitBtn_->getHeight() / 2))});
 }
 
-void MainMenu::display(const BlitTarget* target) {
-    for(auto* b:buttons_) b->display(target);
+void MainMenu::handleEvents(){
+    SDL_Event event;
+
+    while (SDL_PollEvent(&event)) {
+        expeditionBtn_->handleEvent(event);
+        howToPlayBtn_->handleEvent(event);
+        exitBtn_->handleEvent(event);
+
+        handleEvent(event);
+    }
+}
+
+void MainMenu::draw() {
+    window_->fill(ColorUtils::SEABLUE);
+
+    window_->blit(bg_.get());
+    window_->blit(logo_.get(), expeditionBtn_->getPos() - Point{static_cast<int>(logo_->getWidth() / 2), expeditionBtn_->getHeight() + logo_->getHeight()});
+    expeditionBtn_->display(window_.get());
+    howToPlayBtn_->display(window_.get());
+    exitBtn_->display(window_.get());
+
+    window_->refresh();
+}
+
+std::shared_ptr<MenuBase> MainMenu::run() {
+    loop_ = true;
+
+    while (loop_) {
+        // Handle events
+        handleEvents();
+
+        // Draw elements
+        draw();
+
+        // Control loop duration
+        SDL_Delay(1/60);
+    }
+
+    return nextMenu_;
 }

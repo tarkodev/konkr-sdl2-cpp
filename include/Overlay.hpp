@@ -23,7 +23,6 @@ public:
     void handleEvent(const SDL_Event& e);
 
     void display(const BlitTarget* target) override;
-    const Size getSize() const override { return Size{100, 100}; }; //! Changer quand MenuBase aura une size_
 
 private:
     std::vector<Button*> buttons_;

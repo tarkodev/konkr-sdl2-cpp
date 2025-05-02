@@ -43,7 +43,7 @@ const double Ground::getInnerRadius() {
 }
 
 
-Ground::Ground(const Point& pos): Displayer(pos) {}
+Ground::Ground(const Point& pos): Displayer(pos, getIslandSize()) {}
 
 void Ground::display(const BlitTarget* target) {
     std::vector<bool> GroundNeighbors{
@@ -56,6 +56,3 @@ void Ground::display(const BlitTarget* target) {
     islandDisplayer.display(target, pos_, GroundNeighbors);
 }
 
-const Size Ground::getSize() const {
-    return getIslandSize();
-}

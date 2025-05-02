@@ -1,5 +1,5 @@
-#ifndef LOGIC_PLAYERELEMENT_HPP
-#define LOGIC_PLAYERELEMENT_HPP
+#ifndef LOGIC_TROOP_HPP
+#define LOGIC_TROOP_HPP
 
 #include "SDL.h"
 #include "logic/GameElement.hpp"
@@ -21,7 +21,7 @@ protected:
 
     bool free_ = false;
 
-    Troop(const Point& pos);
+    Troop(const Point& pos, const Size& size);
 
     void displaySprite(const BlitTarget* target, const Texture* sprite);
 };

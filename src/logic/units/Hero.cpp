@@ -13,7 +13,7 @@ void Hero::init()
 }
 
 
-Hero::Hero(const Point& pos): Troop(pos) {}
+Hero::Hero(const Point& pos): Troop(pos, sprite_->getSize()) {}
 
 void Hero::display(const BlitTarget* target)
 {

@@ -13,7 +13,7 @@ void Bandit::init()
 }
 
 
-Bandit::Bandit(const Point& pos): Troop(pos) {}
+Bandit::Bandit(const Point& pos): Troop(pos, sprite_->getSize()) {}
 
 void Bandit::display(const BlitTarget* target)
 {

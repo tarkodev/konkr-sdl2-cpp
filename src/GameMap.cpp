@@ -50,7 +50,7 @@ void GameMap::init() {
 
 
 GameMap::GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize)
-    : Displayer(pos), size_{size}, HexagonGrid<Cell*>(gridSize, nullptr)
+    : Displayer(pos, size), HexagonGrid<Cell*>(gridSize, nullptr)
 {
     if (getWidth() < 2 || getHeight() < 2)
         throw std::runtime_error("Une map doit au moins être de taille 2x2.");
@@ -81,7 +81,7 @@ GameMap::GameMap(const Point& pos, const Size size, const std::string mapFile)
 {}
 
 GameMap::GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize, const std::string mapFile)
-    : Displayer(pos), size_{size}, HexagonGrid<Cell*>(gridSize, nullptr)
+    : Displayer(pos, size), HexagonGrid<Cell*>(gridSize, nullptr)
 {
     if (getWidth() < 2 || getHeight() < 2)
         throw std::runtime_error("Une map doit au moins être de taille 2x2.");
@@ -306,34 +306,30 @@ void GameMap::setPos(const Point& pos) {
     updateSelectedCell();
 }
 
-const Size GameMap::getSize() const {
-    return size_;
-}
-
 
 void GameMap::updateNeighbors() {
     for (int y = 0; y < getHeight(); y++) {
         if (y & 1) {
             for (int x = 0; x < getWidth(); x++) {
                 get(x, y)->setNeighbors({
-                    y > 0                                 ? get(x,   y-1)   : nullptr,
-                    x > 0                                 ? get(x-1, y)   : nullptr,
-                    y+1 < getHeight()                     ? get(x,   y+1)   : nullptr,
+                    y > 0                                                           ? get(x,   y-1)   : nullptr,
+                    x > 0                                                           ? get(x-1, y)   : nullptr,
+                    y+1 < getHeight()                                  ? get(x,   y+1)   : nullptr,
                     x+1 < getWidth() && y+1 < getHeight() ? get(x+1, y+1) : nullptr,
-                    x+1 < getWidth()                      ? get(x+1, y)   : nullptr,
-                    x+1 < getWidth() && y > 0             ? get(x+1, y-1) : nullptr,
+                    x+1 < getWidth()                                   ? get(x+1, y)   : nullptr,
+                    x+1 < getWidth() && y > 0                          ? get(x+1, y-1) : nullptr,
                 });
             }
         }
         else {
             for (int x = 0; x < getWidth(); x++) {
                 get(x, y)->setNeighbors({
-                    x > 0 && y > 0                        ? get(x-1, y-1) : nullptr,
-                    x > 0                                 ? get(x-1, y)   : nullptr,
+                    x > 0 && y > 0                                     ? get(x-1, y-1) : nullptr,
+                    x > 0                                              ? get(x-1, y)   : nullptr,
                     x > 0 && y+1 < getHeight()            ? get(x-1, y+1) : nullptr,
                     y+1 < getHeight()                     ? get(x,   y+1)   : nullptr,
                     x+1 < getWidth()                      ? get(x+1, y)   : nullptr,
-                    y > 0                                 ? get(x,   y-1)   : nullptr,
+                    y > 0                                              ? get(x,   y-1)   : nullptr,
                 });
             }
         }

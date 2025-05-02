@@ -13,7 +13,7 @@ void Castle::init()
 }
 
 
-Castle::Castle(const Point& pos): GameElement(pos) {}
+Castle::Castle(const Point& pos): GameElement(pos, sprite_->getSize()) {}
 
 void Castle::display(const BlitTarget* target)
 {

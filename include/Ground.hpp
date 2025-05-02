@@ -20,7 +20,6 @@ public:
 
     const std::string getType() override;
     void display(const BlitTarget* target) override;
-    const Size getSize() const override;
 
 protected:
     Ground(const Point& pos);

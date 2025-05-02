@@ -15,7 +15,7 @@ void Town::init()
 }
 
 
-Town::Town(const Point& pos): GameElement(pos) {
+Town::Town(const Point& pos): GameElement(pos, sprite_->getSize()) {
     Point treasuryPos{
         pos_.getX(),
         pos_.getY() + sprite_->getHeight() / 2
@@ -23,10 +23,6 @@ Town::Town(const Point& pos): GameElement(pos) {
     treasuryDisplayer_ = std::make_unique<TreasuryDisplayer>(treasuryPos, 0, 0);
 }
 
-
-const Size Town::getSize() const {
-    return sprite_->getSize();
-};
 
 int Town::getStrength() const {
     return STRENGTH;

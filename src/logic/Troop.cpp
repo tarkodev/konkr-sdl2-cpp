@@ -13,7 +13,7 @@ void Troop::init() {
 }
 
 
-Troop::Troop(const Point& pos) : GameElement(pos) {}
+Troop::Troop(const Point& pos, const Size& size) : GameElement(pos, size) {}
 
 void Troop::displaySprite(const BlitTarget* target, const Texture* sprite)
 {

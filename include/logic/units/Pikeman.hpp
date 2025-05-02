@@ -13,7 +13,6 @@ public:
 
     /* Displayer */
     void display(const BlitTarget* target) override;
-    const Size getSize() const override { return sprite_->getSize(); }
 
     /* --- Accesseurs génériques --- */
     int getStrength() const override { return STRENGTH; };

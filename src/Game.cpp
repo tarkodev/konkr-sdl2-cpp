@@ -26,20 +26,15 @@
 #include <vector>
 
 
-Game::Game() 
-    : window_(std::make_unique<Window>("Konkr", windowSize_.getWidth(), windowSize_.getHeight())) {
+Game::Game() {
+    // Create Window
+    window_ = std::make_shared<Window>("Konkr", windowSize_.getWidth(), windowSize_.getHeight());
     if (!window_ || !window_->isInitialized())
         throw std::runtime_error("Échec de l'initialisation de SDL: " + std::string(SDL_GetError()));
-
-    pendingAction_ = PendingAction::None;
-
 
     // Get renderer and window size
     renderer_ = window_->getRenderer();
     windowSize_ = window_->getSize();
-
-    minHexSize_ = windowSize_ * 0.03;
-    maxHexSize_ = windowSize_ * 0.13;
 
     // Init each class to initialize
     Displayer::init(renderer_);
@@ -62,11 +57,15 @@ Game::Game()
 
     GameMap::init();
     
+    // Init variables
+    minHexSize_ = windowSize_ * 0.03;
+    maxHexSize_ = windowSize_ * 0.13;
 
-    openMainMenu();
+    menu_.reset(new MainMenu(window_));
 
     //! A déplacer dans Overlay pour le chargement des textures
     // Après avoir créé vos textures :
+    /*
     Texture* undoTex  = new Texture(renderer_, "../assets/img/undo.png");
     Button* undoBtn = new Button(undoTex, nullptr, nullptr, Point{150,100});
     undoBtn->setCallback([](){
@@ -103,6 +102,7 @@ Game::Game()
     overlay_.addButton(turnBtn);
     overlay_.addButton(nextBtn);
     overlay_.addButton(skipBtn);
+    */
     //! A déplacer dans Overlay pour le chargement des textures
 }
 
@@ -134,7 +134,7 @@ void Game::handleEvents() {
 
         if (screen_ != ScreenState::InGame) {
             if (activeMenu_)
-                activeMenu_->handleEvent(event);
+                ;//activeMenu_->handleEvent(event);
 
             continue;
         }
@@ -221,7 +221,7 @@ void Game::handleEvents() {
 }
 
 void Game::draw() {
-    window_->fill(ColorUtils::SEABLUE);
+    window_->fill({60, 104, 131});
 
     if (screen_ == ScreenState::InGame) {
         map_->display(&(*window_));
@@ -229,7 +229,7 @@ void Game::draw() {
         // Dans la boucle de rendu :
         overlay_.display(&(*window_));
     } else if (activeMenu_) {
-        activeMenu_->display(&(*window_));
+        //activeMenu_->display(&(*window_));
     }
     
     window_->refresh();
@@ -237,12 +237,12 @@ void Game::draw() {
 
 void Game::openMapSelect() {
     screen_ = ScreenState::MapSelect;
-    activeMenu_ = std::make_unique<MapSelectMenu>(*this);
+    activeMenu_ = std::make_unique<MapSelectMenu>(window_);
 }
 
 void Game::openMainMenu() {
     screen_     = ScreenState::MainMenu;
-    activeMenu_ = std::make_unique<MainMenu>(*this);
+    activeMenu_ = std::make_unique<MainMenu>(window_);
 }
 
 void Game::startGameWithMap(const std::string& file) {
@@ -278,16 +278,6 @@ void Game::startGameWithMap(const std::string& file) {
 }
 
 void Game::run() {
-    loop_ = true;
-
-    while (loop_) {
-        // Handle events
-        handleEvents();
-
-        // Draw elements
-        draw();
-
-        // Control loop duration
-        SDL_Delay(1/60);
-    }
+    while (menu_)
+        menu_ = menu_->run();
 }

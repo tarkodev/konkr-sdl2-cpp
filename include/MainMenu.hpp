@@ -1,16 +1,32 @@
-#pragma once
+#ifndef MAINMENU_HPP
+#define MAINMENU_HPP
 #include "MenuBase.hpp"
-class Game;           // forward
+#include "Window.hpp"
+#include "Texture.hpp"
+#include "Button.hpp"
+#include <memory>
+
+class MapSelectMenu;
 
 class MainMenu : public MenuBase {
 public:
-    MainMenu(Game& app);
-    ~MainMenu();
-    void handleEvent(const SDL_Event& e) override;
+    MainMenu(const std::shared_ptr<Window>& window);
 
-    void display(const BlitTarget* target) override;
-    const Size getSize() const override { return Size{100, 100}; }; //! Changer quand MenuBase aura une size_
+    ~MainMenu() = default;
+
+    std::shared_ptr<MenuBase> run() override;
+
+protected:
+    void handleEvents() override;
+    void draw() override;
 
 private:
-    Game&         app_;
+    std::unique_ptr<Texture> bg_;
+    std::unique_ptr<Texture> logo_;
+
+    std::unique_ptr<Button> expeditionBtn_;
+    std::unique_ptr<Button> howToPlayBtn_;
+    std::unique_ptr<Button> exitBtn_;
 };
+
+#endif

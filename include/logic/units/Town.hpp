@@ -1,5 +1,5 @@
-#ifndef TOWN_HPP
-#define TOWN_HPP
+#ifndef UNIT_TOWN_HPP
+#define UNIT_TOWN_HPP
 
 #include "BlitTarget.hpp"
 #include "TreasuryDisplayer.hpp"
@@ -14,7 +14,6 @@ public:
 
     /* Displayer */
     void display(const BlitTarget* target) override;
-    const Size getSize() const override;
 
     void displayTreasury(const BlitTarget* target);
 

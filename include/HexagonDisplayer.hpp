@@ -18,7 +18,6 @@ public:
 
     ~HexagonDisplayer();
 
-    const Size getSize() const override;
     void display(const BlitTarget* target) override;
     void display(const BlitTarget* target, const Point& pos) override;
 

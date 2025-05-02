@@ -13,7 +13,7 @@ void Camp::init()
 }
 
 
-Camp::Camp(const Point& pos): GameElement(pos) {}
+Camp::Camp(const Point& pos): GameElement(pos, sprite_->getSize()) {}
 
 void Camp::addCoins(int coins) {
     treasury_ += coins;

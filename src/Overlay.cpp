@@ -1,7 +1,7 @@
 // Overlay.cpp
 #include "Overlay.hpp"
 
-Overlay::Overlay() = default;
+Overlay::Overlay(): Displayer() {} //! a compléter
 
 Overlay::~Overlay() {
     // Supprime tous les boutons ajoutés

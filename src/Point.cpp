@@ -96,14 +96,14 @@ Point& Point::operator-=(const Size& other) {
 
 // Opérateur de multiplication affecté
 Point& Point::operator*=(const double coef) {
-    point_.x *= coef;
-    point_.y *= coef;
+    point_.x = static_cast<int>(point_.x * coef);
+    point_.y = static_cast<int>(point_.y * coef);
     return *this;
 }
 
 // Opérateur de division affecté
 Point& Point::operator/=(const double coef) {
-    point_.x /= coef;
-    point_.y /= coef;
+    point_.x = static_cast<int>(point_.x / coef);
+    point_.y = static_cast<int>(point_.y / coef);
     return *this;
 }

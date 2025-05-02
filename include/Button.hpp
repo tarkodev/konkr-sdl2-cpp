@@ -8,48 +8,40 @@
 #include "Rect.hpp"
 #include "Point.hpp"
 #include "Size.hpp"
-
 #include <functional>
+#include <memory>
 
 
-/**
- * @brief Bouton graphique dont la hitbox est la taille de la texture normale.
- */
 class Button: public Displayer {
 public:
     using Callback = std::function<void()>;
 
-    /**
-     * @param normal    Texture d'affichage normal (définit la taille du bouton)
-     * @param hover     Texture au survol (nullptr = pas de changement)
-     * @param pressed   Texture quand on presse (nullptr = pas de changement)
-     * @param pos       Coin supérieur-gauche du bouton
-     */
-    Button(Texture* normal,
-           Texture* hover,
-           Texture* pressed,
-           const Point& pos);
+    Button(const Point& pos,
+           const std::string& normal,
+           const std::string& hover = "",
+           const std::string& pressed = "");
 
-    ~Button();
+    ~Button() = default;
 
-    /// Gère SDL_MOUSEMOTION / SDL_MOUSEBUTTONDOWN / SDL_MOUSEBUTTONUP
+    Button(const Button&) = delete;
+    Button& operator=(const Button&) = delete;
+  
+    Button(Button&&) noexcept = default;
+    Button& operator=(Button&&) noexcept = default;
+
     void handleEvent(const SDL_Event& e);
-
-    /// Définit l'action à exécuter au clic
     void setCallback(Callback cb);
 
     void display(const BlitTarget* target) override;
-    const Size getSize() const override { return bounds_.getSize(); };
 
 private:
-    Texture* texNormal_;
-    Texture* texHover_;
-    Texture* texPressed_;
-    Rect     bounds_; //! ATTENTION: doubblon entre bounds et pos_(par héritage); supprimer bounds
+    std::unique_ptr<Texture> sprite_;
+    std::unique_ptr<Texture> hoverSprite_;
+    std::unique_ptr<Texture> pressedSprite_;
 
-    Callback callback_;
-    bool     isHover_;
-    bool     isPressed_;
+    Callback callback_ = nullptr;
+    bool     isHover_ = false;
+    bool     isPressed_ = false;
 };
 
-#endif // BUTTON_HPP
+#endif

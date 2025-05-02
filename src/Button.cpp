@@ -2,61 +2,55 @@
 #include "Button.hpp"
 #include <SDL.h>
 
-Button::Button(Texture* normal,
-               Texture* hover,
-               Texture* pressed,
-               const Point& pos)
-  : texNormal_(normal)
-  , texHover_(hover)
-  , texPressed_(pressed)
-  , callback_(nullptr)
-  , isHover_(false)
-  , isPressed_(false)
+Button::Button(const Point& pos, const std::string& normal, const std::string& hover, const std::string& pressed)
+    : Displayer(pos)
 {
-    // On crée la hitbox à partir de la taille de la texture normale
-    Size sz = normal->getSize();
-    bounds_ = Rect{ pos, sz };
-}
+    // Create sprites
+    sprite_ = std::make_unique<Texture>(renderer_, normal);
+    size_ = sprite_->getSize();
 
-Button::~Button() {
-    // On ne delete pas les textures ici (possiblement partagées)
-}
+    if (!hover.empty())
+        hoverSprite_ = std::make_unique<Texture>(renderer_, hover);
 
-void Button::handleEvent(const SDL_Event& e) {
-    switch (e.type) {
-        case SDL_MOUSEMOTION:
-            isHover_ = bounds_.contains(e.motion.x, e.motion.y);
-            break;
-
-        case SDL_MOUSEBUTTONDOWN:
-            if (e.button.button == SDL_BUTTON_LEFT
-                && bounds_.contains(e.button.x, e.button.y)) {
-                isPressed_ = true;
-            }
-            break;
-
-        case SDL_MOUSEBUTTONUP:
-            
-            if (e.button.button == SDL_BUTTON_LEFT) {
-                if (isPressed_
-                    && bounds_.contains(e.button.x, e.button.y)
-                    && callback_) {
-                    callback_();
-                }
-                isPressed_ = false;
-            }
-            break;
-    }
-}
-
-void Button::display(const BlitTarget* target) {
-    Texture* toDraw = texNormal_;
-    if (isPressed_ && texPressed_)   toDraw = texPressed_;
-    else if (isHover_ && texHover_)   toDraw = texHover_;
-
-    target->blit(toDraw, bounds_);
+    if (!pressed.empty())
+        pressedSprite_ = std::make_unique<Texture>(renderer_, pressed);
 }
 
 void Button::setCallback(Callback cb) {
     callback_ = std::move(cb);
+}
+
+void Button::handleEvent(const SDL_Event& e) {
+    switch (e.type) {
+        case SDL_MOUSEMOTION: {
+            Point pos = (Point{e.motion.x, e.motion.y} + size_ / 2);
+            isHover_ = Rect{pos_, size_}.contains(pos);
+            break;
+        }
+
+        case SDL_MOUSEBUTTONDOWN: { 
+            Point pos = Point{e.button.x, e.button.y} + size_ / 2;
+            isPressed_ = (e.button.button == SDL_BUTTON_LEFT && Rect{pos_, size_}.contains(pos));
+            break;
+        }
+
+        case SDL_MOUSEBUTTONUP: {
+            if (e.button.button == SDL_BUTTON_LEFT) {
+                Point pos = Point{e.button.x, e.button.y} + size_ / 2;
+                if (callback_ && isPressed_ && Rect{pos_, size_}.contains(pos))
+                    callback_();
+                isPressed_ = false;
+            }
+            break;
+        }
+    }
+}
+
+void Button::display(const BlitTarget* target) {
+    if (isPressed_ && pressedSprite_)
+        target->blit(pressedSprite_.get(), pos_ - (pressedSprite_->getSize() / 2));
+    else if (isHover_ && hoverSprite_)
+        target->blit(pressedSprite_.get(), pos_ - (hoverSprite_->getSize() / 2));
+    else
+        target->blit(sprite_.get(), pos_ - (sprite_->getSize() / 2));
 }

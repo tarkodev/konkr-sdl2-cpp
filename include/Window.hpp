@@ -26,6 +26,8 @@ public:
 
     SDL_Renderer* getRenderer() const { return renderer_.get(); }
     Size getSize() const override { return size_; }
+    int getWidth() const { return size_.getWidth(); }
+    int getHeight() const { return size_.getHeight(); }
     SDL_Texture* get() const override { return calc_->get(); };
 
     void fill(const SDL_Color& color) const;

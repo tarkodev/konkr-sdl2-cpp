@@ -1,5 +1,5 @@
-#ifndef CAPITALDISPLAYER_HPP
-#define CAPITALDISPLAYER_HPP
+#ifndef TREASURYDISPLAYER_HPP
+#define TREASURYDISPLAYER_HPP
 
 #include <vector>
 #include "SDL.h"
@@ -19,7 +19,6 @@ public:
     void setTreasury(int treasury);
     void setIncome(int income);
 
-    const Size getSize() const override;
     void display(const BlitTarget* target) override;
 
 private:

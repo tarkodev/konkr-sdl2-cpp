@@ -1,16 +1,24 @@
-#pragma once
+#ifndef MAPSELECTMENU_HPP
+#define MAPSELECTMENU_HPP
+
 #include "MenuBase.hpp"
-class Game;
+
+class MainMenu;
 
 class MapSelectMenu : public MenuBase {
 public:
-    MapSelectMenu(Game& app);
-    ~MapSelectMenu();
-    void handleEvent(const SDL_Event& e) override;
+    MapSelectMenu(const std::shared_ptr<Window>& window);
 
-    void display(const BlitTarget* target) override;
-    const Size getSize() const override { return Size{100, 100}; }; //! Changer quand MenuBase aura une size_
-    
+    ~MapSelectMenu() = default;
+
+    std::shared_ptr<MenuBase> run() override;
+
+protected:
+    void handleEvents() override;
+    void draw() override;
+
 private:
-    Game&         app_;
+    std::vector<Button> buttons_;
 };
+
+#endif

@@ -1,52 +1,72 @@
 #include "MapSelectMenu.hpp"
-#include "Game.hpp"
-#include <SDL.h>
+#include "SDL.h"
+#include "MainMenu.hpp"
+#include "ColorUtils.hpp"
 
 static const struct { const char* label; const char* file; } MAPS[] = {
     {"Ten Paces",   "../assets/map/Ten Paces.txt"},
-    {"Unity",       "../assets/map/Unity.txt"},
-    {"Test",        "../assets/map/Test.txt"},
-    {"Custom file", ""}              // vide ⇒ à demander plus tard
+    {"Unity",       "../assets/map/Unity.txt"}
 };
 
 
 //! faire fonction init pour passer le renderer
-MapSelectMenu::MapSelectMenu(Game& app) : app_(app)
+MapSelectMenu::MapSelectMenu(const std::shared_ptr<Window>& window) : MenuBase{window}
 {
     int y = 120;
-    for(auto m : MAPS){
-        Texture* t = new Texture(renderer_, std::string("../assets/map/")+m.label+".png");
-        auto* b = new Button(t,nullptr,nullptr, Point{200,y});
-        if (m.file[0])   // 3 cartes fournies
-            b->setCallback([this,m](){
-                app_.requestStartGame(m.file); 
-            });
-        else             // Custom :
-            b->setCallback([](){
-                // TODO : ouvrir une boîte de dialogue ou std::cin pour le chemin
-                SDL_Log("Custom map selection not implemented yet.");
-            });
-        buttons_.push_back(b);
+    for(auto map : MAPS){
+        buttons_.emplace_back(Point{200, y}, std::string("../assets/map/")+map.label+".png");
+        auto& btn = buttons_.back();
+        btn.setCallback([this](){
+            //! générer map
+            loop_ = false;
+        });
+
         y += 120;
     }
 
-    Texture* backTex = new Texture(renderer_, "../assets/img/back.png");
-    auto* backBtn = new Button(backTex, nullptr, nullptr, Point{50, 30});  // Position en haut à gauche
-    backBtn->setCallback([this](){
-        app_.requestAction(PendingAction::OpenMainMenu);
+    // Back button
+    buttons_.emplace_back(Point{50, 30}, "../assets/img/back.png");
+    auto& backBtn = buttons_.back();
+    backBtn.setCallback([this](){
+        loop_ = false;
+        nextMenu_ = std::make_shared<MainMenu>(window_);
     });
-    buttons_.push_back(backBtn);
 }
-MapSelectMenu::~MapSelectMenu(){ for(auto* b:buttons_) delete b; }
-void MapSelectMenu::handleEvent(const SDL_Event& e){
-    for(auto* b:buttons_) b->handleEvent(e);
 
-    // Échap pour revenir au menu principal
-    if(e.type==SDL_KEYDOWN && e.key.keysym.sym==SDLK_ESCAPE){
-        app_.openMapSelect();   // ou recréer un MainMenu si vous préférez
+void MapSelectMenu::handleEvents() {
+    SDL_Event event;
+
+    while (SDL_PollEvent(&event)) {
+        for(auto& button : buttons_)
+            button.handleEvent(event);
+
+        handleEvent(event);
     }
 }
 
-void MapSelectMenu::display(const BlitTarget* target) {
-    for(auto* b:buttons_) b->display(target);
+void MapSelectMenu::draw() {
+    window_->fill(ColorUtils::SEABLUE);
+
+    for(auto& button : buttons_)
+        button.display(window_.get());
+
+    window_->refresh();
 }
+
+std::shared_ptr<MenuBase> MapSelectMenu::run() {
+    loop_ = true;
+
+    while (loop_) {
+        // Handle events
+        handleEvents();
+
+        // Draw elements
+        draw();
+
+        // Control loop duration
+        SDL_Delay(1/60);
+    }
+
+    return nextMenu_;
+}
+

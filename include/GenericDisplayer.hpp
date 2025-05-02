@@ -7,12 +7,11 @@
 
 class GenericDisplayer: public Displayer {
 public:
-    GenericDisplayer(): Displayer() {}
-    virtual ~GenericDisplayer() = default;
-    virtual void display(const BlitTarget* target, const Point& pos) = 0;
+    GenericDisplayer(const Size& size): Displayer(Point{0, 0}, size) {}
 
-protected:
-    Point pos_;
+    virtual ~GenericDisplayer() = default;
+    
+    virtual void display(const BlitTarget* target, const Point& pos) = 0;
 };
 
 #endif

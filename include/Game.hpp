@@ -11,6 +11,7 @@
 #include "MainMenu.hpp"
 #include "MapSelectMenu.hpp"
 #include "Font.hpp"
+#include "MenuBase.hpp"
 
 enum class ScreenState { MainMenu, MapSelect, InGame };
 
@@ -63,12 +64,14 @@ private:
     // Background color
     const SDL_Color bgColor = ColorUtils::SEABLUE;
 
+    std::shared_ptr<MenuBase> menu_;
+
 
     // Object to render textures
     SDL_Renderer* renderer_;
 
     // Window
-    std::unique_ptr<Window> window_;
+    std::shared_ptr<Window> window_;
 
     // Map of game
     std::optional<GameMap> map_;
@@ -87,8 +90,6 @@ private:
     
     
     void updateMapPos();
-
-
 };
 
 #endif

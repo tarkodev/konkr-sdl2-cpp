@@ -36,7 +36,6 @@ public:
     GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize);
     GameMap(const Point& pos, const Size size, const std::string mapFile);
 
-    const Size getSize() const override;
     void setProportionalSize(const Size size);
     void selectCell(const Point& pos);
 
@@ -55,6 +54,9 @@ public:
     void display(const BlitTarget* target) override;
 
     void nextPlayer();
+
+    int getWidth() const override { return HexagonGrid<Cell*>::getWidth(); }
+    int getHeight() const override { return HexagonGrid<Cell*>::getHeight(); }
 
 private:
     static std::mt19937 gen_;
@@ -98,7 +100,6 @@ private:
     PlayableGround* selectedNewTroopCell_ = nullptr;
     int selectedPlayerNum_ = 0;
 
-    Size size_;
     Size calcSize_;
     Texture* islandsCalc_ = nullptr; //! tout passer en unique_ptr
     Texture* platesCalc_ = nullptr;

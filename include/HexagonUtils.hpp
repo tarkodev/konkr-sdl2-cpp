@@ -1,5 +1,5 @@
-#ifndef HEXUTILS_HPP
-#define HEXUTILS_HPP
+#ifndef HEXAGONUTILS_HPP
+#define HEXAGONUTILS_HPP
 
 #include <cmath>
 #include <utility>

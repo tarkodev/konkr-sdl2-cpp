@@ -1,5 +1,5 @@
-#ifndef UNIT_Castle_HPP
-#define UNIT_Castle_HPP
+#ifndef UNIT_CASTLE_HPP
+#define UNIT_CASTLE_HPP
 
 #include "BlitTarget.hpp"
 #include "logic/GameElement.hpp"
@@ -13,7 +13,6 @@ public:
 
     /* Displayer */
     void display(const BlitTarget* target) override;
-    const Size getSize() const override { return sprite_->getSize(); }
 
     /* --- Accesseurs génériques --- */
     int getStrength() const override { return STRENGTH; };

@@ -13,7 +13,7 @@ void Villager::init()
 }
 
 
-Villager::Villager(const Point& pos): Troop(pos) {}
+Villager::Villager(const Point& pos): Troop(pos, sprite_->getSize()) {}
 
 void Villager::display(const BlitTarget* target)
 {
