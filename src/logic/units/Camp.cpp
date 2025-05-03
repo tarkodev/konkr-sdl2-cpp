@@ -4,13 +4,27 @@
 
 std::shared_ptr<Texture> Camp::sprite_ = nullptr;
 
+std::shared_ptr<Camp> Camp::cast(const std::weak_ptr<GameElement>& obj) {
+    auto lobj = obj.lock();
+    return lobj ? std::dynamic_pointer_cast<Camp>(lobj) : nullptr;
+}
+
+bool Camp::is(const std::weak_ptr<GameElement>& obj) {
+    return cast(obj) != nullptr;
+}
+
 void Camp::init()
 {
-    if (!renderer_)
+    if (renderer_.expired())
         throw std::runtime_error("Displayer not initialized");
         
     if (sprite_) return;
     sprite_ = std::make_shared<Texture>(renderer_, "../assets/img/camp.png");
+}
+
+void Camp::quit()
+{
+    sprite_ = nullptr;
 }
 
 
@@ -20,9 +34,9 @@ void Camp::addCoins(int coins) {
     treasury_ += coins;
 }
 
-void Camp::display(const std::shared_ptr<BlitTarget>& target)
-{
-    if (!sprite_) return;
-    target->blit(sprite_, Point{pos_.getX()-sprite_->getWidth()/2,
-                                pos_.getY()-sprite_->getHeight()/2});
+void Camp::display(const std::weak_ptr<BlitTarget>& target) {
+    auto ltarget = target.lock();
+    if (!ltarget || !sprite_) return;
+
+    ltarget->blit(sprite_, pos_ - sprite_->getSize() / 2);
 }

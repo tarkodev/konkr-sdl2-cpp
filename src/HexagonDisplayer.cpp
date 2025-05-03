@@ -17,11 +17,13 @@ HexagonDisplayer::~HexagonDisplayer()
 {}
 
 
-void HexagonDisplayer::display(const std::shared_ptr<BlitTarget>& target, const Point& pos, const std::vector<bool>& neighbors) {
+void HexagonDisplayer::display(const std::weak_ptr<BlitTarget>& target, const Point& pos, const std::vector<bool>& neighbors) {
     auto [x, y] = pos.get();
+    auto ltarget = target.lock();
+    if (!ltarget) return;
     
     // Draw hexagon
-    target->blit(hexagon_, Point{
+    ltarget->blit(hexagon_, Point{
         static_cast<int>(x - hexagon_->getWidth() / 2.0),
         static_cast<int>(y - hexagon_->getHeight() / 2.0)
     });
@@ -32,18 +34,18 @@ void HexagonDisplayer::display(const std::shared_ptr<BlitTarget>& target, const 
         if (!neighbors[i]) continue;
 
         std::shared_ptr<Texture> link = neighbors[i+1] ? link_ : links[i];
-        target->blit(link, Point{
+        ltarget->blit(link, Point{
             static_cast<int>(x - (innerRadius_ / (2 - (i%2))) - link->getWidth() / 2.0),
             static_cast<int>(y + ((i-1) * radius_ * 0.75) - link->getHeight() / 2.0)
         });
     }
 }
 
-void HexagonDisplayer::display(const std::shared_ptr<BlitTarget>& target, const Point& pos) {
+void HexagonDisplayer::display(const std::weak_ptr<BlitTarget>& target, const Point& pos) {
     display(target, pos, {false, false, false, false, false, false});
 }
 
-void HexagonDisplayer::display(const std::shared_ptr<BlitTarget>& target) {
+void HexagonDisplayer::display(const std::weak_ptr<BlitTarget>& target) {
     display(target, pos_, {false, false, false, false, false, false});
 }
 

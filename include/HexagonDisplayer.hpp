@@ -19,10 +19,10 @@ public:
 
     ~HexagonDisplayer();
 
-    void display(const std::shared_ptr<BlitTarget>& target) override;
-    void display(const std::shared_ptr<BlitTarget>& target, const Point& pos) override;
+    void display(const std::weak_ptr<BlitTarget>& target) override;
+    void display(const std::weak_ptr<BlitTarget>& target, const Point& pos) override;
 
-    void display(const std::shared_ptr<BlitTarget>& target, const Point& pos, const std::vector<bool>& neighbors);
+    void display(const std::weak_ptr<BlitTarget>& target, const Point& pos, const std::vector<bool>& neighbors);
 
     HexagonDisplayer copy();
     void colorize(const SDL_Color& color);

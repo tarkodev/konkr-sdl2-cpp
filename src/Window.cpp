@@ -40,6 +40,7 @@ Window::Window(const char* title, const Size& size) {
 }
 
 Window::~Window() {
+    calc_ = nullptr;
     TTF_Quit();
     SDL_Quit();
 }
@@ -49,31 +50,31 @@ void Window::fill(const SDL_Color& color) const {
     calc_->fill(color);
 }
 
-void Window::blit(const std::shared_ptr<BlitTarget>& src) const {
+void Window::blit(const std::weak_ptr<BlitTarget>& src) const {
     calc_->blit(src);
 }
 
-void Window::blit(const std::shared_ptr<BlitTarget>& src, const Point& destPos) const {
+void Window::blit(const std::weak_ptr<BlitTarget>& src, const Point& destPos) const {
     calc_->blit(src, destPos);
 }
 
-void Window::blit(const std::shared_ptr<BlitTarget>& src, const Size& destSize) const {
+void Window::blit(const std::weak_ptr<BlitTarget>& src, const Size& destSize) const {
     calc_->blit(src, destSize);
 }
 
-void Window::blit(const std::shared_ptr<BlitTarget>& src, const Rect& destRect) const {
+void Window::blit(const std::weak_ptr<BlitTarget>& src, const Rect& destRect) const {
     calc_->blit(src, destRect);
 }
 
-void Window::blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Point& destPos) const {
+void Window::blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Point& destPos) const {
     calc_->blit(src, srcRect, destPos);
 }
 
-void Window::blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Size& destSize) const {
+void Window::blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Size& destSize) const {
     calc_->blit(src, srcRect, destSize);
 }
 
-void Window::blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Rect& destRect) const {
+void Window::blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Rect& destRect) const {
     calc_->blit(src, srcRect, destRect);
 }
 

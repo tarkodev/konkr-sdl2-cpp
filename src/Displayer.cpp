@@ -3,11 +3,12 @@
 #include "BlitTarget.hpp"
 #include "Texture.hpp"
 
-std::shared_ptr<SDL_Renderer> Displayer::renderer_ = nullptr;
+std::weak_ptr<SDL_Renderer> Displayer::renderer_ = {};
 
 void Displayer::init(const std::shared_ptr<SDL_Renderer>& renderer) {
     renderer_ = renderer;
 }
+
 
 Displayer::Displayer(const Point& pos, const Size& size): pos_(pos), size_(size) {}
 

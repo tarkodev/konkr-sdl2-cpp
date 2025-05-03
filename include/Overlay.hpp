@@ -20,7 +20,8 @@ public:
 
     void handleEvent(const SDL_Event& e);
 
-    void display(const std::shared_ptr<BlitTarget>& target) override;
+    void setPos(const Point& pos) override;
+    void display(const std::weak_ptr<BlitTarget>& target) override;
 
     bool backRequested() { return backRequested_; };
     bool nextRequested() { return nextRequested_; };
@@ -29,7 +30,9 @@ public:
 
 private:
     std::shared_ptr<Texture> bg_;
-    std::vector<Button> buttons_;
+    std::unique_ptr<Button> backBtn_;
+    std::unique_ptr<Button> turnBtn_;
+    std::vector<Button> troopBtns_;
 
     Point bgPos_;
 
@@ -39,4 +42,4 @@ private:
     bool buyTroopRequested_ = false;
 };
 
-#endif // OVERLAY_HPP
+#endif

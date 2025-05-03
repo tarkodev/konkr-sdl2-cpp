@@ -35,7 +35,7 @@ public:
     Texture render(const std::string& text, SDL_Color color);
 
 private:
-    std::shared_ptr<SDL_Renderer> renderer_ = nullptr;
+    std::weak_ptr<SDL_Renderer> renderer_ = {};
     TTF_Font* font_ = nullptr;
 };
 

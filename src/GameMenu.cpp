@@ -18,7 +18,7 @@ GameMenu::GameMenu(const std::shared_ptr<Window>& window, const std::string& map
 
     // Create Overlay
     overlay_ = std::make_unique<Overlay>(Point{0, 0});
-    overlay_->setPos(Point{windowSize_.getWidth() / 2, windowSize_.getHeight()} - overlay_->getSize() / 2);
+    overlay_->setPos(Point{windowSize_.getWidth() / 2, windowSize_.getHeight() - overlay_->getHeight() / 2});
 }
 
 void GameMenu::createMap(const std::string& mapPath) {
@@ -82,7 +82,8 @@ void GameMenu::onMouseMotion(SDL_Event& event) {
         moved_ = true;
     }
 
-    map_->handleEvent(event);
+    if (true || map_->hasTroopSelected()/*//! || !overlay.isHover()*/)
+        map_->handleEvent(event);
 }
 
 void GameMenu::onMouseButtonUp(SDL_Event& event) {

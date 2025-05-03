@@ -10,39 +10,41 @@
 #include "FenceDisplayer.hpp"
 #include <unordered_set>
 #include <queue>
+#include <memory>
 
-class PlayableGround: public Ground {
+class PlayableGround: public Ground, public std::enable_shared_from_this<PlayableGround> {
 public:
-    static const std::string TYPE;
+    static std::shared_ptr<PlayableGround> cast(const std::weak_ptr<Cell>& obj);
+    static bool is(const std::weak_ptr<Cell>& obj);
     static void init();
+    static void quit();
 
-    PlayableGround(const Point& pos, Player *owner);
+    PlayableGround(const Point& pos, const std::shared_ptr<Player>& owner);
     PlayableGround(const Point& pos);
 
-    Player* getOwner();
-    Player* getOldOwner();
-    void setOwner(Player *owner);
+    std::shared_ptr<Player> getOwner();
+    std::shared_ptr<Player> getOldOwner();
+    void setOwner(std::shared_ptr<Player> owner);
 
-    const std::string getType() override;
-    void display(const std::shared_ptr<BlitTarget>& target) override;
+    void display(const std::weak_ptr<BlitTarget>& target) override;
 
     bool hasFences() const;
-    void displayFences(const std::shared_ptr<Texture>& target);
-    void displayElement(const std::shared_ptr<Texture>& target);
-    void displayShield(const std::shared_ptr<Texture>& target);
-    void displaySelectable(const std::shared_ptr<Texture>& target);
+    void displayFences(const std::weak_ptr<Texture>& target);
+    void displayElement(const std::weak_ptr<Texture>& target);
+    void displayShield(const std::weak_ptr<Texture>& target);
+    void displaySelectable(const std::weak_ptr<Texture>& target);
 
     bool isLinked();
     void updateLinked();
-    void link(Player* owner);
+    void link(const std::weak_ptr<Player>& owner);
     
     void freeTroops();
-    std::vector<Town*> getTowns();
-    Town* getNearestTown();
+    std::vector<std::weak_ptr<Town>> getTowns();
+    std::shared_ptr<Town> getNearestTown();
     void updateIncome();
 
-    GameElement* getElement();
-    void setElement(GameElement* elt);
+    std::shared_ptr<GameElement> getElement();
+    void setElement(std::shared_ptr<GameElement> elt);
 
     int getShield() const;
     void updateSelectable(int strength);
@@ -53,21 +55,21 @@ private:
     static std::vector<std::shared_ptr<Texture>> shieldSprites_;
     static std::shared_ptr<Texture> selectableSprite_;
 
-    Player* oldOwner_ = nullptr;
-    Player* owner_ = nullptr;
+    std::shared_ptr<Player> oldOwner_;
+    std::shared_ptr<Player> owner_;
     HexagonDisplayer plate_ = HexagonDisplayer{-1, nullptr, nullptr, nullptr, nullptr, nullptr};
     HexagonDisplayer lostPlate_ = HexagonDisplayer{-1, nullptr, nullptr, nullptr, nullptr, nullptr};
-    GameElement* element = nullptr;
+    std::shared_ptr<GameElement> element = nullptr;
     bool hasPlate_ = false;
     bool selectable_ = false;
 
-    bool isLinked(std::unordered_set<PlayableGround*>& visited);
-    void unlink(std::unordered_set<PlayableGround*>& visited);
-    void link(Player* owner, std::unordered_set<PlayableGround*>& visited);
-    void updateSelectable(int strength, std::unordered_set<PlayableGround*>& visited);
-    void getTowns(std::queue<PlayableGround*>& toVisit, std::unordered_set<PlayableGround*>& visited, std::vector<Town*>& towns);
-    Town* getNearestTown(std::queue<PlayableGround*>& toVisit, std::unordered_set<PlayableGround*>& visited);
-    void freeTroops(std::unordered_set<PlayableGround*>& visited);
+    bool isLinked(std::unordered_set<std::shared_ptr<PlayableGround>>& visited);
+    void unlink(std::unordered_set<std::shared_ptr<PlayableGround>>& visited);
+    void link(const std::weak_ptr<Player>& owner, std::unordered_set<std::shared_ptr<PlayableGround>>& visited);
+    void updateSelectable(int strength, std::unordered_set<std::shared_ptr<PlayableGround>>& visited);
+    void getTowns(std::queue<std::weak_ptr<PlayableGround>>& toVisit, std::unordered_set<std::shared_ptr<PlayableGround>>& visited, std::vector<std::weak_ptr<Town>>& towns);
+    std::shared_ptr<Town> getNearestTown(std::queue<std::weak_ptr<PlayableGround>>& toVisit, std::unordered_set<std::shared_ptr<PlayableGround>>& visited);
+    void freeTroops(std::unordered_set<std::shared_ptr<PlayableGround>>& visited);
 
     void setSelectable(bool selectable);
 };

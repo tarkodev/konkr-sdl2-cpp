@@ -34,12 +34,15 @@ Font& Font::operator=(Font&& o) noexcept {
 }
 
 Texture Font::render(const std::string& text, SDL_Color color) {
+    auto lrenderer = renderer_.lock();
+    if (!lrenderer) throw std::runtime_error("Renderer isn't initialized");
+    
     // Render on SDL_Surface
     SDL_Surface* surf = TTF_RenderUTF8_Blended(font_, text.c_str(), color);
     if (!surf) throw std::runtime_error(std::string("TTF_RenderUTF8_Blended failed: ") + TTF_GetError());
 
     // Convert to SDL_Texture
-    std::shared_ptr<SDL_Texture> tex = std::shared_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(renderer_.get(), surf), SDL_DestroyTexture);
+    std::shared_ptr<SDL_Texture> tex = std::shared_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(lrenderer.get(), surf), SDL_DestroyTexture);
     SDL_FreeSurface(surf);
 
     // return Texture

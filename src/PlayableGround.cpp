@@ -14,13 +14,18 @@ FenceDisplayer PlayableGround::fenceDisplayer_ = FenceDisplayer{-1, nullptr, nul
 std::vector<std::shared_ptr<Texture>> PlayableGround::shieldSprites_ = std::vector<std::shared_ptr<Texture>>();
 std::shared_ptr<Texture> PlayableGround::selectableSprite_ = nullptr;
 
-const std::string PlayableGround::TYPE = "PlayableGround";
-const std::string PlayableGround::getType() {
-    return PlayableGround::TYPE;
+
+std::shared_ptr<PlayableGround> PlayableGround::cast(const std::weak_ptr<Cell>& obj) {
+    auto lobj = obj.lock();
+    return lobj ? std::dynamic_pointer_cast<PlayableGround>(lobj) : nullptr;
+}
+
+bool PlayableGround::is(const std::weak_ptr<Cell>& obj) {
+    return cast(obj) != nullptr;
 }
 
 void PlayableGround::init() {
-    if (!renderer_)
+    if (renderer_.expired())
         throw std::runtime_error("Displayer not initialized");
 
     // Load fence
@@ -56,7 +61,14 @@ void PlayableGround::init() {
     selectableSprite_->colorize(ColorUtils::YELLOW);
 }
 
-PlayableGround::PlayableGround(const Point& pos, Player *owner)
+void PlayableGround::quit() {
+    fenceDisplayer_ = FenceDisplayer{-1, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
+    shieldSprites_.clear();
+    selectableSprite_ = nullptr;
+}
+
+
+PlayableGround::PlayableGround(const Point& pos, const std::shared_ptr<Player>& owner)
     : Ground(pos), owner_(owner)
 {
     if (owner_) {
@@ -70,7 +82,7 @@ PlayableGround::PlayableGround(const Point& pos)
     : PlayableGround(pos, nullptr)
 {}
 
-void PlayableGround::setOwner(Player *owner) {
+void PlayableGround::setOwner(std::shared_ptr<Player> owner) {
     if (owner != owner_) {
         oldOwner_ = owner == nullptr ? owner_ : nullptr;
         owner_ = owner;
@@ -83,21 +95,21 @@ void PlayableGround::setOwner(Player *owner) {
     }
 }
 
-Player* PlayableGround::getOwner() {
+std::shared_ptr<Player> PlayableGround::getOwner() {
     return owner_;
 }
 
-Player* PlayableGround::getOldOwner() {
+std::shared_ptr<Player> PlayableGround::getOldOwner() {
     return oldOwner_;
 }
 
-void PlayableGround::display(const std::shared_ptr<BlitTarget>& target) {
+void PlayableGround::display(const std::weak_ptr<BlitTarget>& target) {
     if (!hasPlate_) return;
 
     std::vector<bool> similarNeighbors;
     if (owner_) {
-        for (Cell* n : neighbors) {
-            if (auto* pg = dynamic_cast<PlayableGround*>(n))
+        for (auto& cell : neighbors_) {
+            if (auto pg = PlayableGround::cast(cell))
                 similarNeighbors.push_back(pg->getOwner() == owner_);
             else
                 similarNeighbors.push_back(false);
@@ -106,8 +118,8 @@ void PlayableGround::display(const std::shared_ptr<BlitTarget>& target) {
         plate_.display(target, pos_, similarNeighbors);
 
     } else {
-        for (Cell* n : neighbors) {
-            if (auto* pg = dynamic_cast<PlayableGround*>(n))
+        for (auto& cell : neighbors_) {
+            if (auto pg = PlayableGround::cast(cell))
                 similarNeighbors.push_back(pg->getOldOwner() == oldOwner_);
             else
                 similarNeighbors.push_back(false);
@@ -118,28 +130,28 @@ void PlayableGround::display(const std::shared_ptr<BlitTarget>& target) {
 }
 
 bool PlayableGround::hasFences() const {
-    if (element && (dynamic_cast<Castle*>(element) || dynamic_cast<Town*>(element) || dynamic_cast<Camp*>(element)))
+    if (element && (Castle::cast(element) || Town::cast(element) || Camp::cast(element)))
         return true;
 
-    return owner_ && std::any_of(neighbors.begin(), neighbors.end(), [this](Cell* n) {
-        if (auto* pg = dynamic_cast<PlayableGround*>(n)) {
+    return owner_ && std::any_of(neighbors_.begin(), neighbors_.end(), [this](auto cell) {
+        if (auto pg = PlayableGround::cast(cell)) {
             if (pg->getOwner() != owner_) return false;
             auto elt = pg->getElement();
-            return (elt && (dynamic_cast<Castle*>(elt) || dynamic_cast<Town*>(elt)));
+            return (elt && (Castle::cast(elt) || Town::cast(elt)));
         }
         return false;
     });
 }
 
-bool PlayableGround::isLinked(std::unordered_set<PlayableGround*>& visited) {
-    if (!owner_ || visited.find(this) != visited.end()) return false;
-    visited.insert(this);
+bool PlayableGround::isLinked(std::unordered_set<std::shared_ptr<PlayableGround>>& visited) {
+    if (!owner_ || visited.find(shared_from_this()) != visited.end()) return false;
+    visited.insert(shared_from_this());
 
-    auto town = dynamic_cast<Town*>(element);
+    auto town = Town::cast(element);
     if (town) return true;
 
-    for (Cell* n : neighbors) {
-        auto* pg = dynamic_cast<PlayableGround*>(n);
+    for (auto& cell : neighbors_) {
+        auto pg = PlayableGround::cast(cell);
         if (pg && pg->getOwner() == owner_ && pg->isLinked(visited))
             return true;
     }
@@ -148,17 +160,17 @@ bool PlayableGround::isLinked(std::unordered_set<PlayableGround*>& visited) {
 }
 
 bool PlayableGround::isLinked() {
-    std::unordered_set<PlayableGround*> visited;
+    std::unordered_set<std::shared_ptr<PlayableGround>> visited;
     return isLinked(visited);
 }
 
-void PlayableGround::unlink(std::unordered_set<PlayableGround*>& visited) {
-    if (visited.find(this) != visited.end()) return;
-    visited.insert(this);
+void PlayableGround::unlink(std::unordered_set<std::shared_ptr<PlayableGround>>& visited) {
+    if (visited.find(shared_from_this()) != visited.end()) return;
+    visited.insert(shared_from_this());
 
     if (owner_) {
-        for (Cell* n : neighbors) {
-            auto* pg = dynamic_cast<PlayableGround*>(n);
+        for (auto& cell : neighbors_) {
+            auto pg = PlayableGround::cast(cell);
             if (pg && pg->getOwner() == owner_)
                 pg->unlink(visited);
         }
@@ -166,28 +178,29 @@ void PlayableGround::unlink(std::unordered_set<PlayableGround*>& visited) {
         setOwner(nullptr);
     }
 
-    if (auto castle = dynamic_cast<Castle*>(element))
+    if (auto castle = Castle::cast(element))
         castle->lost();
-    else if (auto troop = dynamic_cast<Troop*>(element))
+    else if (auto troop = Troop::cast(element))
         troop->lost();
 }
 
 //! check si voisin.owner == null && oldowner = owner
-void PlayableGround::link(Player* owner, std::unordered_set<PlayableGround*>& visited) {
-    if (visited.find(this) != visited.end()) return;
-    visited.insert(this);
+void PlayableGround::link(const std::weak_ptr<Player>& owner, std::unordered_set<std::shared_ptr<PlayableGround>>& visited) {
+    if (visited.find(shared_from_this()) != visited.end()) return;
+    visited.insert(shared_from_this());
 
-    if (owner_ == nullptr && owner == oldOwner_) {
-        setOwner(owner);
-        for (Cell* n : neighbors) {
-            auto* pg = dynamic_cast<PlayableGround*>(n);
+    auto lowner = owner.lock();
+    if (owner_ == nullptr && lowner == oldOwner_) {
+        setOwner(lowner);
+        for (auto& cell : neighbors_) {
+            auto pg = PlayableGround::cast(cell);
             if (pg && pg->getOldOwner() == owner_)
                 pg->link(owner, visited);
         }
     } else {
-        setOwner(owner);
-        for (Cell* n : neighbors) {
-            if (auto* pg = dynamic_cast<PlayableGround*>(n)) {
+        setOwner(lowner);
+        for (auto& cell : neighbors_) {
+            if (auto pg = PlayableGround::cast(cell)) {
                 if (pg && pg->getOldOwner() == owner_)
                     pg->link(owner, visited);
                 else
@@ -197,55 +210,56 @@ void PlayableGround::link(Player* owner, std::unordered_set<PlayableGround*>& vi
     }
 }
 
-void PlayableGround::link(Player* owner) {
-    if (owner == owner_) return;
+void PlayableGround::link(const std::weak_ptr<Player>& owner) {
+    auto lowner = owner.lock();
+    if (!lowner || lowner == owner_) return;
 
-    std::unordered_set<PlayableGround*> visited;
+    std::unordered_set<std::shared_ptr<PlayableGround>> visited;
     link(owner, visited);
 }
 
 void PlayableGround::updateLinked() {
-    std::unordered_set<PlayableGround*> visited;
+    std::unordered_set<std::shared_ptr<PlayableGround>> visited;
     if (!isLinked(visited)) {
         visited.clear();
         unlink(visited);
     }
 }
 
-void PlayableGround::freeTroops(std::unordered_set<PlayableGround*>& visited) {
-    if (visited.find(this) != visited.end()) return;
-    visited.insert(this);
+void PlayableGround::freeTroops(std::unordered_set<std::shared_ptr<PlayableGround>>& visited) {
+    if (visited.find(shared_from_this()) != visited.end()) return;
+    visited.insert(shared_from_this());
 
     if (owner_) {
-        for (Cell* n : neighbors) {
-            auto* pg = dynamic_cast<PlayableGround*>(n);
+        for (auto& cell : neighbors_) {
+            auto pg = PlayableGround::cast(cell);
             if (pg && pg->getOwner() == owner_)
                 pg->freeTroops(visited);
         }
     }
 
-    auto troop = dynamic_cast<Troop*>(element);
-    if (troop && !dynamic_cast<Bandit*>(troop))
+    auto troop = Troop::cast(element);
+    if (troop && !Bandit::cast(troop))
         troop->setFree(true);
 }
 
 void PlayableGround::freeTroops() {
-    std::unordered_set<PlayableGround*> visited;
+    std::unordered_set<std::shared_ptr<PlayableGround>> visited;
     freeTroops(visited);
 }
 
 // Return towns from nearest to further
-void PlayableGround::getTowns(std::queue<PlayableGround*>& toVisit, std::unordered_set<PlayableGround*>& visited, std::vector<Town*>& towns) {
-    if (!owner_ || visited.find(this) != visited.end()) return;
-    visited.insert(this);
+void PlayableGround::getTowns(std::queue<std::weak_ptr<PlayableGround>>& toVisit, std::unordered_set<std::shared_ptr<PlayableGround>>& visited, std::vector<std::weak_ptr<Town>>& towns) {
+    if (!owner_ || visited.find(shared_from_this()) != visited.end()) return;
+    visited.insert(shared_from_this());
 
     // Add town to list
-    if (auto* town = dynamic_cast<Town*>(element))
+    if (auto town = Town::cast(element))
         towns.push_back(town);
 
     // Add neighbors to visit
-    for (Cell* cell : neighbors) {
-        auto* ng = dynamic_cast<PlayableGround*>(cell);
+    for (auto& cell : neighbors_) {
+        auto ng = PlayableGround::cast(cell);
         if (ng && ng->getOwner() == owner_)
             toVisit.push(ng);
     }
@@ -254,48 +268,50 @@ void PlayableGround::getTowns(std::queue<PlayableGround*>& toVisit, std::unorder
     while (!toVisit.empty()) {
         auto pg = toVisit.front();
         toVisit.pop();
-        pg->getTowns(toVisit, visited, towns);
+        if (auto lpg = pg.lock())
+            lpg->getTowns(toVisit, visited, towns);
     }
 }
 
-std::vector<Town*> PlayableGround::getTowns() {
-    std::queue<PlayableGround*> toVisit;
-    std::unordered_set<PlayableGround*> visited;
-    std::vector<Town*> towns;
+std::vector<std::weak_ptr<Town>> PlayableGround::getTowns() {
+    std::queue<std::weak_ptr<PlayableGround>> toVisit;
+    std::unordered_set<std::shared_ptr<PlayableGround>> visited;
+    std::vector<std::weak_ptr<Town>> towns;
 
     getTowns(toVisit, visited, towns);
     return towns;
 }
 
-Town* PlayableGround::getNearestTown(std::queue<PlayableGround*>& toVisit, std::unordered_set<PlayableGround*>& visited) {
-    if (!owner_ || visited.find(this) != visited.end()) return nullptr;
-    visited.insert(this);
+std::shared_ptr<Town> PlayableGround::getNearestTown(std::queue<std::weak_ptr<PlayableGround>>& toVisit, std::unordered_set<std::shared_ptr<PlayableGround>>& visited) {
+    if (!owner_ || visited.find(shared_from_this()) != visited.end()) return nullptr;
+    visited.insert(shared_from_this());
 
     // Add town to list
-    if (auto* town = dynamic_cast<Town*>(element))
+    if (auto town = Town::cast(element))
         return town;
 
     // Add neighbors to visit
-    for (Cell* cell : neighbors) {
-        auto* ng = dynamic_cast<PlayableGround*>(cell);
+    for (auto& cell : neighbors_) {
+        auto ng = PlayableGround::cast(cell);
         if (ng && ng->getOwner() == owner_)
             toVisit.push(ng);
     }
 
     // Visit next cells
-    Town* town = nullptr;
+    std::shared_ptr<Town> town = nullptr;
     while (!toVisit.empty() && !town) {
         auto pg = toVisit.front();
         toVisit.pop();
-        town = pg->getNearestTown(toVisit, visited);
+        if (auto lpg = pg.lock())
+            town = lpg->getNearestTown(toVisit, visited);
     }
 
     return town;
 }
 
-Town* PlayableGround::getNearestTown() {
-    std::queue<PlayableGround*> toVisit;
-    std::unordered_set<PlayableGround*> visited;
+std::shared_ptr<Town> PlayableGround::getNearestTown() {
+    std::queue<std::weak_ptr<PlayableGround>> toVisit;
+    std::unordered_set<std::shared_ptr<PlayableGround>> visited;
     return getNearestTown(toVisit, visited);
 }
 
@@ -303,17 +319,17 @@ void PlayableGround::updateIncome() {
     int income = element ? 1 - element->getUpkeep() : 1;
     if (income == 0) return;
 
-    if (auto* town = getNearestTown())
+    if (auto town = getNearestTown())
         town->addIncome(income);
 }
 
-void PlayableGround::displayFences(const std::shared_ptr<Texture>& target) {
+void PlayableGround::displayFences(const std::weak_ptr<Texture>& target) {
     if (!hasFences()) return;
 
     std::vector<bool> similarNeighborsWithFences;
     if (owner_) {
-        for (Cell* n : neighbors) {
-            if (auto* pg = dynamic_cast<PlayableGround*>(n))
+        for (auto& cell : neighbors_) {
+            if (auto pg = PlayableGround::cast(cell))
                 similarNeighborsWithFences.push_back(pg->getOwner() == owner_ && pg->hasFences());
             else
                 similarNeighborsWithFences.push_back(false);
@@ -323,28 +339,30 @@ void PlayableGround::displayFences(const std::shared_ptr<Texture>& target) {
     fenceDisplayer_.display(target, pos_, similarNeighborsWithFences);
 }
 
-void PlayableGround::displayElement(const std::shared_ptr<Texture>& target) {
+void PlayableGround::displayElement(const std::weak_ptr<Texture>& target) {
     if (element) element->display(target);
 }
 
-void PlayableGround::displayShield(const std::shared_ptr<Texture>& target) {
-    if (element) return;
+void PlayableGround::displayShield(const std::weak_ptr<Texture>& target) {
+    auto ltarget = target.lock();
+    if (!ltarget || element) return;
 
     int shield = getShield();
     if (shield > 0) {
         auto shieldTex = shieldSprites_[shield - 1];
 
-        target->blit(shieldTex, Point{
+        ltarget->blit(shieldTex, Point{
             static_cast<int>(pos_.getX() - shieldTex->getWidth() / 2.0),
             static_cast<int>(pos_.getY() - shieldTex->getHeight() / 2.0)
         });
     }
 }
 
-void PlayableGround::displaySelectable(const std::shared_ptr<Texture>& target) {
-    if (!selectable_ || (owner_ && owner_->hasSelected())) return;
+void PlayableGround::displaySelectable(const std::weak_ptr<Texture>& target) {
+    auto ltarget = target.lock();
+    if (!ltarget || !selectable_ || (owner_ && owner_->hasSelected())) return;
 
-    target->blit(selectableSprite_, Point{
+    ltarget->blit(selectableSprite_, Point{
         static_cast<int>(pos_.getX() - selectableSprite_->getWidth() / 2.0),
         static_cast<int>(pos_.getY() - selectableSprite_->getHeight() / 2.0)
     });
@@ -352,20 +370,20 @@ void PlayableGround::displaySelectable(const std::shared_ptr<Texture>& target) {
 
 
 
-void PlayableGround::setElement(GameElement* elt) {
+void PlayableGround::setElement(std::shared_ptr<GameElement> elt) {
     element = elt;
     if (element) elt->setPos(pos_);
 }
 
-GameElement* PlayableGround::getElement() {
+std::shared_ptr<GameElement> PlayableGround::getElement() {
     return element;
 }
 
 int PlayableGround::getShield() const {
     int maxStrength = element ? element->getStrength() : 0;
 
-    for (Cell* cell : neighbors) {
-        auto* pg = dynamic_cast<PlayableGround*>(cell);
+    for (auto& cell : neighbors_) {
+        auto pg = PlayableGround::cast(cell);
         if (!pg) continue;
 
         auto owner = pg->getOwner();
@@ -384,14 +402,14 @@ void PlayableGround::setSelectable(bool selectable) {
     selectable_ = selectable;
 }
 
-void PlayableGround::updateSelectable(int strength, std::unordered_set<PlayableGround*>& visited) {
-    if (visited.find(this) != visited.end()) return;
-    visited.insert(this);
+void PlayableGround::updateSelectable(int strength, std::unordered_set<std::shared_ptr<PlayableGround>>& visited) {
+    if (visited.find(shared_from_this()) != visited.end()) return;
+    visited.insert(shared_from_this());
 
     selectable_ = strength > 0;
     
-    for (Cell* cell : neighbors) {
-        if (auto* pg = dynamic_cast<PlayableGround*>(cell)) {
+    for (auto& cell : neighbors_) {
+        if (auto pg = PlayableGround::cast(cell)) {
             if (pg->getOwner() == owner_) pg->updateSelectable(strength, visited);
             else pg->setSelectable(pg->getShield() < strength);
         }
@@ -399,6 +417,6 @@ void PlayableGround::updateSelectable(int strength, std::unordered_set<PlayableG
 }
 
 void PlayableGround::updateSelectable(int strength) {
-    std::unordered_set<PlayableGround*> visited;
+    std::unordered_set<std::shared_ptr<PlayableGround>> visited;
     updateSelectable(strength, visited);
 }

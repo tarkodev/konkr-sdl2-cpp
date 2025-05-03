@@ -4,14 +4,29 @@
 std::shared_ptr<Texture> Town::sprite_ = nullptr;
 std::shared_ptr<Texture> Town::selectSprite_ = nullptr;
 
+std::shared_ptr<Town> Town::cast(const std::weak_ptr<GameElement>& obj) {
+    auto lobj = obj.lock();
+    return lobj ? std::dynamic_pointer_cast<Town>(lobj) : nullptr;
+}
+
+bool Town::is(const std::weak_ptr<GameElement>& obj) {
+    return cast(obj) != nullptr;
+}
+
 void Town::init()
 {
-    if (!renderer_)
+    if (renderer_.expired())
         throw std::runtime_error("Displayer not initialized");
 
     if (sprite_) return;
     sprite_ = std::make_shared<Texture>(renderer_, "../assets/img/town.png");
     selectSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/bgtown.png");
+}
+
+void Town::quit()
+{
+    sprite_ = nullptr;
+    selectSprite_ = nullptr;
 }
 
 
@@ -65,17 +80,17 @@ void Town::setSelected(bool selected) {
     selected_ = selected;
 }
 
-void Town::display(const std::shared_ptr<BlitTarget>& target)
-{
-    if (!sprite_) return;
+void Town::display(const std::weak_ptr<BlitTarget>& target) {
+    auto ltarget = target.lock();
+    if (!ltarget || !sprite_) return;
 
     if (selected_)
-        target->blit(selectSprite_, Point{pos_.getX()-selectSprite_->getWidth()/2, pos_.getY()-selectSprite_->getHeight()/2});
+        ltarget->blit(selectSprite_, Point{pos_.getX()-selectSprite_->getWidth()/2, pos_.getY()-selectSprite_->getHeight()/2});
 
-    target->blit(sprite_, Point{pos_.getX()-sprite_->getWidth()/2, pos_.getY()-sprite_->getHeight()/2});
+    ltarget->blit(sprite_, pos_ - sprite_->getSize() / 2);
 }
 
-void Town::displayTreasury(const std::shared_ptr<BlitTarget>& target)
+void Town::displayTreasury(const std::weak_ptr<BlitTarget>& target)
 {
     treasuryDisplayer_.display(target);
 }

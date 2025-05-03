@@ -6,13 +6,17 @@
 
 class Camp : public GameElement {
 public:
+    static std::shared_ptr<Camp> cast(const std::weak_ptr<GameElement>& obj);
+    static bool is(const std::weak_ptr<GameElement>& obj);
+
     /* Chargement des ressources partagées */
     static void init();
+    static void quit();
 
     explicit Camp(const Point& pos);
 
     /* Displayer */
-    void display(const std::shared_ptr<BlitTarget>& target) override;
+    void display(const std::weak_ptr<BlitTarget>& target) override;
 
     /* --- Accesseurs génériques --- */
     int getStrength() const override { return STRENGTH; };

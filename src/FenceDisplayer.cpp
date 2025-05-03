@@ -17,86 +17,88 @@ FenceDisplayer::~FenceDisplayer()
 {}
 
 
-void FenceDisplayer::display(const std::shared_ptr<BlitTarget>& target, const Point& pos, const std::vector<bool>& neighbors) {
+void FenceDisplayer::display(const std::weak_ptr<BlitTarget>& target, const Point& pos, const std::vector<bool>& neighbors) {
     auto [x, y] = pos.get();
+    auto ltarget = target.lock();
+    if (!ltarget) return;
 
     if (!neighbors[5] && !neighbors[0]) {
-        target->blit(top_, Point{
+        ltarget->blit(top_, Point{
             static_cast<int>(x - top_->getWidth() / 2.0),
             static_cast<int>(y - top_->getHeight() / 2.0)
         });
     } else if (!neighbors[5] && neighbors[0]) {
-        target->blit(linkTopRight_, Point{
+        ltarget->blit(linkTopRight_, Point{
             static_cast<int>(x - 0.5 * innerRadius_ - linkTop_->getWidth() / 2.0),
             static_cast<int>(y - 0.75 * radius_ - linkTop_->getHeight() / 2.0)
         });
     } else if (neighbors[5] && !neighbors[0]) {
-        target->blit(linkTopLeft_, Point{
+        ltarget->blit(linkTopLeft_, Point{
             static_cast<int>(x + 0.5 * innerRadius_ - linkTop_->getWidth() / 2.0),
             static_cast<int>(y - 0.75 * radius_ - linkTop_->getHeight() / 2.0)
         });
     }
 
     if (!neighbors[0] && !neighbors[1]) {
-        target->blit(topLeft_, Point{
+        ltarget->blit(topLeft_, Point{
             static_cast<int>(x - topLeft_->getWidth() / 2.0),
             static_cast<int>(y - topLeft_->getHeight() / 2.0)
         });
     } else if (!neighbors[0] && neighbors[1]) {
-        target->blit(linkTop_, Point{
+        ltarget->blit(linkTop_, Point{
             static_cast<int>(x - innerRadius_ - linkTop_->getWidth() / 2.0),
             static_cast<int>(y - linkTop_->getHeight() / 2.0)
         });
     }
 
     if (!neighbors[4] && !neighbors[5]) {
-        target->blit(topRight_, Point{
+        ltarget->blit(topRight_, Point{
             static_cast<int>(x - topRight_->getWidth() / 2.0),
             static_cast<int>(y - topRight_->getHeight() / 2.0)
         });
     }
 
     if (!neighbors[1] && !neighbors[2]) {
-        target->blit(bottomLeft_, Point{
+        ltarget->blit(bottomLeft_, Point{
             static_cast<int>(x - bottomLeft_->getWidth() / 2.0),
             static_cast<int>(y - bottomLeft_->getHeight() / 2.0)
         });
     }
 
     if (!neighbors[3] && !neighbors[4]) {
-        target->blit(bottomRight_, Point{
+        ltarget->blit(bottomRight_, Point{
             static_cast<int>(x - bottomRight_->getWidth() / 2.0),
             static_cast<int>(y - bottomRight_->getHeight() / 2.0)
         });
     } else if (!neighbors[3] && neighbors[4]) {
-        target->blit(linkBottom_, Point{
+        ltarget->blit(linkBottom_, Point{
             static_cast<int>(x + innerRadius_ - linkBottom_->getWidth() / 2.0),
             static_cast<int>(y - linkBottom_->getHeight() / 2.0)
         });
     }
 
     if (!neighbors[2] && !neighbors[3]) {
-        target->blit(bottom_, Point{
+        ltarget->blit(bottom_, Point{
             static_cast<int>(x - bottom_->getWidth() / 2.0),
             static_cast<int>(y - bottom_->getHeight() / 2.0)
         });
     } else if (neighbors[2] && !neighbors[3]) {
-        target->blit(linkBottomRight_, Point{
+        ltarget->blit(linkBottomRight_, Point{
             static_cast<int>(x - 0.5 * innerRadius_ - linkBottomRight_->getWidth() / 2.0),
             static_cast<int>(y + 0.75 * radius_ - linkBottomRight_->getHeight() / 2.0)
         });
     } else if (!neighbors[2] && neighbors[3]) {
-        target->blit(linkBottomLeft_, Point{
+        ltarget->blit(linkBottomLeft_, Point{
             static_cast<int>(x + 0.5 * innerRadius_ - linkBottomLeft_->getWidth() / 2.0),
             static_cast<int>(y + 0.75 * radius_ - linkBottomLeft_->getHeight() / 2.0)
         });
     }
 }
 
-void FenceDisplayer::display(const std::shared_ptr<BlitTarget>& target, const Point& pos) {
+void FenceDisplayer::display(const std::weak_ptr<BlitTarget>& target, const Point& pos) {
     display(target, pos, {false, false, false, false, false, false});
 }
 
-void FenceDisplayer::display(const std::shared_ptr<BlitTarget>& target) {
+void FenceDisplayer::display(const std::weak_ptr<BlitTarget>& target) {
     display(target, pos_, {false, false, false, false, false, false});
 }

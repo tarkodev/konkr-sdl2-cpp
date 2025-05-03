@@ -4,8 +4,17 @@
 std::shared_ptr<Texture> Troop::shadow_ = nullptr;
 std::shared_ptr<Texture> Troop::lostSprite_ = nullptr;
 
+std::shared_ptr<Troop> Troop::cast(const std::weak_ptr<GameElement>& obj) {
+    auto lobj = obj.lock();
+    return lobj ? std::dynamic_pointer_cast<Troop>(lobj) : nullptr;
+}
+
+bool Troop::is(const std::weak_ptr<GameElement>& obj) {
+    return cast(obj) != nullptr;
+}
+
 void Troop::init() {
-    if (!renderer_)
+    if (renderer_.expired())
         throw std::runtime_error("Displayer not initialized");
 
     if (shadow_) return;
@@ -13,16 +22,22 @@ void Troop::init() {
     lostSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/lost.png");
 }
 
+void Troop::quit() {
+    shadow_ = nullptr;
+    lostSprite_ = nullptr;
+}
+
 
 Troop::Troop(const Point& pos, const Size& size) : GameElement(pos, size) {}
 
-void Troop::displaySprite(const std::shared_ptr<BlitTarget>& target, const std::shared_ptr<Texture>& sprite)
-{
-    if (!sprite || !shadow_ || !lostSprite_) return;
+void Troop::displaySprite(const std::weak_ptr<BlitTarget>& target, const std::weak_ptr<Texture>& sprite) {
+    auto ltarget = target.lock();
+    auto lsprite = sprite.lock();
+    if (!ltarget || !lsprite || !shadow_ || !lostSprite_) return;
     
-    if (lost_ || free_) target->blit(lostSprite_, Point{pos_.getX() - lostSprite_->getWidth() / 2, pos_.getY() - lostSprite_->getHeight() / 2});
-    target->blit(shadow_, Point{pos_.getX() - shadow_->getWidth() / 2, pos_.getY() - shadow_->getHeight() / 2});
-    target->blit(sprite, Point{pos_.getX() - sprite->getWidth() / 2, pos_.getY() - sprite->getHeight() / 2});
+    if (lost_ || free_) ltarget->blit(lostSprite_, Point{pos_.getX() - lostSprite_->getWidth() / 2, pos_.getY() - lostSprite_->getHeight() / 2});
+    ltarget->blit(shadow_, Point{pos_.getX() - shadow_->getWidth() / 2, pos_.getY() - shadow_->getHeight() / 2});
+    ltarget->blit(sprite, Point{pos_.getX() - lsprite->getWidth() / 2, pos_.getY() - lsprite->getHeight() / 2});
 }
 
 void Troop::setFree(bool free) {

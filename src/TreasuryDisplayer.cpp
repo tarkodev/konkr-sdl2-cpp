@@ -5,14 +5,20 @@ std::shared_ptr<Texture> TreasuryDisplayer::bg_ = nullptr;
 std::shared_ptr<Font> TreasuryDisplayer::font_ = nullptr;
 
 void TreasuryDisplayer::init() {
-    if (!renderer_)
+    auto lrenderer = renderer_.lock();
+    if (!lrenderer)
         throw std::runtime_error("Displayer not initialized");
 
     // Load bg
-    bg_ = std::make_shared<Texture>(renderer_, "../assets/img/treasury_bg.png");
+    bg_ = std::make_shared<Texture>(lrenderer, "../assets/img/treasury_bg.png");
 
     // Load Font
-    font_ = std::make_shared<Font>(renderer_, "../assets/fonts/Inter/static/Inter_18pt-SemiBold.ttf", 25);
+    font_ = std::make_shared<Font>(lrenderer, "../assets/fonts/Inter/static/Inter_18pt-SemiBold.ttf", 25);
+}
+
+void TreasuryDisplayer::quit() {
+    bg_ = nullptr;
+    font_ = nullptr;
 }
 
 TreasuryDisplayer::TreasuryDisplayer(
@@ -41,7 +47,9 @@ void TreasuryDisplayer::setIncome(int income) {
     refreshTexture();
 }
 
-void TreasuryDisplayer::display(const std::shared_ptr<BlitTarget>& target) {
-    target->blit(bg_, Point{pos_.getX() - bg_->getWidth() / 2, pos_.getY() - bg_->getHeight() / 2});
-    target->blit(treasuryTex_, Point{pos_.getX() - treasuryTex_->getWidth() / 2, pos_.getY() - treasuryTex_->getHeight() / 2});
+void TreasuryDisplayer::display(const std::weak_ptr<BlitTarget>& target) {
+    if (auto ltarget = target.lock()) {
+        ltarget->blit(bg_, Point{pos_.getX() - bg_->getWidth() / 2, pos_.getY() - bg_->getHeight() / 2});
+        ltarget->blit(treasuryTex_, Point{pos_.getX() - treasuryTex_->getWidth() / 2, pos_.getY() - treasuryTex_->getHeight() / 2});
+    }
 }

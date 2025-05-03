@@ -13,7 +13,7 @@ public:
 
     virtual ~Displayer() = default;
     
-    virtual void display(const std::shared_ptr<BlitTarget>& target) = 0; //! display est const ?
+    virtual void display(const std::weak_ptr<BlitTarget>& target) = 0; //! rendre const ?
     
     virtual Point getPos() const;
     virtual void setPos(const Point& pos);
@@ -24,7 +24,7 @@ public:
 
 
 protected:
-    static std::shared_ptr<SDL_Renderer> renderer_;
+    static std::weak_ptr<SDL_Renderer> renderer_;
 
     Size size_;
     Point pos_;

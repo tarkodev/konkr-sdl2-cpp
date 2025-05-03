@@ -5,11 +5,10 @@
 
 class Water: public Cell {
 public:
-    static const std::string TYPE;
+    static std::shared_ptr<Water> cast(const std::weak_ptr<Cell>& obj);
+    static bool is(const std::weak_ptr<Cell>& obj);
 
-    Water();
-
-    const std::string getType() override;
+    Water() = default;
 };
 
 #endif

@@ -14,13 +14,13 @@ public:
     virtual Size getSize() const = 0;
     virtual SDL_Texture* get() const = 0;
 
-    virtual void blit(const std::shared_ptr<BlitTarget>& src) const = 0;
-    virtual void blit(const std::shared_ptr<BlitTarget>& src, const Point& destPos) const = 0;
-    virtual void blit(const std::shared_ptr<BlitTarget>& src, const Size& destSize) const = 0;
-    virtual void blit(const std::shared_ptr<BlitTarget>& src, const Rect& destRect) const = 0;
-    virtual void blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Point& destPos) const = 0;
-    virtual void blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Size& destSize) const = 0;
-    virtual void blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Rect& destRect) const = 0;
+    virtual void blit(const std::weak_ptr<BlitTarget>& src) const = 0;
+    virtual void blit(const std::weak_ptr<BlitTarget>& src, const Point& destPos) const = 0;
+    virtual void blit(const std::weak_ptr<BlitTarget>& src, const Size& destSize) const = 0;
+    virtual void blit(const std::weak_ptr<BlitTarget>& src, const Rect& destRect) const = 0;
+    virtual void blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Point& destPos) const = 0;
+    virtual void blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Size& destSize) const = 0;
+    virtual void blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Rect& destRect) const = 0;
 };
 
 #endif

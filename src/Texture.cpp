@@ -5,9 +5,11 @@
 #include <sstream>
 
 // Constructeur : charge la texture depuis le fichier
-Texture::Texture(const std::shared_ptr<SDL_Renderer>& renderer, const std::string& file): renderer_(renderer)
-{
-    SDL_Texture* texture = IMG_LoadTexture(renderer.get(), file.c_str());
+Texture::Texture(const std::weak_ptr<SDL_Renderer>& renderer, const std::string& file): renderer_(renderer) {
+    auto lrenderer = renderer_.lock();
+    if (!lrenderer) throw std::runtime_error("Renderer isn't initialized.");
+
+    SDL_Texture* texture = IMG_LoadTexture(lrenderer.get(), file.c_str());
     if (!texture)
         throw std::runtime_error("Failed to load texture from " + file + ": " + std::string(SDL_GetError()));
 
@@ -21,7 +23,7 @@ Texture::Texture(const std::shared_ptr<SDL_Renderer>& renderer, const std::strin
     size_ = {w, h};
 }
 
-Texture::Texture(const std::shared_ptr<SDL_Renderer>& renderer, const std::shared_ptr<SDL_Texture>& texture): renderer_(renderer) {
+Texture::Texture(const std::weak_ptr<SDL_Renderer>& renderer, const std::shared_ptr<SDL_Texture>& texture): renderer_(renderer) {
     texture_ = texture;
     if (!texture_)
         throw std::runtime_error("Texture isn't defined: " + std::string(SDL_GetError()));
@@ -34,8 +36,11 @@ Texture::Texture(const std::shared_ptr<SDL_Renderer>& renderer, const std::share
     size_ = {w, h};
 }
 
-Texture::Texture(const std::shared_ptr<SDL_Renderer>& renderer, int w, int h): renderer_(renderer) {
-    texture_ = std::shared_ptr<SDL_Texture>(SDL_CreateTexture(renderer.get(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, w, h), SDL_DestroyTexture);
+Texture::Texture(const std::weak_ptr<SDL_Renderer>& renderer, int w, int h): renderer_(renderer) {
+    auto lrenderer = renderer_.lock();
+    if (!lrenderer) throw std::runtime_error("Renderer isn't initialized.");
+
+    texture_ = std::shared_ptr<SDL_Texture>(SDL_CreateTexture(lrenderer.get(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, w, h), SDL_DestroyTexture);
     if (!texture_)
         throw std::runtime_error("Failed to create texture: " + std::string(SDL_GetError()));
 
@@ -43,12 +48,12 @@ Texture::Texture(const std::shared_ptr<SDL_Renderer>& renderer, int w, int h): r
     size_ = {w, h};
 }
 
-Texture::Texture(const std::shared_ptr<SDL_Renderer>& renderer, const Size& size): 
+Texture::Texture(const std::weak_ptr<SDL_Renderer>& renderer, const Size& size): 
     Texture(renderer, size.getWidth(), size.getHeight()) {}
 
 Texture::Texture(Texture&& o): texture_(o.texture_), renderer_(o.renderer_), size_(o.size_), alpha_(o.alpha_) {
     o.texture_  = nullptr;
-    o.renderer_  = nullptr;
+    o.renderer_ = {};
     o.alpha_    = false;
     o.size_     = Size{0, 0};
 }
@@ -65,7 +70,7 @@ Texture& Texture::operator=(Texture&& o) noexcept {
         alpha_     = o.alpha_;
 
         o.texture_  = nullptr;
-        o.renderer_  = nullptr;
+        o.renderer_  = {};
         o.alpha_    = false;
         o.size_     = Size{0, 0};
     }
@@ -73,7 +78,6 @@ Texture& Texture::operator=(Texture&& o) noexcept {
 }
 
 void Texture::colorize(const SDL_Color& color) {
-    RenderTargetGuard target(renderer_, texture_);
     SDL_SetTextureColorMod(texture_.get(), color.r, color.g, color.b);
 }
 
@@ -118,57 +122,80 @@ void Texture::removeAlpha() {
 }
 
 void Texture::fill(const SDL_Color& color) const {
-    RenderTargetGuard target(renderer_, texture_);
+    auto lrenderer = renderer_.lock();
+    if (!lrenderer) return;
 
-    if (SDL_SetRenderDrawColor(renderer_.get(), color.r, color.g, color.b, color.a) != 0 ||
-        SDL_RenderClear(renderer_.get()) != 0)
+    RenderTargetGuard target(renderer_, texture_);
+    if (SDL_SetRenderDrawColor(lrenderer.get(), color.r, color.g, color.b, color.a) != 0 ||
+        SDL_RenderClear(lrenderer.get()) != 0)
         throw std::runtime_error("Erreur lors du fill de la texture: " + std::string(SDL_GetError()));
 }
 
 
-void Texture::blit(const std::shared_ptr<BlitTarget>& src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const {
-    RenderTargetGuard target(renderer_, texture_);
+void Texture::blit(const std::weak_ptr<BlitTarget>& src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const {
+    auto lrenderer = renderer_.lock();
+    if (!lrenderer) return;
 
-    if (SDL_RenderCopy(renderer_.get(), src->get(), srcRect, destRect) != 0)
+    RenderTargetGuard target(renderer_, texture_);
+    auto lsrc = src.lock();
+    if (!lsrc) return;
+
+    if (SDL_RenderCopy(lrenderer.get(), lsrc->get(), srcRect, destRect) != 0)
+        throw std::runtime_error("Erreur lors du blitting de la texture: " + std::string(SDL_GetError()));
+}
+
+void Texture::blit(const std::weak_ptr<BlitTarget>& src) const {
+    blit(src, nullptr, nullptr);
+}
+
+void Texture::blit(const std::weak_ptr<BlitTarget>& src, const Point& destPos) const {
+    if (auto lsrc = src.lock()) {
+        Rect destRect(destPos, lsrc->getSize());
+        blit(src, nullptr, &destRect.get());
+    }
+}
+
+void Texture::blit(const std::weak_ptr<BlitTarget>& src, const Size& destSize) const {
+    Rect destRect({0, 0}, destSize);
+    blit(src, nullptr, &destRect.get());
+}
+
+void Texture::blit(const std::weak_ptr<BlitTarget>& src, const Rect& destRect) const {
+    blit(src, nullptr, &destRect.get());
+}
+
+void Texture::blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Point& destPos) const {
+    if (auto lsrc = src.lock()) {
+        Rect destRect(destPos, lsrc->getSize());
+        blit(src, &srcRect.get(), &destRect.get());
+    }
+}
+
+void Texture::blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Size& destSize) const {
+    Rect destRect({0, 0}, destSize);
+    blit(src, &srcRect.get(), &destRect.get());
+}
+
+void Texture::blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Rect& destRect) const {
+    blit(src, &srcRect.get(), &destRect.get());
+}
+
+
+void Texture::blit(const std::unique_ptr<BlitTarget>& src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const {
+    auto lrenderer = renderer_.lock();
+    if (!lrenderer) return;
+
+    RenderTargetGuard target(renderer_, texture_);
+    if (SDL_RenderCopy(lrenderer.get(), src->get(), srcRect, destRect) != 0)
         throw std::runtime_error("Erreur lors du blitting de la texture: " + std::string(SDL_GetError()));
 }
 
 
-void Texture::blit(const std::shared_ptr<BlitTarget>& src) const {
-    blit(src, nullptr, nullptr);
-}
-
-void Texture::blit(const std::shared_ptr<BlitTarget>& src, const Point& destPos) const {
-    Rect destRect(destPos, src->getSize());
-    blit(src, nullptr, &destRect.get());
-}
-
-void Texture::blit(const std::shared_ptr<BlitTarget>& src, const Size& destSize) const {
-    Rect destRect({0, 0}, destSize);
-    blit(src, nullptr, &destRect.get());
-}
-
-void Texture::blit(const std::shared_ptr<BlitTarget>& src, const Rect& destRect) const {
-    blit(src, nullptr, &destRect.get());
-}
-
-void Texture::blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Point& destPos) const {
-    Rect destRect(destPos, src->getSize());
-    blit(src, &srcRect.get(), &destRect.get());
-}
-
-void Texture::blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Size& destSize) const {
-    Rect destRect({0, 0}, destSize);
-    blit(src, &srcRect.get(), &destRect.get());
-}
-
-void Texture::blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Rect& destRect) const {
-    blit(src, &srcRect.get(), &destRect.get());
-}
-
 void Texture::display(const Point& destPos) {
-    SDL_Rect destRect{destPos.getX(), destPos.getY(), getWidth(), getHeight()};
+    auto lrenderer = renderer_.lock();
+    if (!lrenderer) return;
 
-    if (SDL_RenderCopy(renderer_.get(), texture_.get(), nullptr, &destRect) != 0)
+    SDL_Rect destRect{destPos.getX(), destPos.getY(), getWidth(), getHeight()};
+    if (SDL_RenderCopy(lrenderer.get(), texture_.get(), nullptr, &destRect) != 0)
         throw std::runtime_error("Erreur lors du display de la texture: " + std::string(SDL_GetError()));
 }

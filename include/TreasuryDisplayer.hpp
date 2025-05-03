@@ -11,6 +11,7 @@
 class TreasuryDisplayer: public Displayer {
 public:
     static void init();
+    static void quit();
     
     TreasuryDisplayer(const Point& pos, int treasury = 0, int income = 0);
 
@@ -19,7 +20,7 @@ public:
     void setTreasury(int treasury);
     void setIncome(int income);
 
-    void display(const std::shared_ptr<BlitTarget>& target) override;
+    void display(const std::weak_ptr<BlitTarget>& target) override;
 
 private:
     static std::shared_ptr<Texture> bg_;

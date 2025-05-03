@@ -9,14 +9,15 @@
 
 class Forest: public Ground {
 public:
-    static const std::string TYPE;
+    static std::shared_ptr<Forest> cast(const std::weak_ptr<Cell>& obj);
+    static bool is(const std::weak_ptr<Cell>& obj);
+
+    static void init();
+    static void quit();
 
     Forest(const Point& pos);
 
-    const std::string getType() override;
-    void display(const std::shared_ptr<BlitTarget>& target) override;
-
-    static void init();
+    void display(const std::weak_ptr<BlitTarget>& target) override;
 
 protected:
     static std::shared_ptr<Texture> forest_;

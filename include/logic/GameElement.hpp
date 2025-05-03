@@ -20,7 +20,7 @@ public:
     virtual int getUpkeep()   const = 0;
 
     /* --- Displayer --- */
-    virtual void display(const std::shared_ptr<BlitTarget>& target) override = 0;
+    virtual void display(const std::weak_ptr<BlitTarget>& target) override = 0;
 
     virtual bool isLost() const { return lost_; };
     virtual void lost() { lost_ = true; };
@@ -32,7 +32,6 @@ protected:
     static constexpr int COST     = 0;
     static constexpr int UPKEEP   = 0;
 
-    Player* owner_;
     bool lost_ = false;
 };
 

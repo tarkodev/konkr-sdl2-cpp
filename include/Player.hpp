@@ -16,8 +16,9 @@ using namespace ColorUtils;
 class Player {
 public:
     static void init(const std::shared_ptr<SDL_Renderer>& renderer);
+    static void quit();
 
-    Player(const std::string& name_, const GroundColor& color);
+    Player(const GroundColor& color);
     ~Player();
 
     HexagonDisplayer& getPlate();
@@ -26,23 +27,22 @@ public:
     void updateTowns();
     bool hasSelected() const { return selected_; };
     bool hasTowns();
-    std::unordered_set<PlayableGround*> getTownCells();
+    std::vector<std::weak_ptr<PlayableGround>> getTownCells();
 
-    void addTownCell(PlayableGround* town);
+    void addTownCell(std::weak_ptr<PlayableGround> town);
 
     void onTurnStart();
     void onTurnEnd();
 
 private:
-    static std::shared_ptr<SDL_Renderer> renderer_;
-    static HexagonDisplayer plateDisplayer;
+    static std::weak_ptr<SDL_Renderer> renderer_;
+    static HexagonDisplayer plateDisplayer_;
     
-    std::string name_;
     GroundColor color_;
 
     HexagonDisplayer plate_;
     HexagonDisplayer lostPlate_;
-    std::unordered_set<PlayableGround*> townCells_;
+    std::vector<std::weak_ptr<PlayableGround>> townCells_;
 
     bool selected_ = false;
 };

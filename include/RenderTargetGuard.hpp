@@ -5,22 +5,32 @@
 
 class RenderTargetGuard {
 public:
-    RenderTargetGuard(const std::shared_ptr<SDL_Renderer>& renderer, const std::shared_ptr<SDL_Texture> newTarget)
-        : renderer_(renderer), oldTarget_(SDL_GetRenderTarget(renderer.get())) {
-        SDL_SetRenderTarget(renderer.get(), newTarget.get());
+    RenderTargetGuard(const std::weak_ptr<SDL_Renderer>& renderer, const std::shared_ptr<SDL_Texture> newTarget): renderer_(renderer) {
+        auto lrenderer = renderer_.lock();
+        if (!lrenderer) throw std::runtime_error("Renderer isn't initialized.");
+        
+        oldTarget_ = SDL_GetRenderTarget(lrenderer.get());
+        if (SDL_SetRenderTarget(lrenderer.get(), newTarget.get()) != 0)
+            throw std::runtime_error("SDL_SetRenderTarget failed: " + std::string(SDL_GetError()));
     }
     
-    RenderTargetGuard(const std::shared_ptr<SDL_Renderer>& renderer, const std::shared_ptr<Texture> newTarget)
-        : renderer_(renderer), oldTarget_(SDL_GetRenderTarget(renderer.get())) {
-        SDL_SetRenderTarget(renderer.get(), newTarget->get());
-    }
+    RenderTargetGuard(const std::weak_ptr<SDL_Renderer>& renderer, const std::shared_ptr<Texture> newTarget): renderer_(renderer) {
+            auto lrenderer = renderer_.lock();
+            if (!lrenderer) throw std::runtime_error("Renderer isn't initialized.");
+            
+            oldTarget_ = SDL_GetRenderTarget(lrenderer.get());
+            if (SDL_SetRenderTarget(lrenderer.get(), newTarget->get()) != 0)
+                throw std::runtime_error("SDL_SetRenderTarget failed: " + std::string(SDL_GetError()));
+        }
 
     ~RenderTargetGuard() {
-        SDL_SetRenderTarget(renderer_.get(), oldTarget_);
+        auto lrenderer = renderer_.lock();
+        if (!lrenderer) return;
+        SDL_SetRenderTarget(lrenderer.get(), oldTarget_);
     }
 
 private:
-    std::shared_ptr<SDL_Renderer> renderer_;
+    std::weak_ptr<SDL_Renderer> renderer_;
     SDL_Texture* oldTarget_;
 };
 

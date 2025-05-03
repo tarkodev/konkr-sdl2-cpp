@@ -21,6 +21,7 @@
 #include "logic/units/Hero.hpp"
 #include "Font.hpp"
 #include "TreasuryDisplayer.hpp"
+#include "Cursor.hpp"
 
 #include <ranges>
 #include <random>
@@ -32,48 +33,21 @@
 #include <sstream>
 #include <cctype>
 
-
-std::shared_ptr<Texture> GameMap::selectSprite_ = nullptr;
-SDL_Cursor* GameMap::handCursor_ = nullptr;
-SDL_Cursor* GameMap::arrowCursor_ = nullptr;
 std::mt19937 GameMap::gen_{};
 
 void GameMap::init() {
-    // Load sprites and cursors
-    selectSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/plate.png"); //!temp
-    handCursor_ = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
-    arrowCursor_ = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
-
     // Create random seed
     gen_ = std::mt19937{ std::random_device{}() };
 }
 
 
 GameMap::GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize)
-    : Displayer(pos, size), HexagonGrid<Cell*>(gridSize, nullptr)
+    : Displayer(pos, size), HexagonGrid<std::shared_ptr<Cell>>(gridSize, nullptr)
 {
     if (getWidth() < 2 || getHeight() < 2)
         throw std::runtime_error("Une map doit au moins être de taille 2x2.");
 
-    double islandRadius = Ground::getRadius();
-    double islandInnerRadius = Ground::getInnerRadius();
-    for (int x=0; x < getWidth(); x++) {
-        for (int y = 0; y < getHeight(); y++) {
-            auto [posX, posY] = HexagonUtils::offsetToPixel(x, y, islandRadius);
-            Point pos{static_cast<int>(posX + islandInnerRadius), static_cast<int>(posY + islandRadius)};
-
-            int v = std::rand() % 3;
-            if (v == 0)
-                set(x, y, new PlayableGround(pos));
-            else if (v == 1)
-                set(x, y, new Water());
-            else if (v == 2)
-                set(x, y, new Forest(pos));
-        }
-    }
-
-    updateNeighbors();
-    initGame();
+    //! a compléter (ou a retirer)
 }
 
 GameMap::GameMap(const Point& pos, const Size size, const std::string mapFile)
@@ -81,7 +55,7 @@ GameMap::GameMap(const Point& pos, const Size size, const std::string mapFile)
 {}
 
 GameMap::GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize, const std::string mapFile)
-    : Displayer(pos, size), HexagonGrid<Cell*>(gridSize, nullptr)
+    : Displayer(pos, size), HexagonGrid<std::shared_ptr<Cell>>(gridSize, nullptr)
 {
     if (getWidth() < 2 || getHeight() < 2)
         throw std::runtime_error("Une map doit au moins être de taille 2x2.");
@@ -98,7 +72,6 @@ std::pair<int,int> GameMap::getSizeOfMapFile(const std::string& mapFile) {
     int width = 0;
     int height;
     std::string line;
-
     for (height = 0; std::getline(in, line); height++) {
         // Trim
         auto first = line.find_first_not_of(" \t\r\n");
@@ -119,14 +92,15 @@ std::pair<int,int> GameMap::getSizeOfMapFile(const std::string& mapFile) {
 }
 
 void GameMap::loadMap(const std::string& mapFile) {
-    //! Si on a le temps, découper cette fonction (voir la mettre dans une classe à part entière avec getSizeOfMapFile)
     std::ifstream in(mapFile);
     if (!in) throw std::runtime_error("Impossible d'ouvrir le fichier de map.");
 
+    // Get utils dimensions
     double islandInnerRadius = Ground::getInnerRadius();
     double islandRadius = Ground::getRadius();
-    std::map<int, Player*> players;
+    std::map<int, std::shared_ptr<Player>> players;
 
+    // Read file
     int y;
     std::string line;
     for (y = 0; y < getHeight() && std::getline(in, line); y++) {
@@ -136,167 +110,106 @@ void GameMap::loadMap(const std::string& mapFile) {
         std::string token;
         std::istringstream iss(line);
         for (x = 0; x < getWidth() && iss >> token; x++) {
-            if (token.size() != 2)
-                throw std::runtime_error("Malformation du fichier.");
+            if (token.size() != 2) throw std::runtime_error("Malformation du fichier.");
 
+            // Calculate pos of cell
             auto [posX, posY] = HexagonUtils::offsetToPixel(x, y, islandRadius);
             Point pos{static_cast<int>(posX + islandInnerRadius), static_cast<int>(posY + islandRadius)};
 
+            // Check Cell char
             char cellType = token[0];
-            Cell* cell = nullptr;
+            std::shared_ptr<Cell> cell = nullptr;
             switch (cellType) {
-                case 'F': {
-                    cell = new Forest(pos);
-                    break;
-                }
+                case 'F': cell = std::make_shared<Forest>(pos); break;
+                case 'W': cell = std::make_shared<Water>(); break;
+                case '0': cell = std::make_shared<PlayableGround>(pos); break;
 
-                case 'W': {
-                    cell = new Water();
-                    break;
-                }
-                
-                case '0': {
-                    cell = new PlayableGround(pos);
-                    break;
-                }
-
-                default: {
+                default: { // 1 - 9
                     if (!std::isdigit(cellType))
-                        throw std::runtime_error("Caractère inattendu: " + std::to_string(cellType));
+                        throw std::runtime_error(std::string("Caractère inattendu: ") + cellType);
 
+                    // Create Player
                     int playerId = cellType - '0';
-                    if (players.find(playerId) == players.end()) {
-                        players[playerId] = new Player(std::string("Player ") + std::to_string(playerId), ColorUtils::getGroundColor(playerId));
-                        players_.push_back(players[playerId]);
-                    }
+                    if (players.find(playerId) == players.end())
+                        players[playerId] = std::make_shared<Player>(ColorUtils::getGroundColor(playerId));
 
-                    cell = new PlayableGround(pos, players[playerId]);
+                    // Create Cell
+                    cell = std::make_shared<PlayableGround>(pos, players[playerId]);
                     break;
                 }
             }
-
-            char gameEltType = token[1];
-            GameElement* gameElt = nullptr;
-            switch (gameEltType) {
-                case 'B': {
-                    gameElt = new Bandit(pos);
-                    if (cellType != 'W' && cellType != 'F')
-                        dynamic_cast<PlayableGround*>(cell)->setElement(gameElt);
-                    break;
-                }
-
-                case 'T': {
-                    gameElt = new Town(pos);
-                    PlayableGround* pg = dynamic_cast<PlayableGround*>(cell);
-                    if (pg && cellType != '0') {
-                        pg->setElement(gameElt);
-                        pg->getOwner()->addTownCell(pg);
-                    }
-                    break;
-                }
-
-                case 'C': {
-                    gameElt = new Castle(pos);
-                    PlayableGround* pg = dynamic_cast<PlayableGround*>(cell);
-                    if (pg && cellType != '0') pg->setElement(gameElt);
-                    break;
-                }
-
-                case 'A': {
-                    gameElt = new Camp(pos);
-                    PlayableGround* pg = dynamic_cast<PlayableGround*>(cell);
-                    if (pg && cellType == '0') pg->setElement(gameElt);
-                    break;
-                }
-
-                case 'V': {
-                    gameElt = new Villager(pos);
-                    PlayableGround* pg = dynamic_cast<PlayableGround*>(cell);
-                    if (pg && cellType != '0') pg->setElement(gameElt);
-                    break;
-                }
-
-                case 'P': {
-                    gameElt = new Pikeman(pos);
-                    PlayableGround* pg = dynamic_cast<PlayableGround*>(cell);
-                    if (pg && cellType != '0') pg->setElement(gameElt);
-                    break;
-                }
-
-                case 'K': {
-                    gameElt = new Knight(pos);
-                    PlayableGround* pg = dynamic_cast<PlayableGround*>(cell);
-                    if (pg && cellType != '0') pg->setElement(gameElt);
-                    break;
-                }
-
-                case 'H': {
-                    gameElt = new Hero(pos);
-                    PlayableGround* pg = dynamic_cast<PlayableGround*>(cell);
-                    if (pg && cellType != '0') pg->setElement(gameElt);
-                    break;
-                }
-
-                default:
-                    break;
-            }
-
             set(x, y, cell);
+
+
+            // Don't check if it isn't PlayableGround
+            auto pg = PlayableGround::cast(cell);
+            if (!pg) continue;
+
+
+            // Check GameElement char
+            char gameEltType = token[1];
+            std::shared_ptr<GameElement> gameElt = nullptr;
+            switch (gameEltType) {
+                case 'B': gameElt = std::make_shared<Bandit>(pos); break;
+                case 'T': gameElt = std::make_shared<Town>(pos); break;
+                case 'C': gameElt = std::make_shared<Castle>(pos); break;
+                case 'A': gameElt = std::make_shared<Camp>(pos); break;
+                case 'V': gameElt = std::make_shared<Villager>(pos); break;
+                case 'P': gameElt = std::make_shared<Pikeman>(pos); break;
+                case 'K': gameElt = std::make_shared<Knight>(pos); break;
+                case 'H': gameElt = std::make_shared<Hero>(pos); break;
+                case '.': break;
+                default: throw std::runtime_error(std::string("Caractère inattendu: ") + gameEltType);
+            }
+
+            // Set element on cell
+            if (gameEltType != '.' && (cellType != '0' || gameEltType == 'T')) {
+                pg->setElement(gameElt);
+                if (gameEltType == 'T') pg->getOwner()->addTownCell(pg);
+            }
         }
         
         for (; x < getWidth(); x++)
-            set(x, y, new Water());
+            set(x, y, std::make_shared<Water>());
     }
 
     if (y != getHeight())
         throw std::runtime_error("Le fichier de map n'a pas assez de lignes (attendu " + std::to_string(getHeight()) + ")");
 
+    // Move players
+    players_.reserve(players.size());
+    for (const auto& [id, playerPtr] : players)
+        players_.push_back(playerPtr);
+
+    // update neighbors of cells
     updateNeighbors();
 }
 
-void GameMap::initGame() {
-    // Update links
-    for (Cell* cell : *this)
-        if (auto* pg = dynamic_cast<PlayableGround*>(cell))
-            pg->updateLinked();
-    updateLostElements();
-
-    currentPlayer_ = players_[selectedPlayerNum_];
-    for (Player *player : players_)
-        if (player != currentPlayer_)
-            updateIncomes(player);
-
-    currentPlayer_->onTurnStart();
-    defrayBandits(currentPlayer_);
-    checkDeficits(currentPlayer_);
-    updateFreeTroops(currentPlayer_);
-    updateIncomes(currentPlayer_);
-    refresh();
-}
-
-void GameMap::defrayBandits(Player* player) {
-    std::vector<Camp*> camps;
+void GameMap::defrayBandits(const std::weak_ptr<Player>& player) {
+    auto lplayer = player.lock();
+    if (!lplayer) return;
+    std::vector<std::weak_ptr<Camp>> camps;
     int nbBandits = 0;
 
-    for (Cell* cell : *this) {
-        if (auto* pg = dynamic_cast<PlayableGround*>(cell)) {
-            if (pg->getOwner() == player) {
-                if (auto* bandit = dynamic_cast<Bandit*>(pg->getElement()))
-                    nbBandits++;
-            }
-            else if (auto* camp = dynamic_cast<Camp*>(pg->getElement())) {
-                camps.push_back(camp);
-            }
-        }
+    // Get camps and count bandits
+    for (auto& cell : *this) {
+        auto pg = PlayableGround::cast(cell);
+        if (!pg) continue;
+
+        if (auto camp = Camp::cast(pg->getElement()))
+            camps.push_back(camp);
+        else if (pg->getOwner() == lplayer && Bandit::is(pg->getElement()))
+            nbBandits++;
     }
     
+    // Pay bandits
     if (camps.size()) {
         std::uniform_int_distribution<> dist(0, static_cast<int>(camps.size()) - 1);
 
-        for (int i = 0; i < nbBandits; ++i) {
-            Camp* chosenCamp = camps[dist(gen_)];
-            chosenCamp->addCoins(1);
-        }
+        // Add coins in camps
+        for (int i = 0; i < nbBandits; i++)
+            if (auto lcamp = camps[dist(gen_)].lock())
+                lcamp->addCoins(1);
     }
 }
 
@@ -308,32 +221,50 @@ void GameMap::setPos(const Point& pos) {
 
 
 void GameMap::updateNeighbors() {
-    for (int y = 0; y < getHeight(); y++) {
+    auto w = getWidth();
+    auto h = getHeight();
+
+    for (int y = 0; y < h; y++) {
+        // Odd cell
         if (y & 1) {
-            for (int x = 0; x < getWidth(); x++) {
+            for (int x = 0; x < w; x++) {
                 get(x, y)->setNeighbors({
-                    y > 0                                                           ? get(x,   y-1)   : nullptr,
-                    x > 0                                                           ? get(x-1, y)   : nullptr,
-                    y+1 < getHeight()                                  ? get(x,   y+1)   : nullptr,
-                    x+1 < getWidth() && y+1 < getHeight() ? get(x+1, y+1) : nullptr,
-                    x+1 < getWidth()                                   ? get(x+1, y)   : nullptr,
-                    x+1 < getWidth() && y > 0                          ? get(x+1, y-1) : nullptr,
+                    y > 0              ? get(x,   y-1) : nullptr,
+                    x > 0              ? get(x-1, y)   : nullptr,
+                    y+1 < h            ? get(x,   y+1) : nullptr,
+                    x+1 < w && y+1 < h ? get(x+1, y+1) : nullptr,
+                    x+1 < w            ? get(x+1, y)   : nullptr,
+                    x+1 < w && y > 0   ? get(x+1, y-1) : nullptr,
                 });
             }
         }
+
+        // Event cell
         else {
-            for (int x = 0; x < getWidth(); x++) {
+            for (int x = 0; x < w; x++) {
                 get(x, y)->setNeighbors({
-                    x > 0 && y > 0                                     ? get(x-1, y-1) : nullptr,
-                    x > 0                                              ? get(x-1, y)   : nullptr,
-                    x > 0 && y+1 < getHeight()            ? get(x-1, y+1) : nullptr,
-                    y+1 < getHeight()                     ? get(x,   y+1)   : nullptr,
-                    x+1 < getWidth()                      ? get(x+1, y)   : nullptr,
-                    y > 0                                              ? get(x,   y-1)   : nullptr,
+                    x > 0 && y > 0     ? get(x-1, y-1) : nullptr,
+                    x > 0              ? get(x-1, y)   : nullptr,
+                    x > 0 && y+1 < h   ? get(x-1, y+1) : nullptr,
+                    y+1 < h            ? get(x,   y+1) : nullptr,
+                    x+1 < w            ? get(x+1, y)   : nullptr,
+                    y > 0              ? get(x,   y-1) : nullptr,
                 });
             }
         }
     }
+}
+
+bool GameMap::hasTroopSelected() {
+    return static_cast<bool>(selectedTroop_);
+}
+
+
+int GameMap::getWidth() const {
+    return HexagonGrid::getWidth();
+}
+int GameMap::getHeight() const {
+    return HexagonGrid::getHeight();
 }
 
 
@@ -353,22 +284,12 @@ void GameMap::createCalcs() {
     calcSize_ = {static_cast<int>(cx), static_cast<int>(cy)};
     setProportionalSize(size_);
 
-    // Create calc for islands
+    // Create calcs
     islandsCalc_ = std::make_shared<Texture>(renderer_, calcSize_);
-
-    // Create calc for plates
     platesCalc_ = std::make_shared<Texture>(renderer_, calcSize_);
-
-    // Create calc for selectables
     selectablesCalc_ = std::make_shared<Texture>(renderer_, calcSize_);
-
-    // Create calc for fences
     fencesCalc_ = std::make_shared<Texture>(renderer_, calcSize_);
-
-    // Create calc for elements
     elementsCalc_ = std::make_shared<Texture>(renderer_, calcSize_);
-
-    // Create main calc
     calc_ = std::make_shared<Texture>(renderer_, calcSize_);
 }
 
@@ -380,8 +301,8 @@ void GameMap::refreshIslands() {
     platesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
 
     // Draw islands
-    for (Cell* cell : *this)
-        if (auto* g = dynamic_cast<Ground*>(cell))
+    for (auto& cell : *this)
+        if (auto g = Ground::cast(cell))
             g->Ground::display(islandsCalc_);
 
     refreshMain();
@@ -394,9 +315,9 @@ void GameMap::refreshPlates() {
     platesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
 
     // Draw plates
-    for (Cell* cell : *this)
-        if (auto* disp = dynamic_cast<Displayer*>(cell))
-            disp->display(platesCalc_);
+    for (auto& cell : *this)
+        if (auto ground = Ground::cast(cell))
+            ground->display(platesCalc_);
 
     refreshMain();
 }
@@ -408,8 +329,8 @@ void GameMap::refreshSelectables() {
     selectablesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
 
     // Draw selectables
-    for (Cell* cell : *this)
-        if (auto* pg = dynamic_cast<PlayableGround*>(cell))
+    for (auto& cell : *this)
+        if (auto pg = PlayableGround::cast(cell))
             pg->displaySelectable(selectablesCalc_);
 
     refreshMain();
@@ -422,8 +343,8 @@ void GameMap::refreshFences() {
     fencesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
 
     // Draw fences
-    for (Cell* cell : *this)
-        if (auto* pg = dynamic_cast<PlayableGround*>(cell))
+    for (auto& cell : *this)
+        if (auto pg = PlayableGround::cast(cell))
             pg->displayFences(fencesCalc_);
 
     refreshMain();
@@ -436,15 +357,17 @@ void GameMap::refreshElements() {
     elementsCalc_->fill(ColorUtils::toTransparent(ColorUtils::GREY));
 
     // Draw game elements
-    for (Cell* cell : *this) {
-        if (auto* pg = dynamic_cast<PlayableGround*>(cell)) {
+    for (auto& cell : *this) {
+        if (auto pg = PlayableGround::cast(cell)) {
             pg->displayElement(elementsCalc_);
             pg->displayShield(elementsCalc_);
         }
     }
 
-    if (townToShowTreasury_)
-        townToShowTreasury_->displayTreasury(elementsCalc_);
+    // draw treasury of town
+    auto ltownToShowTreasury_ = townToShowTreasury_.lock();
+    if (ltownToShowTreasury_)
+        ltownToShowTreasury_->displayTreasury(elementsCalc_);
 
     refreshMain();
 }
@@ -452,8 +375,10 @@ void GameMap::refreshElements() {
 void GameMap::refreshMain() {
     if (!calc_) refresh();
 
-    calc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
+    // Draw transparent background
+    calc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE)); //! voir si tout en GREY ou SEABLUE dans les calcs
 
+    // Blit all calcs
     calc_->blit(islandsCalc_);
     calc_->blit(platesCalc_);
     calc_->blit(selectablesCalc_);
@@ -475,17 +400,15 @@ void GameMap::refresh()
     elementsCalc_->fill(ColorUtils::toTransparent(ColorUtils::GREY));
 
     // Draw islands and cells
-    for (Cell* cell : *this) {
-        // Draw island
-        if (auto* g = dynamic_cast<Ground*>(cell))
-            g->Ground::display(islandsCalc_);
-
-        // Draw cell
-        if (auto* disp = dynamic_cast<Displayer*>(cell))
-            disp->display(platesCalc_);
+    for (auto& cell : *this) {
+        // Draw island and plates
+        if (auto ground = Ground::cast(cell)) {
+            ground->Ground::display(islandsCalc_);
+            ground->display(platesCalc_);
+        }
 
         // Draw element
-        if (auto* pg = dynamic_cast<PlayableGround*>(cell)) {
+        if (auto pg = PlayableGround::cast(cell)) {
             pg->displaySelectable(selectablesCalc_);
             pg->displayFences(fencesCalc_);
             pg->displayElement(elementsCalc_);
@@ -508,109 +431,182 @@ void GameMap::setProportionalSize(const Size size) {
 }
 
 void GameMap::updateLostElements() {
-    for (Cell* cell : *this) {
-        auto* pg = dynamic_cast<PlayableGround*>(cell);
+    for (auto& cell : *this) {
+        auto pg = PlayableGround::cast(cell);
         if (!pg) continue;
 
-        auto* elt = pg->getElement();
+        // Pass if no element
+        auto elt = pg->getElement();
         if (!elt || !elt->isLost()) continue;
 
-        if (dynamic_cast<Castle*>(elt)) {
-            delete elt;
-            pg->setElement(new Camp(pg->getPos()));
-        } else if (dynamic_cast<Troop*>(elt)) {
-            delete elt;
-            pg->setElement(new Bandit(pg->getPos()));
-        }
+        // Transform Castles and troops to camps and bandits
+        if (Castle::is(elt))
+            pg->setElement(std::make_shared<Camp>(pg->getPos()));
+        else if (Troop::is(elt))
+            pg->setElement(std::make_shared<Bandit>(pg->getPos()));
     }
 }
 
+void GameMap::updateLinks() {
+    // Update lost cells
+    for (auto& cell : *this)
+        if (auto pg = PlayableGround::cast(cell))
+            pg->updateLinked();
+
+    // Update lost elements
+    updateLostElements();
+}
+
+void GameMap::searchNextPlayer() {
+    auto cp = currentPlayer_.lock();
+
+    // Search player still in game
+    while (!cp || !cp->hasTowns()) {
+        players_.erase(players_.begin() + selectedPlayerNum_);
+        if (players_.empty()) {
+            currentPlayer_.reset();
+            return;
+        }
+
+        // next player
+        selectedPlayerNum_ %= players_.size();
+        currentPlayer_ = players_[selectedPlayerNum_];
+        auto cp = currentPlayer_.lock();
+    }
+}
+
+void GameMap::initGame() {
+    if (players_.empty()) {
+        SDL_Log("Aucun joueur sur la carte");
+        return; //! retourner au menu (popup ? Ou SDL_Log ?)
+    }
+    updateLinks();
+
+    // Set the current player
+    currentPlayer_ = players_[selectedPlayerNum_];
+    searchNextPlayer();
+    auto cp = currentPlayer_.lock();
+    if (!cp) {
+        SDL_Log("Aucun joueur n'a de chateau sur la carte");
+        return; //! Aucun joueur sur la map, retourner au menu (popup ? Ou SDL_Log ?)
+    }
+
+    // Update next income of players
+    for (auto& player : players_)
+        if (auto lplayer = player.lock())
+            if (lplayer != cp) updateIncomes(player);
+
+    // Start turn of current player
+    startTurn(currentPlayer_);
+    refresh();
+}
+
 void GameMap::nextPlayer() {
-    if (players_.empty()) return;
+    auto cp = currentPlayer_.lock();
+    if (!cp || players_.empty())
+        return; //! Comportement innatendu, retourner au menu
 
     // Finish turn of current player
     updateLostElements();
-    currentPlayer_->onTurnEnd();
+    cp->onTurnEnd();
+    auto lastCp = cp;
 
     // Set the new current player
     selectedPlayerNum_ = (selectedPlayerNum_ + 1) % players_.size();
     currentPlayer_ = players_[selectedPlayerNum_];
+    searchNextPlayer();
 
-    // Search next player
-    while (!currentPlayer_->hasTowns()) {
-        delete currentPlayer_;
-        players_.erase(players_.begin() + selectedPlayerNum_);
-        if (players_.empty()) return;
+    // Check new current player
+    cp = currentPlayer_.lock();
+    if (!cp) return; //! Comportement innatendu, retourner au menu
+    else if (cp == lastCp)
+        return; //! Victoire
 
-        selectedPlayerNum_ %= players_.size();
-        currentPlayer_ = players_[selectedPlayerNum_];
-    }
-
+    // If first player
     if (selectedPlayerNum_ == 0) {
         moveBandits();
-        for (Player *player : players_)
+        for (auto& player : players_)
             updateIncomes(player);
     }
 
     // Start turn of new current player
-    currentPlayer_->onTurnStart();
-    defrayBandits(currentPlayer_);
-    checkDeficits(currentPlayer_);
-    updateFreeTroops(currentPlayer_);
-    updateIncomes(currentPlayer_);
-
-    movedTroops_.clear();
+    startTurn(currentPlayer_);
     refreshElements();
 }
 
-void GameMap::checkDeficits(Player *player) {
-    int treasury = 0;
-    for (auto* pg : player->getTownCells()) {
-        if (auto* town = dynamic_cast<Town*>(pg->getElement())) {
-            treasury = town->getTreasury();
-            if (treasury >= 0) continue;
-
-            town->setTreasury(0);
-            for (auto* neighborTown : pg->getTowns()) {
-                if (neighborTown == town) continue;
-
-                int neighborTreasury = neighborTown->getTreasury();
-                if (neighborTreasury <= 0) {
-                    continue;
-                } else if (neighborTreasury > -treasury) {
-                    neighborTown->setTreasury(neighborTreasury + treasury);
-                    treasury = 0;
-                    break;
-                } else {
-                    treasury += neighborTreasury;
-                    neighborTown->setTreasury(0);
-                }
-            }
-            if (treasury < 0)
-                pg->freeTroops();
-        }
+void GameMap::startTurn(std::weak_ptr<Player>& player) { //! const weak_ptr ?
+    if (auto lplayer = player.lock()) { 
+        lplayer->onTurnStart();
+        defrayBandits(player);
+        checkDeficits(player);
+        updateFreeTroops(player);
+        updateIncomes(player);
+        movedTroops_.clear();
     }
 }
 
+void GameMap::checkDeficits(std::weak_ptr<Player>& player) {
+    auto lplayer = player.lock();
+    if (!lplayer) return;
+
+    // Search town in deficit
+    int treasury = 0;
+    for (auto& townCell : lplayer->getTownCells()) {
+        auto ltownCell = townCell.lock();
+        if (!ltownCell) continue;
+        auto town = Town::cast(ltownCell->getElement());
+        if (!town) continue;
+
+        // Pass if no deficit
+        treasury = town->getTreasury();
+        if (treasury >= 0) continue;
+
+        // Search neighbors towns
+        town->setTreasury(0);
+        for (auto& neighborTown : ltownCell->getTowns()) {
+            auto lneighborTown = neighborTown.lock();
+            if (!lneighborTown || lneighborTown == town) continue;
+
+            // Share deficit
+            int neighborTreasury = lneighborTown->getTreasury();
+            if (neighborTreasury <= 0) {
+                continue;
+            } else if (neighborTreasury > -treasury) {
+                lneighborTown->setTreasury(neighborTreasury + treasury);
+                treasury = 0;
+                break;
+            } else {
+                treasury += neighborTreasury;
+                lneighborTown->setTreasury(0);
+            }
+        }
+
+        // Too much deficit
+        if (treasury < 0)
+            ltownCell->freeTroops();
+    }
+}
 
 void GameMap::selectCell(const Point& pos) {
-    //! update le code de cette fonction
     double islandInnerRadius = Ground::getInnerRadius();
     double islandRadius = Ground::getRadius();
     
-    int relX = pos.getX() / ratio_ - islandInnerRadius;
-    int relY = pos.getY() / ratio_ - islandRadius;
+    // Calculate coords
+    Point relPos = pos / ratio_ - Point{static_cast<int>(islandInnerRadius), static_cast<int>(islandRadius)};
+    auto [x, y] = HexagonUtils::pixelToOffset(relPos.getX(), relPos.getY(), islandRadius);
+    Rect bounds{0, 0, getWidth(), getHeight()};
+    Point coords{x, y};
 
-    auto [q, r] = HexagonUtils::pixelToAxial(relX, relY, islandRadius);
-    auto [x, y] = HexagonUtils::axialToOffset(q, r);
-    
-    if (x < 0 || x >= getWidth() || y < 0 || y >= getHeight()) {
+    // Out of bounds
+    if (!bounds.contains(coords))
         selectedCell_.reset();
-        return;
-    }
     
-    auto pg = dynamic_cast<PlayableGround*>(get(x, y));
-    selectedCell_ = pg ? pg : nullptr;
+    // Set selected cell
+    else if (auto pg = PlayableGround::cast(get(x, y)))
+        selectedCell_ = pg;
+
+    // remove selected cell
+    else selectedCell_.reset();
 }
 
 void GameMap::updateSelectedCell() {
@@ -619,63 +615,59 @@ void GameMap::updateSelectedCell() {
     selectCell(Point{x, y} - pos_);
 }
 
-//! Pour l'ajout de troupe depuis le shop
-//void GameMap::addTroop(Troop* fromTroop, PlayableGround* to)
-
-void GameMap::moveTroop(PlayableGround* from, PlayableGround* to) {
-    if (!from || !to || from == to || !to->isSelectable()) return;
+void GameMap::moveTroop(std::weak_ptr<PlayableGround>& from, std::weak_ptr<PlayableGround>& to) {
+    auto lfrom = from.lock();
+    auto lto = to.lock();
+    if (!lfrom || !lto || lfrom == lto || !lto->isSelectable()) return;
 
     // Get interesting elements
-    auto fromTroop = dynamic_cast<Troop*>(from->getElement());
+    auto fromTroop = Troop::cast(lfrom->getElement());
     if (!fromTroop) return;
     
-    auto toTroop = dynamic_cast<Troop*>(to->getElement());
-    auto fromOwner = from->getOwner();
-    auto toOwner = to->getOwner();
+    auto toTroop = Troop::cast(lto->getElement());
+    auto fromOwner = lfrom->getOwner();
+    if (!fromOwner) return;
+    auto toOwner = lto->getOwner();
 
 
     // Different owner
-    if (fromOwner != toOwner || dynamic_cast<Bandit*>(toTroop)) {
-        delete toTroop;
-        from->setElement(nullptr);
-        to->setElement(fromTroop);
+    if (fromOwner != toOwner || Bandit::cast(toTroop)) {
+        lfrom->setElement(nullptr);
+        lto->setElement(fromTroop);
 
-        movedTroops_.insert(fromTroop);
+        movedTroops_.push_back(fromTroop);
 
         // Give grounds to the new owner
-        to->link(fromOwner);
+        lto->link(fromOwner);
         updateIncomes(fromOwner);
         if (toOwner) updateIncomes(toOwner);
     }
     
     // Same Owner
     else {
-        if (!to->getElement()) {
-            from->setElement(nullptr);
-            to->setElement(fromTroop);
+        if (!lto->getElement()) {
+            lfrom->setElement(nullptr);
+            lto->setElement(fromTroop);
             updateIncomes(fromOwner);
         }
 
         else if (toTroop) {
             // Check merge
-            Troop *troop = nullptr;
-            if (dynamic_cast<Villager*>(fromTroop) && dynamic_cast<Villager*>(toTroop))
-                troop = new Pikeman(to->getPos());
-            else if (dynamic_cast<Pikeman*>(fromTroop) && dynamic_cast<Pikeman*>(toTroop))
-                troop = new Knight(to->getPos());
-            else if (dynamic_cast<Knight*>(fromTroop) && dynamic_cast<Knight*>(toTroop)) 
-                troop = new Hero(to->getPos());
+            std::shared_ptr<Troop> troop = nullptr;
+            if (Villager::cast(fromTroop) && Villager::cast(toTroop))
+                troop = std::make_shared<Pikeman>(lto->getPos());
+            else if (Pikeman::cast(fromTroop) && Pikeman::cast(toTroop))
+                troop = std::make_shared<Knight>(lto->getPos());
+            else if (Knight::cast(fromTroop) && Knight::cast(toTroop)) 
+                troop = std::make_shared<Hero>(lto->getPos());
 
             if (troop) {
                 // Merge troops
-                if (movedTroops_.find(fromTroop) != movedTroops_.find(toTroop))
-                    movedTroops_.insert(troop);
+                if (std::find_if(movedTroops_.begin(), movedTroops_.end(), [&](const auto& ptr) { return ptr.lock() == fromTroop; }) != std::find_if(movedTroops_.end(), movedTroops_.end(), [&](const auto& ptr) { return ptr.lock() == toTroop; }))
+                    movedTroops_.push_back(troop);
 
-                delete fromTroop;
-                delete toTroop;
-
-                from->setElement(nullptr);
-                to->setElement(troop);
+                lfrom->setElement(nullptr);
+                lto->setElement(troop);
 
                 updateIncomes(fromOwner);
             }
@@ -683,43 +675,44 @@ void GameMap::moveTroop(PlayableGround* from, PlayableGround* to) {
     }
 }
 
-void GameMap::moveBandit(PlayableGround* from, PlayableGround* to) {
-    if (!from || !to || from == to) return;
+void GameMap::moveBandit(std::weak_ptr<PlayableGround>& from, std::weak_ptr<PlayableGround>& to) {
+    auto lfrom = from.lock();
+    auto lto = to.lock();
+    if (!lfrom || !lto || lfrom == lto) return;
 
     // Get interesting elements
-    auto fromBandit = dynamic_cast<Bandit*>(from->getElement());
-    if (!fromBandit) return;
-    
-    if (to->getElement()) return;
+    auto fromBandit = Bandit::cast(lfrom->getElement());
+    if (!fromBandit || lto->getElement()) return;
     
     // Move bandit
-    from->setElement(nullptr);
-    to->setElement(fromBandit);
+    lfrom->setElement(nullptr);
+    lto->setElement(fromBandit);
 }
 
 void GameMap::moveBandits() {
-    std::unordered_set<Bandit*> movedBandits;
+    std::unordered_set<std::shared_ptr<Bandit>> movedBandits;
 
-    for (Cell* cell : *this) {
-        auto* pg = dynamic_cast<PlayableGround*>(cell);
+    for (auto& cell : *this) {
+        auto pg = PlayableGround::cast(cell);
         if (!pg) continue;
 
-        auto* bandit = dynamic_cast<Bandit*>(pg->getElement());
+        auto bandit = Bandit::cast(pg->getElement());
         if (!bandit || movedBandits.find(bandit) != movedBandits.end()) continue;
 
         // Get free neighbors
-        std::vector<PlayableGround*> candidates;
-        for (Cell* c : pg->getNeighbors())
-            if (auto* g = dynamic_cast<PlayableGround*>(c))
-                if (!g->getElement() && !g->hasFences())
-                    candidates.push_back(g);
-
+        std::vector<std::weak_ptr<PlayableGround>> candidates;
+        for (auto& cell : pg->getNeighbors())
+            if (auto ground = PlayableGround::cast(cell))
+                if (!ground->getElement())
+                    candidates.push_back(ground);
 
         // Random move bandit
         if (!candidates.empty()) {
             std::uniform_int_distribution<> dist(0, static_cast<int>(candidates.size()) - 1);
-            PlayableGround* dest = candidates[dist(gen_)];
-            moveBandit(pg, dest);
+            std::weak_ptr<PlayableGround> wpg = pg;
+            auto dest = candidates[dist(gen_)];
+
+            moveBandit(wpg, dest);
             movedBandits.insert(bandit);
         }
     }
@@ -728,7 +721,8 @@ void GameMap::moveBandits() {
 }
 
 
-bool GameMap::isSelectableTroop(PlayableGround* pg) {
+bool GameMap::isSelectableTroop(const std::weak_ptr<PlayableGround>& pgCell) {
+    auto pg = pgCell.lock();
     if (!pg) return false;
 
     // Check owner
@@ -736,206 +730,245 @@ bool GameMap::isSelectableTroop(PlayableGround* pg) {
     if (!(owner && owner->hasSelected())) return false;
 
     // Check troop
-    auto troop = dynamic_cast<Troop*>(pg->getElement());
-    if (!troop || dynamic_cast<Bandit*>(troop)) return false;
-    if (movedTroops_.find(troop) != movedTroops_.end()) return false;
+    auto troop = Troop::cast(pg->getElement());
+    if (!troop || Bandit::cast(troop)) return false;
+    if (std::find_if(movedTroops_.begin(), movedTroops_.end(), [&](const auto& ptr) { return ptr.lock() == troop; }) != movedTroops_.end())
+        return false;
 
     return true;
 }
 
 void GameMap::updateCursor() {
-    if (selectedCell_.has_value() && isSelectableTroop(*selectedCell_))
-        SDL_SetCursor(handCursor_);
+    auto lselectedCell = selectedCell_.lock();
+    if (lselectedCell && isSelectableTroop(lselectedCell))
+        Cursor::hand();
     else
-        SDL_SetCursor(arrowCursor_);
+        Cursor::arrow();
+}
+
+void GameMap::onMouseButtonDown(SDL_Event& event) {
+    Point mousePos{event.motion.x, event.motion.y};
+    selectedNewTroopCell_.reset();
+    selectedTroopCell_.reset();
+    selectedTroop_.reset();
+
+    // Check selected cell
+    auto lselectedCell = selectedCell_.lock();
+    if (!lselectedCell || !PlayableGround::is(lselectedCell)) return;
+    
+    // If cell is selectable
+    if (isSelectableTroop(lselectedCell)) {
+        // Select element
+        selectedTroopCell_ = lselectedCell;
+        selectedTroop_ = Troop::cast(lselectedCell->getElement());
+
+        if (selectedTroop_) {
+            selectedTroop_->setPos(mousePos);
+
+            lselectedCell->updateSelectable(selectedTroop_->getStrength());
+            lselectedCell->setElement(nullptr);
+        }
+
+        refreshElements();
+        refreshSelectables();
+    }
+    
+    // If Town is pressed, buy villager
+    else {
+        auto town = Town::cast(lselectedCell->getElement());
+        auto lcurrentPlayer = currentPlayer_.lock();
+        if (!town || !lcurrentPlayer || lselectedCell->getOwner() != lcurrentPlayer) 
+            return;
+
+        // Get treasury
+        int treasury = 0;
+        for (auto& town : lselectedCell->getTowns())
+            if (auto ltown = town.lock())
+                treasury += ltown->getTreasury();
+        
+        // Check treasury
+        auto v = std::make_shared<Villager>(lselectedCell->getPos());
+        if (treasury < v->getCost()) return;
+
+        // Set town cell
+        selectedTroopCell_ = lselectedCell;
+
+        // Create temp cell
+        selectedNewTroopCell_ = std::make_shared<PlayableGround>(Point{0, 0});
+        selectedNewTroopCell_->setOwner(lcurrentPlayer);
+
+        // Set new troop
+        selectedTroop_ = v;
+        v->setPos(mousePos);
+        lselectedCell->updateSelectable(v->getStrength());
+
+        refreshElements();
+        refreshSelectables();
+    }
+}
+
+void GameMap::onMouseMotion(SDL_Event& event) {
+    Point mousePos{event.motion.x, event.motion.y};
+    selectCell(mousePos - pos_);
+    townToShowTreasury_.reset();
+
+    // Move selected troop
+    if (selectedTroop_) {
+        selectedTroop_->setPos(mousePos);
+        refreshElements();
+        return;
+    }
+
+    // Check hover of elements
+    updateCursor();
+    if (auto lselectedCell = selectedCell_.lock()) {
+        auto town = Town::cast(lselectedCell->getElement());
+        if (town) townToShowTreasury_ = town;
+    }
+    refreshElements();
+}
+
+void GameMap::onMouseButtonUp(SDL_Event& event) {
+    auto lselectedCell = selectedCell_.lock();
+    auto lselectedTroopCell = selectedTroopCell_.lock();
+
+    // Buy Troop
+    if (selectedNewTroopCell_ && selectedTroop_ && lselectedTroopCell && lselectedCell && PlayableGround::is(lselectedCell)) {
+        selectedNewTroopCell_->setElement(selectedTroop_);
+        int cost = selectedTroop_->getCost();
+
+        // Move troop
+        std::weak_ptr<PlayableGround> wsntc = selectedNewTroopCell_;
+        moveTroop(wsntc, selectedCell_);
+
+        // Share purchase
+        if (!selectedNewTroopCell_->getElement()) {
+            for (auto& town : lselectedCell->getTowns()) {
+                if (auto ltown = town.lock()) {
+                    int treasury = ltown->getTreasury();
+                    if (treasury > cost) {
+                        ltown->setTreasury(treasury - cost);
+                        break;
+                    }
+
+                    cost -= treasury;
+                    ltown->setTreasury(0);
+                }
+            }
+        }
+
+        // Remove possibilities
+        lselectedTroopCell->updateSelectable(0);
+    }
+
+    // Move Troop
+    else if (!selectedNewTroopCell_ && lselectedTroopCell && selectedTroop_) {
+        lselectedTroopCell->setElement(selectedTroop_);
+
+        // Move troop
+        if (lselectedCell)
+            moveTroop(selectedTroopCell_, selectedCell_);
+
+        // Remove possibilities
+        lselectedTroopCell->updateSelectable(0);
+    }
+
+    selectedNewTroopCell_.reset();
+    selectedTroopCell_.reset();
+    selectedTroop_.reset();
+    refresh();
+
+    updateCursor();
+}
+
+void GameMap::onKeyDown(SDL_Event& event) {
+
 }
 
 void GameMap::handleEvent(SDL_Event &event) {
-    //! Voir si faire fonction pour chaque event
     switch (event.type) {
-        case SDL_MOUSEBUTTONDOWN: {
-            Point mousePos{event.motion.x, event.motion.y};
-            selectedNewTroopCell_ = nullptr;
-            selectedTroopCell_ = nullptr;
-            selectedTroop_ = nullptr;
-            if (!selectedCell_.has_value() || !dynamic_cast<PlayableGround*>(*selectedCell_))
-                break;
-            
-            if (isSelectableTroop(*selectedCell_)) {
-                // Select element
-                selectedTroopCell_ = *selectedCell_;
-                selectedTroop_ = dynamic_cast<Troop*>(selectedTroopCell_->getElement());
-                selectedTroop_->setPos(mousePos);
-
-                selectedTroopCell_->updateSelectable(selectedTroop_->getStrength());
-                selectedTroopCell_->setElement(nullptr);
-                
-                refreshElements();
-                refreshSelectables();
-            } else {
-                auto* town = dynamic_cast<Town*>((*selectedCell_)->getElement());
-                if (town && (*selectedCell_)->getOwner() == currentPlayer_) {
-                    std::vector<Town *> towns = (*selectedCell_)->getTowns();
-
-                    int treasury = 0;
-                    for (auto* t : towns)
-                        treasury += t->getTreasury();
-                    
-                    Villager* v = new Villager((*selectedCell_)->getPos());
-                    if (treasury >= v->getCost()) {
-                        selectedNewTroopCell_ = new PlayableGround(Point{0, 0});
-                        selectedNewTroopCell_->setOwner(currentPlayer_);
-
-                        selectedTroop_ = v;
-                        selectedTroop_->setPos(mousePos);
-                        (*selectedCell_)->updateSelectable(v->getStrength());
-
-                        refreshElements();
-                        refreshSelectables();
-                    } else {
-                        delete v;
-                    }
-                }
-            }
-            break;
-        }
-
-        case SDL_MOUSEMOTION: {
-            Point mousePos{event.motion.x, event.motion.y};
-            selectCell(mousePos - pos_);
-            townToShowTreasury_ = nullptr;
-
-            if (selectedTroop_)
-                selectedTroop_->setPos(mousePos);
-            else {
-                updateCursor();
-                if (selectedCell_.has_value() && (*selectedCell_)) {
-                    auto town = dynamic_cast<Town*>((*selectedCell_)->getElement());
-                    if (town)
-                        townToShowTreasury_ = town;
-                }
-            }
-            refreshElements();
-
-            break;
-        }
-
-        case SDL_MOUSEBUTTONUP: {
-            if (selectedTroop_) {
-                // Move Troop
-                if (selectedTroopCell_) {
-                    selectedTroopCell_->setElement(selectedTroop_);
-
-                    // Move troop
-                    if (selectedCell_.has_value() && (*selectedCell_))
-                        moveTroop(selectedTroopCell_, *selectedCell_);
-
-                    // Remove possibilities
-                    selectedTroopCell_->updateSelectable(0);
-                }
-
-                // Buy Troop
-                else if (selectedNewTroopCell_) {
-                    if (selectedCell_.has_value() && (*selectedCell_)) {
-                        if (auto pg = dynamic_cast<PlayableGround *>(*selectedCell_)) {
-                            selectedNewTroopCell_->setElement(selectedTroop_);
-                            int cost = selectedTroop_->getCost();
-
-                            // Move troop
-                            moveTroop(selectedNewTroopCell_, *selectedCell_);
-
-                            if (!selectedNewTroopCell_->getElement()) {
-                                for (auto* t : (*selectedCell_)->getTowns()) {
-                                    int treasury = t->getTreasury();
-                                    if (treasury > cost) {
-                                        t->setTreasury(treasury - cost);
-                                        break;
-                                    } else {
-                                        cost -= treasury;
-                                        t->setTreasury(0);
-                                    }
-                                }
-                            } else {
-                                delete selectedTroop_;
-                            }
-
-                            // Remove possibilities
-                            (*selectedCell_)->updateSelectable(0);
-                            delete selectedNewTroopCell_;
-                        } else {
-                            delete selectedTroop_;
-                        }
-                    } else {
-                        delete selectedTroop_;
-                    }
-                }
-
-                selectedNewTroopCell_ = nullptr;
-                selectedTroopCell_ = nullptr;
-                selectedTroop_ = nullptr;
-                refresh();
-            }
-
-            updateCursor();
-            break;
-        }
+        case SDL_MOUSEBUTTONDOWN: onMouseButtonDown(event); break;
+        case SDL_MOUSEMOTION: onMouseMotion(event); break;
+        case SDL_MOUSEBUTTONUP: onMouseButtonUp(event); break;
     }
 }
 
-void GameMap::display(const std::shared_ptr<BlitTarget>& target)
+void GameMap::display(const std::weak_ptr<BlitTarget>& target)
 {
+    // Check initialized calcs
     if (!islandsCalc_ || !platesCalc_ || !selectablesCalc_ || !fencesCalc_ || !elementsCalc_)
         refresh();
 
-    //! encapsuler renderer dans une classe
-    Rect dest = {pos_, size_};
-    target->blit(calc_, dest);
+    // Check target
+    auto ltarget = target.lock();
+    if (!ltarget) return;
 
-    if (selectedTroop_)
-        selectedTroop_->display(target);
+    // Show map
+    Rect dest = {pos_, size_};
+    ltarget->blit(calc_, dest);
+
+    // Show selected troop
+    if (selectedTroop_) selectedTroop_->display(ltarget);
 }
 
-void GameMap::updateIncomes(Player *player) {
-    std::map<Town*, int>towns;
-    for (auto* pg : player->getTownCells()) {
-        if (auto* town = dynamic_cast<Town*>(pg->getElement())) {
-            town->setIncome(0);
+void GameMap::updateIncomes(std::weak_ptr<Player>& player) {
+    auto lplayer = player.lock();
+    if (!lplayer) return;
+
+    // Get treasures and reset incomes
+    std::map<std::shared_ptr<Town>, int>towns;
+    for (auto& townCell : lplayer->getTownCells()) {
+        if (auto ltownCell = townCell.lock()) {
+            auto town = Town::cast(ltownCell->getElement());
             towns[town] = town->getTreasury();
+            town->setIncome(0);
         }
     }
 
-    for (Cell* cell : *this) {
-        if (auto* pg = dynamic_cast<PlayableGround*>(cell)) {
-            if (pg->getOwner() == player) {
-                pg->updateIncome();
-
-                auto *troop = dynamic_cast<Troop*>(pg->getElement());
-                if (troop && !dynamic_cast<Bandit*>(troop))
-                    troop->setFree(false);
-            }
-        }
+    // Calculate incomes of towns of player
+    for (auto& cell : *this) {
+        auto pg = PlayableGround::cast(cell);
+        if (!pg || pg->getOwner() != lplayer) continue;
+        
+        pg->updateIncome();
+        auto troop = Troop::cast(pg->getElement());
+        if (troop && !Bandit::cast(troop))
+            troop->setFree(false);
     }
 
-    for (PlayableGround* townCell : player->getTownCells()) {
-        Town* town = dynamic_cast<Town*>(townCell->getElement());
-        town->updateTreasury();
+    // Share deficits
+    for (auto& townCell : lplayer->getTownCells()) {
+        if (auto ltownCell = townCell.lock()) {
+            auto town = Town::cast(ltownCell->getElement());
+            town->updateTreasury();
+        }
     }
     checkDeficits(player);
 
     // restore treasures
-    for (auto [town, treasury] : towns)
+    for (auto& [town, treasury] : towns)
         town->setTreasury(treasury);
 }
 
-void GameMap::updateFreeTroops(Player *player) {
-    for (Cell* cell : *this) {
-        auto* pg = dynamic_cast<PlayableGround*>(cell);
-        if (!pg || pg->getOwner() != player) continue;
+void GameMap::updateIncomes(std::shared_ptr<Player>& player) {
+    std::weak_ptr<Player> wplayer = player;
+    updateIncomes(wplayer);
+}
 
-        auto* troop = dynamic_cast<Troop*>(pg->getElement());
-        if (!troop || dynamic_cast<Bandit*>(troop) || !troop->isFree()) continue;
+void GameMap::updateFreeTroops(const std::weak_ptr<Player>& player) {
+    auto lplayer = player.lock();
+    if (!lplayer) return;
 
-        delete troop;
-        pg->setElement(new Bandit(pg->getPos()));
+    // Search free troops
+    for (auto& cell : *this) {
+        auto pg = PlayableGround::cast(cell);
+        if (!pg || pg->getOwner() != lplayer) continue;
+
+        // Path if no free troop
+        auto troop = Troop::cast(pg->getElement());
+        if (!troop || Bandit::cast(troop) || !troop->isFree()) continue;
+
+        // Transform to bandit
+        pg->setElement(std::make_shared<Bandit>(pg->getPos()));
     }
 }

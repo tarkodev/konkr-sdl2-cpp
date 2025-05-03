@@ -21,6 +21,7 @@
 #include "Font.hpp"
 #include "Displayer.hpp"
 #include "TreasuryDisplayer.hpp"
+#include "Cursor.hpp"
 
 #include <memory>
 #include <vector>
@@ -34,6 +35,7 @@ Game::Game() {
     std::shared_ptr<SDL_Renderer> renderer = window_->getRenderer();
 
     // Init each class to initialize
+    Cursor::init();
     Displayer::init(renderer);
     Ground::init();
     Forest::init();
@@ -57,7 +59,25 @@ Game::Game() {
     menu_.reset(new MainMenu(window_));
 }
 
-Game::~Game() = default;
+Game::~Game() {
+    Player::quit();
+
+    Hero::quit();
+    Knight::quit();
+    Pikeman::quit();
+    Villager::quit();
+    Bandit::quit();
+    Camp::quit();
+    Castle::quit();
+    Town::quit();
+    Troop::quit();
+    
+    TreasuryDisplayer::quit();
+    PlayableGround::quit();
+    Forest::quit();
+    Ground::quit();
+    Cursor::quit();
+}
 
 void Game::run() {
     while (menu_)

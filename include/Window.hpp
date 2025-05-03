@@ -30,13 +30,13 @@ public:
 
     void fill(const SDL_Color& color) const;
 
-    void blit(const std::shared_ptr<BlitTarget>& src) const override;
-    void blit(const std::shared_ptr<BlitTarget>& src, const Point& destPos) const override;
-    void blit(const std::shared_ptr<BlitTarget>& src, const Size& destSize) const override;
-    void blit(const std::shared_ptr<BlitTarget>& src, const Rect& destRect) const override;
-    void blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Point& destPos) const override;
-    void blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Size& destSize) const override;
-    void blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Rect& destRect) const override;
+    void blit(const std::weak_ptr<BlitTarget>& src) const override;
+    void blit(const std::weak_ptr<BlitTarget>& src, const Point& destPos) const override;
+    void blit(const std::weak_ptr<BlitTarget>& src, const Size& destSize) const override;
+    void blit(const std::weak_ptr<BlitTarget>& src, const Rect& destRect) const override;
+    void blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Point& destPos) const override;
+    void blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Size& destSize) const override;
+    void blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Rect& destRect) const override;
 
     void refresh();
     
@@ -45,7 +45,7 @@ private:
 
     Size size_ = {0, 0};
     std::unique_ptr<SDL_Window, SDLWindowDeleter> SDLWindow_;
-    std::shared_ptr<SDL_Renderer> renderer_; //! encapsuler le renderer dans une classe
+    std::shared_ptr<SDL_Renderer> renderer_;
 };
 
 #endif

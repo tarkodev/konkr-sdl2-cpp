@@ -1,14 +1,9 @@
 #include "Cell.hpp"
 
-const std::string Cell::TYPE = "Cell";
-const std::string Cell::getType() {
-    return Cell::TYPE;
+void Cell::setNeighbors(const std::vector<std::weak_ptr<Cell>>& cellNeighbors) {
+    neighbors_ = cellNeighbors;
 }
 
-void Cell::setNeighbors(std::vector<Cell*> cellNeighbors) {
-    neighbors = cellNeighbors;
-}
-
-const std::vector<Cell*> Cell::getNeighbors() const {
-    return neighbors;
+std::vector<std::weak_ptr<Cell>> Cell::getNeighbors() const {
+    return neighbors_;
 }

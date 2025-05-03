@@ -32,7 +32,7 @@ public:
     void handleEvent(const SDL_Event& e);
     void setCallback(Callback cb);
 
-    void display(const std::shared_ptr<BlitTarget>& target) override;
+    void display(const std::weak_ptr<BlitTarget>& target) override;
 
 private:
     std::shared_ptr<Texture> sprite_;

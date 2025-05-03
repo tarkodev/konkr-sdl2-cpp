@@ -8,18 +8,15 @@
 /* Classe théoriquement abstraite */
 class Cell {
 public:
-    static const std::string TYPE;
-
-    virtual const std::string getType();
     virtual ~Cell() = default;
 
-    void setNeighbors(std::vector<Cell*> neighbors);
-    const std::vector<Cell*> getNeighbors() const;
+    void setNeighbors(const std::vector<std::weak_ptr<Cell>>& neighbors);
+    std::vector<std::weak_ptr<Cell>> getNeighbors() const;
 
 protected:
     Cell() = default;
     
-    std::vector<Cell*> neighbors{nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
+    std::vector<std::weak_ptr<Cell>> neighbors_;
 };
 
 #endif

@@ -81,6 +81,7 @@ set(SRC_FILES
     "${CMAKE_SOURCE_DIR}/src/Point.cpp"
     "${CMAKE_SOURCE_DIR}/src/Size.cpp"
     "${CMAKE_SOURCE_DIR}/src/Texture.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Cursor.cpp"
     "${CMAKE_SOURCE_DIR}/src/Font.cpp"
     "${CMAKE_SOURCE_DIR}/src/Displayer.cpp"
     "${CMAKE_SOURCE_DIR}/src/HexagonDisplayer.cpp"

@@ -26,10 +26,10 @@ public:
      *
      * Lève une std::runtime_error si le chargement échoue.
      */
-    Texture(const std::shared_ptr<SDL_Renderer>& renderer, const std::string& file);
-    Texture(const std::shared_ptr<SDL_Renderer>& renderer, const std::shared_ptr<SDL_Texture>& texture);
-    Texture(const std::shared_ptr<SDL_Renderer>& renderer, int w, int h);
-    Texture(const std::shared_ptr<SDL_Renderer>& renderer, const Size& size);
+    Texture(const std::weak_ptr<SDL_Renderer>& renderer, const std::string& file);
+    Texture(const std::weak_ptr<SDL_Renderer>& renderer, const std::shared_ptr<SDL_Texture>& texture);
+    Texture(const std::weak_ptr<SDL_Renderer>& renderer, int w, int h);
+    Texture(const std::weak_ptr<SDL_Renderer>& renderer, const Size& size);
     Texture(Texture&& o);
 
     /**
@@ -90,23 +90,24 @@ public:
 
     void fill(const SDL_Color& color) const;
 
-    void blit(const std::shared_ptr<BlitTarget>& src) const override;
-    void blit(const std::shared_ptr<BlitTarget>& src, const Point& destPos) const override;
-    void blit(const std::shared_ptr<BlitTarget>& src, const Size& destSize) const override;
-    void blit(const std::shared_ptr<BlitTarget>& src, const Rect& destRect) const override;
-    void blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Point& destPos) const override;
-    void blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Size& destSize) const override;
-    void blit(const std::shared_ptr<BlitTarget>& src, const Rect& srcRect, const Rect& destRect) const override;
+    void blit(const std::weak_ptr<BlitTarget>& src) const override;
+    void blit(const std::weak_ptr<BlitTarget>& src, const Point& destPos) const override;
+    void blit(const std::weak_ptr<BlitTarget>& src, const Size& destSize) const override;
+    void blit(const std::weak_ptr<BlitTarget>& src, const Rect& destRect) const override;
+    void blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Point& destPos) const override;
+    void blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Size& destSize) const override;
+    void blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Rect& destRect) const override;
 
     void display(const Point& destPos = Point{0, 0});
 
 private:
     std::shared_ptr<SDL_Texture> texture_;
-    std::shared_ptr<SDL_Renderer> renderer_;
+    std::weak_ptr<SDL_Renderer> renderer_;
     Size size_;
     bool alpha_;
 
-    void blit(const std::shared_ptr<BlitTarget>& src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const;
+    void blit(const std::weak_ptr<BlitTarget>& src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const;
+    void blit(const std::unique_ptr<BlitTarget>& src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const;
 };
 
-#endif // TEXTURE_HPP
+#endif

@@ -9,13 +9,16 @@ class Town : public GameElement {
 public:
     /* Chargement des ressources partagées */
     static void init();
+    static void quit();
+    static std::shared_ptr<Town> cast(const std::weak_ptr<GameElement>& obj);
+    static bool is(const std::weak_ptr<GameElement>& obj);
 
     explicit Town(const Point& pos);
 
     /* Displayer */
-    void display(const std::shared_ptr<BlitTarget>& target) override;
+    void display(const std::weak_ptr<BlitTarget>& target) override;
 
-    void displayTreasury(const std::shared_ptr<BlitTarget>& target);
+    void displayTreasury(const std::weak_ptr<BlitTarget>& target);
 
     /* --- Accesseurs génériques --- */
     int getStrength() const override;

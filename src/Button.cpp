@@ -1,6 +1,7 @@
 // Button.cpp
 #include "Button.hpp"
-#include <SDL.h>
+#include "SDL.h"
+#include "Cursor.hpp"
 
 Button::Button(const Point& pos, const std::string& normal, const std::string& hover, const std::string& pressed)
     : Displayer(pos)
@@ -24,7 +25,15 @@ void Button::handleEvent(const SDL_Event& e) {
     switch (e.type) {
         case SDL_MOUSEMOTION: {
             Point pos = (Point{e.motion.x, e.motion.y} + size_ / 2);
-            isHover_ = Rect{pos_, size_}.contains(pos);
+            if (Rect{pos_, size_}.contains(pos)) {
+                if (!isHover_) {
+                    isHover_ = true;
+                    Cursor::hand();
+                }
+            } else if (isHover_) {
+                isHover_ = false;
+                Cursor::arrow();
+            }
             break;
         }
 
@@ -46,11 +55,14 @@ void Button::handleEvent(const SDL_Event& e) {
     }
 }
 
-void Button::display(const std::shared_ptr<BlitTarget>& target) {
+void Button::display(const std::weak_ptr<BlitTarget>& target) {
+    auto ltarget = target.lock();
+    if (!ltarget) return;
+
     if (isPressed_ && pressedSprite_)
-        target->blit(pressedSprite_, pos_ - (pressedSprite_->getSize() / 2));
+        ltarget->blit(pressedSprite_, pos_ - (pressedSprite_->getSize() / 2));
     else if (isHover_ && hoverSprite_)
-        target->blit(pressedSprite_, pos_ - (hoverSprite_->getSize() / 2));
+        ltarget->blit(pressedSprite_, pos_ - (hoverSprite_->getSize() / 2));
     else
-        target->blit(sprite_, pos_ - (sprite_->getSize() / 2));
+        ltarget->blit(sprite_, pos_ - (sprite_->getSize() / 2));
 }

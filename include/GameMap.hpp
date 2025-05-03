@@ -29,7 +29,7 @@
  * Hérite de HexagonGrid<int> pour gérer la logique de la grille d'hexagons,
  * et ajoute des fonctionnalités de rendu graphique (création de sprites, etc.).
  */
-class GameMap : public HexagonGrid<Cell*>, public Displayer {
+class GameMap : public HexagonGrid<std::shared_ptr<Cell>>, public Displayer {
 public:
     static void init();
     
@@ -48,21 +48,18 @@ public:
     void refreshElements();
     void refresh();
 
-    bool hasTroopSelected() {return selectedTroop_ != nullptr;};
+    bool hasTroopSelected();
 
     void handleEvent(SDL_Event &event);
-    void display(const std::shared_ptr<BlitTarget>& target) override;
+    void display(const std::weak_ptr<BlitTarget>& target) override;
 
     void nextPlayer();
 
-    int getWidth() const override { return HexagonGrid<Cell*>::getWidth(); }
-    int getHeight() const override { return HexagonGrid<Cell*>::getHeight(); }
+    int getWidth() const override;
+    int getHeight() const override;
 
 private:
     static std::mt19937 gen_;
-    static std::shared_ptr<Texture> selectSprite_; //!temp
-    static SDL_Cursor* handCursor_;
-    static SDL_Cursor* arrowCursor_;
 
     GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize, const std::string mapFile);
     void loadMap(const std::string& mapFile);
@@ -71,33 +68,42 @@ private:
     void updateNeighbors();
     void createCalcs();
     void updateSelectedCell();
-    bool isSelectableTroop(PlayableGround* pg);
+    bool isSelectableTroop(const std::weak_ptr<PlayableGround>& pg);
     void updateCursor();
     void refreshMain();
+    void searchNextPlayer();
+    void updateLinks();
     void initGame();
-    void defrayBandits(Player *player);
-    void checkDeficits(Player *player);
+    void defrayBandits(const std::weak_ptr<Player>& player);
+    void checkDeficits(std::weak_ptr<Player>& player);
+    void startTurn(std::weak_ptr<Player>& player);
 
     void updateLostElements();
-    void updateFreeTroops(Player *player);
-    void moveTroop(PlayableGround* from, PlayableGround* to);
-    void moveBandit(PlayableGround* from, PlayableGround* to);
+    void updateFreeTroops(const std::weak_ptr<Player>& player);
+    void moveTroop(std::weak_ptr<PlayableGround>& from, std::weak_ptr<PlayableGround>& to);
+    void moveBandit(std::weak_ptr<PlayableGround>& from, std::weak_ptr<PlayableGround>& to);
     void moveBandits();
-    void updateIncomes(Player *player);
+    void updateIncomes(std::weak_ptr<Player>& player);
+    void updateIncomes(std::shared_ptr<Player>& player);
+
+    void onMouseButtonDown(SDL_Event& event);
+    void onMouseMotion(SDL_Event& event);
+    void onMouseButtonUp(SDL_Event& event);
+    void onKeyDown(SDL_Event& event);
 
     double ratio_ = 0;
 
-    std::optional<PlayableGround*> selectedCell_; //! devrait être un std::optional<PlayableGround> ?
-    Town* townToShowTreasury_;
+    std::weak_ptr<PlayableGround> selectedCell_;
+    std::weak_ptr<Town> townToShowTreasury_;
     bool hasSelection_ = false;
 
-    std::vector<Player*> players_;
-    Player* currentPlayer_;
+    std::vector<std::weak_ptr<Player>> players_;
+    std::weak_ptr<Player> currentPlayer_;
 
-    std::unordered_set<Troop *> movedTroops_;
-    Troop* selectedTroop_ = nullptr;
-    PlayableGround* selectedTroopCell_ = nullptr;
-    PlayableGround* selectedNewTroopCell_ = nullptr;
+    std::vector<std::weak_ptr<Troop>> movedTroops_;
+    std::shared_ptr<Troop> selectedTroop_;
+    std::weak_ptr<PlayableGround> selectedTroopCell_;
+    std::shared_ptr<PlayableGround> selectedNewTroopCell_;
     int selectedPlayerNum_ = 0;
 
     Size calcSize_;
