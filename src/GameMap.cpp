@@ -541,7 +541,6 @@ void GameMap::selectCell(const Point& pos) {
 void GameMap::updateSelectedCell() {
     int x, y;
     SDL_GetMouseState(&x, &y);
-    SDL_Check(0, "SDL_GetMouseState");
     selectCell(Point{x, y} - pos_);
 }
 

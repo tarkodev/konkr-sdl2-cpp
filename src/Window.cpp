@@ -122,5 +122,4 @@ void Window::blit(const std::unique_ptr<Texture>& src, const SDL_Rect* srcRect, 
 void Window::refresh() {
     RenderTargetGuard target(renderer_, std::shared_ptr<SDL_Texture>());
     SDL_RenderPresent(renderer_.get());
-    SDL_Check(0, "SDL_RenderPresent");
 }

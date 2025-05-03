@@ -47,7 +47,6 @@ void MapsMenu::handleEvents() {
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
-        SDL_Check(0, "SDL_PollEvent");
         for(auto& button : buttons_)
             button.handleEvent(event);
 
@@ -58,8 +57,6 @@ void MapsMenu::handleEvents() {
         }
         handleEvent(event);
     }
-
-    SDL_Check(0, "SDL_PollEvent");
 }
 
 void MapsMenu::draw() {
@@ -83,7 +80,6 @@ std::shared_ptr<MenuBase> MapsMenu::run() {
 
         // Control loop duration
         SDL_Delay(1/60);
-        SDL_Check(0, "SDL_Delay");
     }
 
     return nextMenu_;

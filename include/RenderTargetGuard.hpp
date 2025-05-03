@@ -12,7 +12,7 @@ public:
         auto lrenderer = renderer_.lock();
         if (!lrenderer) throw std::runtime_error("Renderer isn't initialized.");
         
-        oldTarget_ = SDL_GetRenderTarget(lrenderer.get()), SDL_DestroyTexture;
+        oldTarget_ = SDL_GetRenderTarget(lrenderer.get());
         SDL_SetRenderTarget(lrenderer.get(), newTarget.get());
     }
     
@@ -20,7 +20,7 @@ public:
         auto lrenderer = renderer_.lock();
         if (!lrenderer) throw std::runtime_error("Renderer isn't initialized.");
         
-        oldTarget_ = SDL_GetRenderTarget(lrenderer.get()), SDL_DestroyTexture;
+        oldTarget_ = SDL_GetRenderTarget(lrenderer.get());
         SDL_Check(SDL_SetRenderTarget(lrenderer.get(), newTarget->get()), "SDL_SetRenderTarget");
     }
 

@@ -42,7 +42,6 @@ void MainMenu::handleEvents(){
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
-        SDL_Check(0, "SDL_PollEvent");
 
         expeditionBtn_->handleEvent(event);
         howToPlayBtn_->handleEvent(event);
@@ -50,8 +49,6 @@ void MainMenu::handleEvents(){
 
         handleEvent(event);
     }
-
-    SDL_Check(0, "SDL_PollEvent");
 }
 
 void MainMenu::draw() {
@@ -78,7 +75,6 @@ std::shared_ptr<MenuBase> MainMenu::run() {
 
         // Control loop duration
         SDL_Delay(1/60);
-        SDL_Check(0, "SDL_Delay");
     }
 
     return nextMenu_;
