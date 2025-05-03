@@ -58,10 +58,10 @@ Ground::Ground(const Point& pos): Displayer(pos, getIslandSize()) {}
 void Ground::display(const std::weak_ptr<BlitTarget>& target) {
     if (auto ltarget = target.lock()) {
         std::vector<bool> GroundNeighbors{
-            static_cast<bool>(Ground::is(neighbors_[0])),
-            static_cast<bool>(Ground::is(neighbors_[1])),
-            static_cast<bool>(Ground::is(neighbors_[2])),
-            static_cast<bool>(Ground::is(neighbors_[3]))
+            Ground::is(neighbors_[0]),
+            Ground::is(neighbors_[1]),
+            Ground::is(neighbors_[2]),
+            Ground::is(neighbors_[3])
         };
 
         islandDisplayer_.display(ltarget, pos_, GroundNeighbors);

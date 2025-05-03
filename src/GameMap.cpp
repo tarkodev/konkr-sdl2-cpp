@@ -21,6 +21,7 @@
 #include "Font.hpp"
 #include "TreasuryDisplayer.hpp"
 #include "Cursor.hpp"
+#include "Checker.hpp"
 
 #include <stdexcept>
 #include <ranges>
@@ -540,6 +541,7 @@ void GameMap::selectCell(const Point& pos) {
 void GameMap::updateSelectedCell() {
     int x, y;
     SDL_GetMouseState(&x, &y);
+    SDL_Check(0, "SDL_GetMouseState");
     selectCell(Point{x, y} - pos_);
 }
 
@@ -580,7 +582,7 @@ void GameMap::moveTroop(std::weak_ptr<PlayableGround>& from, std::weak_ptr<Playa
         }
 
         else if (toTroop) {
-            // Check merge
+            // Merge troops
             std::shared_ptr<Troop> troop = nullptr;
             if (Villager::cast(fromTroop) && Villager::cast(toTroop))
                 troop = std::make_shared<Pikeman>(lto->getPos());
@@ -590,8 +592,8 @@ void GameMap::moveTroop(std::weak_ptr<PlayableGround>& from, std::weak_ptr<Playa
                 troop = std::make_shared<Hero>(lto->getPos());
 
             if (troop) {
-                // Merge troops
-                if (std::find_if(movedTroops_.begin(), movedTroops_.end(), [&](const auto& ptr) { return ptr.lock() == fromTroop; }) != std::find_if(movedTroops_.end(), movedTroops_.end(), [&](const auto& ptr) { return ptr.lock() == toTroop; }))
+                // Set merged troop
+                if (std::find_if(movedTroops_.begin(), movedTroops_.end(), [&](const auto& troop) { return troop.lock() == fromTroop; }) != std::find_if(movedTroops_.end(), movedTroops_.end(), [&](const auto& troop) { return troop.lock() == toTroop; }))
                     movedTroops_.push_back(troop);
 
                 lfrom->setElement(nullptr);
@@ -658,9 +660,9 @@ bool GameMap::isSelectableTroop(const std::weak_ptr<PlayableGround>& pgCell) {
     if (!(owner && owner->hasSelected())) return false;
 
     // Check troop
-    auto troop = Troop::cast(pg->getElement());
-    if (!troop || Bandit::cast(troop)) return false;
-    if (std::find_if(movedTroops_.begin(), movedTroops_.end(), [&](const auto& ptr) { return ptr.lock() == troop; }) != movedTroops_.end())
+    auto sTroop = Troop::cast(pg->getElement());
+    if (!sTroop || Bandit::is(sTroop)) return false;
+    if (std::find_if(movedTroops_.begin(), movedTroops_.end(), [&](const auto& troop) { return troop.lock() == sTroop; }) != movedTroops_.end())
         return false;
 
     return true;

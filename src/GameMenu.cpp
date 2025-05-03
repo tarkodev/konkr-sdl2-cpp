@@ -5,6 +5,7 @@
 #include "Overlay.hpp"
 #include <memory>
 #include <string>
+#include "Checker.hpp"
 
 GameMenu::GameMenu(const std::shared_ptr<Window>& window, const std::string& mapPath): MenuBase{window} {
     windowSize_ = window_->getSize();
@@ -127,6 +128,7 @@ void GameMenu::handleEvents(){
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
+        SDL_Check(0, "SDL_PollEvent");
         overlay_->handleEvent(event);
         
         handleEvent(event);
@@ -141,6 +143,8 @@ void GameMenu::handleEvents(){
         else if (event.type == SDL_KEYDOWN)
             onKeyDown(event);
     }
+
+    SDL_Check(0, "SDL_PollEvent");
 }
 
 void GameMenu::draw() {
@@ -164,6 +168,7 @@ std::shared_ptr<MenuBase> GameMenu::run() {
 
         // Control loop duration
         SDL_Delay(1/60);
+        SDL_Check(0, "SDL_Delay");
     }
 
     return nextMenu_;

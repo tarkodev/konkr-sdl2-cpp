@@ -6,6 +6,7 @@
 #include "Size.hpp"
 #include "BlitTarget.hpp"
 #include "Texture.hpp"
+#include "Checker.hpp"
 
 // To free window memory on closing
 struct SDLWindowDeleter {
@@ -26,26 +27,27 @@ public:
     Size getSize() const override { return size_; }
     int getWidth() const { return size_.getWidth(); }
     int getHeight() const { return size_.getHeight(); }
-    SDL_Texture* get() const override { return calc_->get(); };
+    SDL_Texture* get() const override { return nullptr; };
 
     void fill(const SDL_Color& color) const;
 
-    void blit(const std::weak_ptr<BlitTarget>& src) const override;
-    void blit(const std::weak_ptr<BlitTarget>& src, const Point& destPos) const override;
-    void blit(const std::weak_ptr<BlitTarget>& src, const Size& destSize) const override;
-    void blit(const std::weak_ptr<BlitTarget>& src, const Rect& destRect) const override;
-    void blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Point& destPos) const override;
-    void blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Size& destSize) const override;
-    void blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Rect& destRect) const override;
+    void blit(const std::weak_ptr<Texture>& src) const override;
+    void blit(const std::weak_ptr<Texture>& src, const Point& destPos) const override;
+    void blit(const std::weak_ptr<Texture>& src, const Size& destSize) const override;
+    void blit(const std::weak_ptr<Texture>& src, const Rect& destRect) const override;
+    void blit(const std::weak_ptr<Texture>& src, const Rect& srcRect, const Point& destPos) const override;
+    void blit(const std::weak_ptr<Texture>& src, const Rect& srcRect, const Size& destSize) const override;
+    void blit(const std::weak_ptr<Texture>& src, const Rect& srcRect, const Rect& destRect) const override;
 
     void refresh();
     
 private:
-    std::unique_ptr<Texture> calc_;
-
     Size size_ = {0, 0};
     std::unique_ptr<SDL_Window, SDLWindowDeleter> SDLWindow_;
     std::shared_ptr<SDL_Renderer> renderer_;
+
+    void blit(const std::weak_ptr<Texture>& src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const;
+    void blit(const std::unique_ptr<Texture>& src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const;
 };
 
 #endif

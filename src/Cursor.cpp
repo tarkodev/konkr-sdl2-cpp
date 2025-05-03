@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <string>
+#include "Checker.hpp"
 
 void Cursor::init() {
     create_system_cursor(SystemCursor::Arrow, SDL_SYSTEM_CURSOR_ARROW);
@@ -11,14 +12,17 @@ void Cursor::init() {
 }
 
 void Cursor::quit() {
-    for (auto& [type, cursor] : cursors_)
+    for (auto& [type, cursor] : cursors_) {
         SDL_FreeCursor(cursor);
+        SDL_Check(0, "SDL_FreeCursor");
+    }
     cursors_.clear();
 }
 
 
 void Cursor::set(SDL_Cursor* cursor) {
     SDL_SetCursor(cursor);
+    SDL_Check(0, "SDL_SetCursor");
 }
 
 void Cursor::arrow() {
@@ -36,8 +40,7 @@ void Cursor::text() {
 
 void Cursor::create_system_cursor(SystemCursor type, SDL_SystemCursor sdl_type) {
     SDL_Cursor* cursor = SDL_CreateSystemCursor(sdl_type);
-    if (!cursor)
-        throw std::runtime_error("Failed to create system cursor: " + std::string(SDL_GetError()));
+    SDL_Check(!cursor, "Failed to create system cursor");
 
     cursors_[type] = cursor;
 }
@@ -48,4 +51,5 @@ void Cursor::activate(SystemCursor type) {
         throw std::logic_error("Cursor not initialized");
     
     SDL_SetCursor(it->second);
+    SDL_Check(0, "SDL_SetCursor");
 }

@@ -3,6 +3,7 @@
 #include "MainMenu.hpp"
 #include "ColorUtils.hpp"
 #include "GameMenu.hpp"
+#include "Checker.hpp"
 
 static const struct { const char* label; const char* file; } MAPS[] = {
     {"Ten Paces",   "../assets/map/Ten Paces.txt"},
@@ -46,6 +47,7 @@ void MapsMenu::handleEvents() {
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
+        SDL_Check(0, "SDL_PollEvent");
         for(auto& button : buttons_)
             button.handleEvent(event);
 
@@ -56,6 +58,8 @@ void MapsMenu::handleEvents() {
         }
         handleEvent(event);
     }
+
+    SDL_Check(0, "SDL_PollEvent");
 }
 
 void MapsMenu::draw() {
@@ -79,6 +83,7 @@ std::shared_ptr<MenuBase> MapsMenu::run() {
 
         // Control loop duration
         SDL_Delay(1/60);
+        SDL_Check(0, "SDL_Delay");
     }
 
     return nextMenu_;

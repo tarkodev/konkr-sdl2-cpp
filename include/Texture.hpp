@@ -90,13 +90,13 @@ public:
 
     void fill(const SDL_Color& color) const;
 
-    void blit(const std::weak_ptr<BlitTarget>& src) const override;
-    void blit(const std::weak_ptr<BlitTarget>& src, const Point& destPos) const override;
-    void blit(const std::weak_ptr<BlitTarget>& src, const Size& destSize) const override;
-    void blit(const std::weak_ptr<BlitTarget>& src, const Rect& destRect) const override;
-    void blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Point& destPos) const override;
-    void blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Size& destSize) const override;
-    void blit(const std::weak_ptr<BlitTarget>& src, const Rect& srcRect, const Rect& destRect) const override;
+    void blit(const std::weak_ptr<Texture>& src) const override;
+    void blit(const std::weak_ptr<Texture>& src, const Point& destPos) const override;
+    void blit(const std::weak_ptr<Texture>& src, const Size& destSize) const override;
+    void blit(const std::weak_ptr<Texture>& src, const Rect& destRect) const override;
+    void blit(const std::weak_ptr<Texture>& src, const Rect& srcRect, const Point& destPos) const override;
+    void blit(const std::weak_ptr<Texture>& src, const Rect& srcRect, const Size& destSize) const override;
+    void blit(const std::weak_ptr<Texture>& src, const Rect& srcRect, const Rect& destRect) const override;
 
     void display(const Point& destPos = Point{0, 0});
 
@@ -106,8 +106,8 @@ private:
     Size size_;
     bool alpha_;
 
-    void blit(const std::weak_ptr<BlitTarget>& src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const;
-    void blit(const std::unique_ptr<BlitTarget>& src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const;
+    void blit(const std::weak_ptr<Texture>& src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const;
+    void blit(const std::unique_ptr<Texture>& src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const;
 };
 
 #endif

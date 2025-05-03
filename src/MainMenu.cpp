@@ -2,6 +2,7 @@
 #include "ColorUtils.hpp"
 #include "MainMenu.hpp"
 #include "MapsMenu.hpp"
+#include "Checker.hpp"
 
 MainMenu::MainMenu(const std::shared_ptr<Window>& window): MenuBase{window} {
     // Background of menu
@@ -20,7 +21,7 @@ MainMenu::MainMenu(const std::shared_ptr<Window>& window): MenuBase{window} {
     // How to play button
     howToPlayBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/howtoplay.png");
     howToPlayBtn_->setCallback([]() {
-        SDL_OpenURL("https://www.konkr.io/how-to-play/");
+        SDL_Check(SDL_OpenURL("https://www.konkr.io/how-to-play/"), "SDL_OpenURL");
     });
 
     // Quit button
@@ -41,12 +42,16 @@ void MainMenu::handleEvents(){
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
+        SDL_Check(0, "SDL_PollEvent");
+
         expeditionBtn_->handleEvent(event);
         howToPlayBtn_->handleEvent(event);
         exitBtn_->handleEvent(event);
 
         handleEvent(event);
     }
+
+    SDL_Check(0, "SDL_PollEvent");
 }
 
 void MainMenu::draw() {
@@ -73,6 +78,7 @@ std::shared_ptr<MenuBase> MainMenu::run() {
 
         // Control loop duration
         SDL_Delay(1/60);
+        SDL_Check(0, "SDL_Delay");
     }
 
     return nextMenu_;

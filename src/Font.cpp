@@ -1,4 +1,5 @@
 #include "Font.hpp"
+#include "Checker.hpp"
 #include <stdexcept>
 
 Font::Font(const std::shared_ptr<SDL_Renderer>& renderer, const std::string& file, int pointSize)
@@ -43,7 +44,9 @@ Texture Font::render(const std::string& text, SDL_Color color) {
 
     // Convert to SDL_Texture
     std::shared_ptr<SDL_Texture> tex = std::shared_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(lrenderer.get(), surf), SDL_DestroyTexture);
+    SDL_Check(!tex, "SDL_CreateTextureFromSurface");
     SDL_FreeSurface(surf);
+    SDL_Check(0, "SDL_FreeSurface");
 
     // return Texture
     return Texture(renderer_, tex);

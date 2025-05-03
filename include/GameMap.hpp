@@ -70,7 +70,6 @@ private:
     void updateSelectedCell();
     bool isSelectableTroop(const std::weak_ptr<PlayableGround>& pg);
     void updateCursor();
-    void refreshMain();
     void searchNextPlayer();
     void updateLinks();
     void initGame();
