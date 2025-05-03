@@ -35,7 +35,7 @@ Overlay::Overlay(const Point& pos): Displayer(pos) {
         std::cout << "Next button clicked!" << std::endl;
     });
 
-    troopBtns_.emplace_back(Point{650,300}, "../assets/img/Castle.png");
+    troopBtns_.emplace_back(Point{650,300}, "../assets/img/castle.png");
     auto& castleBtn = troopBtns_.back();
     castleBtn.setCallback([]() {
         std::cout << "Next button clicked!" << std::endl;

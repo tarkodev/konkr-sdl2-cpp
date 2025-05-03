@@ -28,7 +28,7 @@ Window::Window(const char* title, const Size& size) {
     
 
     // Init Renderer
-    renderer_.reset(SDL_CreateRenderer(SDLWindow_.get(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC), SDL_DestroyRenderer);
+    renderer_.reset(SDL_CreateRenderer(SDLWindow_.get(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE), SDL_DestroyRenderer);
     if (!renderer_) {
         SDL_DestroyWindow(SDLWindow_.get());
         TTF_Quit();

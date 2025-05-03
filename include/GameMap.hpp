@@ -107,11 +107,6 @@ private:
     int selectedPlayerNum_ = 0;
 
     Size calcSize_;
-    std::shared_ptr<Texture> islandsCalc_ = nullptr;
-    std::shared_ptr<Texture> platesCalc_ = nullptr;
-    std::shared_ptr<Texture> selectablesCalc_ = nullptr;
-    std::shared_ptr<Texture> fencesCalc_ = nullptr;
-    std::shared_ptr<Texture> elementsCalc_ = nullptr;
     std::shared_ptr<Texture> calc_ = nullptr;
 };
 

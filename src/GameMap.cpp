@@ -8,7 +8,6 @@
 #include "PlayableGround.hpp"
 #include "Forest.hpp"
 #include "logic/GameElement.hpp"
-#include "RenderTargetGuard.hpp"
 #include "Rect.hpp"
 #include "Point.hpp"
 #include "logic/units/Bandit.hpp"
@@ -23,6 +22,7 @@
 #include "TreasuryDisplayer.hpp"
 #include "Cursor.hpp"
 
+#include <stdexcept>
 #include <ranges>
 #include <random>
 #include <cmath>
@@ -285,138 +285,66 @@ void GameMap::createCalcs() {
     setProportionalSize(size_);
 
     // Create calcs
-    islandsCalc_ = std::make_shared<Texture>(renderer_, calcSize_);
-    platesCalc_ = std::make_shared<Texture>(renderer_, calcSize_);
-    selectablesCalc_ = std::make_shared<Texture>(renderer_, calcSize_);
-    fencesCalc_ = std::make_shared<Texture>(renderer_, calcSize_);
-    elementsCalc_ = std::make_shared<Texture>(renderer_, calcSize_);
     calc_ = std::make_shared<Texture>(renderer_, calcSize_);
 }
 
 
 void GameMap::refreshIslands() {
-    if (!platesCalc_) refresh();
-
-    // Draw transparent background
-    platesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
-
     // Draw islands
     for (auto& cell : *this)
         if (auto g = Ground::cast(cell))
-            g->Ground::display(islandsCalc_);
-
-    refreshMain();
+            g->Ground::display(calc_);
 }
 
 void GameMap::refreshPlates() {
-    if (!platesCalc_) refresh();
-
-    // Draw transparent background
-    platesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
-
     // Draw plates
     for (auto& cell : *this)
         if (auto ground = Ground::cast(cell))
-            ground->display(platesCalc_);
-
-    refreshMain();
+            ground->display(calc_);
 }
 
 void GameMap::refreshSelectables() {
-    if (!selectablesCalc_) refresh();
-
-    // Draw transparent background
-    selectablesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
-
     // Draw selectables
     for (auto& cell : *this)
         if (auto pg = PlayableGround::cast(cell))
-            pg->displaySelectable(selectablesCalc_);
-
-    refreshMain();
+            pg->displaySelectable(calc_);
 }
 
 void GameMap::refreshFences() {
-    if (!fencesCalc_) refresh();
-
-    // Draw transparent background
-    fencesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
-
     // Draw fences
     for (auto& cell : *this)
         if (auto pg = PlayableGround::cast(cell))
-            pg->displayFences(fencesCalc_);
-
-    refreshMain();
+            pg->displayFences(calc_);
 }
 
 void GameMap::refreshElements() {
-    if (!elementsCalc_) refresh();
-
-    // Draw transparent background
-    elementsCalc_->fill(ColorUtils::toTransparent(ColorUtils::GREY));
-
     // Draw game elements
     for (auto& cell : *this) {
         if (auto pg = PlayableGround::cast(cell)) {
-            pg->displayElement(elementsCalc_);
-            pg->displayShield(elementsCalc_);
+            pg->displayElement(calc_);
+            pg->displayShield(calc_);
         }
     }
 
     // draw treasury of town
     auto ltownToShowTreasury_ = townToShowTreasury_.lock();
     if (ltownToShowTreasury_)
-        ltownToShowTreasury_->displayTreasury(elementsCalc_);
-
-    refreshMain();
-}
-
-void GameMap::refreshMain() {
-    if (!calc_) refresh();
-
-    // Draw transparent background
-    calc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE)); //! voir si tout en GREY ou SEABLUE dans les calcs
-
-    // Blit all calcs
-    calc_->blit(islandsCalc_);
-    calc_->blit(platesCalc_);
-    calc_->blit(selectablesCalc_);
-    calc_->blit(fencesCalc_);
-    calc_->blit(elementsCalc_);
+        ltownToShowTreasury_->displayTreasury(calc_);
 }
 
 void GameMap::refresh()
 {
     // Create calcs of map if isn't exists
-    if (!islandsCalc_ || !platesCalc_ || !selectablesCalc_ || !fencesCalc_ || !elementsCalc_ || !calc_)
+    if (!calc_)
         createCalcs();
 
     // Draw transparent background
-    islandsCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
-    platesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
-    selectablesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
-    fencesCalc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
-    elementsCalc_->fill(ColorUtils::toTransparent(ColorUtils::GREY));
-
-    // Draw islands and cells
-    for (auto& cell : *this) {
-        // Draw island and plates
-        if (auto ground = Ground::cast(cell)) {
-            ground->Ground::display(islandsCalc_);
-            ground->display(platesCalc_);
-        }
-
-        // Draw element
-        if (auto pg = PlayableGround::cast(cell)) {
-            pg->displaySelectable(selectablesCalc_);
-            pg->displayFences(fencesCalc_);
-            pg->displayElement(elementsCalc_);
-            pg->displayShield(elementsCalc_);
-        }
-    }
-
-    refreshMain();
+    calc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
+    refreshIslands();
+    refreshPlates();
+    refreshSelectables();
+    refreshFences();
+    refreshElements();
 }
 
 
@@ -531,7 +459,7 @@ void GameMap::nextPlayer() {
 
     // Start turn of new current player
     startTurn(currentPlayer_);
-    refreshElements();
+    refresh();
 }
 
 void GameMap::startTurn(std::weak_ptr<Player>& player) { //! const weak_ptr ?
@@ -717,7 +645,7 @@ void GameMap::moveBandits() {
         }
     }
 
-    refreshElements();
+    refresh();
 }
 
 
@@ -769,8 +697,7 @@ void GameMap::onMouseButtonDown(SDL_Event& event) {
             lselectedCell->setElement(nullptr);
         }
 
-        refreshElements();
-        refreshSelectables();
+        refresh();
     }
     
     // If Town is pressed, buy villager
@@ -802,8 +729,7 @@ void GameMap::onMouseButtonDown(SDL_Event& event) {
         v->setPos(mousePos);
         lselectedCell->updateSelectable(v->getStrength());
 
-        refreshElements();
-        refreshSelectables();
+        refresh();
     }
 }
 
@@ -815,7 +741,7 @@ void GameMap::onMouseMotion(SDL_Event& event) {
     // Move selected troop
     if (selectedTroop_) {
         selectedTroop_->setPos(mousePos);
-        refreshElements();
+        refresh();
         return;
     }
 
@@ -825,7 +751,7 @@ void GameMap::onMouseMotion(SDL_Event& event) {
         auto town = Town::cast(lselectedCell->getElement());
         if (town) townToShowTreasury_ = town;
     }
-    refreshElements();
+    refresh();
 }
 
 void GameMap::onMouseButtonUp(SDL_Event& event) {
@@ -896,8 +822,7 @@ void GameMap::handleEvent(SDL_Event &event) {
 void GameMap::display(const std::weak_ptr<BlitTarget>& target)
 {
     // Check initialized calcs
-    if (!islandsCalc_ || !platesCalc_ || !selectablesCalc_ || !fencesCalc_ || !elementsCalc_)
-        refresh();
+    if (!calc_) refresh();
 
     // Check target
     auto ltarget = target.lock();

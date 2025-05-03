@@ -2,6 +2,8 @@
 #define RENDERTARGETGUARD_HPP
 
 #include "SDL.h"
+#include <memory>
+#include <stdexcept>
 
 class RenderTargetGuard {
 public:
