@@ -592,7 +592,7 @@ void GameMap::moveTroop(std::weak_ptr<PlayableGround>& from, std::weak_ptr<Playa
 
             if (troop) {
                 // Set merged troop
-                if (std::find_if(movedTroops_.begin(), movedTroops_.end(), [&](const auto& troop) { return troop.lock() == fromTroop; }) != std::find_if(movedTroops_.end(), movedTroops_.end(), [&](const auto& troop) { return troop.lock() == toTroop; }))
+                if (isMovedTroop(fromTroop) || isMovedTroop(toTroop))
                     movedTroops_.push_back(troop);
 
                 lfrom->setElement(nullptr);
@@ -649,6 +649,18 @@ void GameMap::moveBandits() {
     refresh();
 }
 
+bool GameMap::isMovedTroop(const std::weak_ptr<Troop>& troop) {
+    auto ltroop = troop.lock();
+    if (!ltroop) return false;
+    
+    auto it = std::find_if(movedTroops_.begin(), movedTroops_.end(),
+        [&](const auto& t) {
+            auto locked = t.lock();
+            return locked && locked == ltroop;
+        });
+    
+    return (it != movedTroops_.end());
+}
 
 bool GameMap::isSelectableTroop(const std::weak_ptr<PlayableGround>& pgCell) {
     auto pg = pgCell.lock();
@@ -660,8 +672,7 @@ bool GameMap::isSelectableTroop(const std::weak_ptr<PlayableGround>& pgCell) {
 
     // Check troop
     auto sTroop = Troop::cast(pg->getElement());
-    if (!sTroop || Bandit::is(sTroop)) return false;
-    if (std::find_if(movedTroops_.begin(), movedTroops_.end(), [&](const auto& troop) { return troop.lock() == sTroop; }) != movedTroops_.end())
+    if (!sTroop || Bandit::is(sTroop) || isMovedTroop(sTroop))
         return false;
 
     return true;
@@ -759,45 +770,50 @@ void GameMap::onMouseButtonUp(SDL_Event& event) {
     auto lselectedCell = selectedCell_.lock();
     auto lselectedTroopCell = selectedTroopCell_.lock();
 
-    // Buy Troop
-    if (selectedNewTroopCell_ && selectedTroop_ && lselectedTroopCell && lselectedCell && PlayableGround::is(lselectedCell)) {
-        selectedNewTroopCell_->setElement(selectedTroop_);
-        int cost = selectedTroop_->getCost();
+    if (lselectedTroopCell && selectedTroop_) {
 
-        // Move troop
-        std::weak_ptr<PlayableGround> wsntc = selectedNewTroopCell_;
-        moveTroop(wsntc, selectedCell_);
+        // Buy Troop
+        if (selectedNewTroopCell_) {
+            if (lselectedCell && PlayableGround::is(lselectedCell)) {
+                selectedNewTroopCell_->setElement(selectedTroop_);
+                int cost = selectedTroop_->getCost();
 
-        // Share purchase
-        if (!selectedNewTroopCell_->getElement()) {
-            for (auto& town : lselectedCell->getTowns()) {
-                if (auto ltown = town.lock()) {
-                    int treasury = ltown->getTreasury();
-                    if (treasury > cost) {
-                        ltown->setTreasury(treasury - cost);
-                        break;
+                // Move troop
+                std::weak_ptr<PlayableGround> wsntc = selectedNewTroopCell_;
+                moveTroop(wsntc, selectedCell_);
+
+                // Share purchase
+                if (!selectedNewTroopCell_->getElement()) {
+                    for (auto& town : lselectedCell->getTowns()) {
+                        if (auto ltown = town.lock()) {
+                            int treasury = ltown->getTreasury();
+                            if (treasury > cost) {
+                                ltown->setTreasury(treasury - cost);
+                                break;
+                            }
+
+                            cost -= treasury;
+                            ltown->setTreasury(0);
+                        }
                     }
-
-                    cost -= treasury;
-                    ltown->setTreasury(0);
                 }
             }
+
+            // Remove possibilities
+            lselectedTroopCell->updateSelectable(0);
         }
 
-        // Remove possibilities
-        lselectedTroopCell->updateSelectable(0);
-    }
-
-    // Move Troop
-    else if (!selectedNewTroopCell_ && lselectedTroopCell && selectedTroop_) {
-        lselectedTroopCell->setElement(selectedTroop_);
-
-        // Move troop
-        if (lselectedCell)
-            moveTroop(selectedTroopCell_, selectedCell_);
-
-        // Remove possibilities
-        lselectedTroopCell->updateSelectable(0);
+        // Move Troop
+        else {
+            lselectedTroopCell->setElement(selectedTroop_);
+    
+            // Move troop
+            if (lselectedCell)
+                moveTroop(selectedTroopCell_, selectedCell_);
+    
+            // Remove possibilities
+            lselectedTroopCell->updateSelectable(0);
+        }
     }
 
     selectedNewTroopCell_.reset();

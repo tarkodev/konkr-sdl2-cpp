@@ -17,7 +17,7 @@ Window::Window(const char* title, const Size& size) {
 
     // Init Window
     SDLWindow_.reset(SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, size.getWidth(), size.getHeight(), SDL_WINDOW_SHOWN));
-    if (!SDLWindow_ || SDL_GetError()[0] != '\0') {
+    if (!SDLWindow_) {
         TTF_Quit();
         SDL_Quit();
         throw std::runtime_error(SDL_GetError());
@@ -32,12 +32,6 @@ Window::Window(const char* title, const Size& size) {
         throw std::runtime_error(std::string("SDL_SetWindowFullscreen failed: ") + SDL_GetError());
     }
     SDL_GetWindowSize(SDLWindow_.get(), &width, &height);
-    if (SDL_GetError()[0] != '\0') {
-        SDL_DestroyWindow(SDLWindow_.get());
-        TTF_Quit();
-        SDL_Quit();
-        throw std::runtime_error(std::string("SDL_GetWindowSize failed: ") + SDL_GetError());
-    }
     size_ = {width, height};
     
 
@@ -71,7 +65,6 @@ void Window::blit(const std::weak_ptr<Texture>& src, const SDL_Rect* srcRect, co
     lsrc->convertAlpha();
     RenderTargetGuard target(renderer_, std::shared_ptr<SDL_Texture>());
     SDL_Check(SDL_RenderCopy(renderer_.get(), lsrc->get(), srcRect, destRect), "SDL_RenderCopy");
-    //!SDL_Check(SDL_RenderFlush(renderer_.get()), "SDL_RenderFlush");
 }
 
 void Window::blit(const std::weak_ptr<Texture>& src) const {
@@ -115,7 +108,6 @@ void Window::blit(const std::unique_ptr<Texture>& src, const SDL_Rect* srcRect, 
     src->convertAlpha();
     RenderTargetGuard target(renderer_, std::shared_ptr<SDL_Texture>());
     SDL_Check(SDL_RenderCopy(renderer_.get(), src->get(), srcRect, destRect), "SDL_RenderCopy");
-    //!SDL_Check(SDL_RenderFlush(renderer_.get()), "SDL_RenderFlush");
 }
 
 

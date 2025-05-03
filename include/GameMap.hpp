@@ -76,6 +76,7 @@ private:
     void defrayBandits(const std::weak_ptr<Player>& player);
     void checkDeficits(std::weak_ptr<Player>& player);
     void startTurn(std::weak_ptr<Player>& player);
+    bool isMovedTroop(const std::weak_ptr<Troop>& troop);
 
     void updateLostElements();
     void updateFreeTroops(const std::weak_ptr<Player>& player);

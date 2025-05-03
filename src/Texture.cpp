@@ -126,7 +126,6 @@ void Texture::blit(const std::weak_ptr<Texture>& src, const SDL_Rect* srcRect, c
     lsrc->convertAlpha();
     RenderTargetGuard target(renderer_, texture_);
     SDL_Check(SDL_RenderCopy(lrenderer.get(), lsrc->get(), srcRect, destRect), "SDL_RenderCopy");
-    //!SDL_Check(SDL_RenderFlush(lrenderer.get()), "SDL_RenderFlush");
 }
 
 void Texture::blit(const std::weak_ptr<Texture>& src) const {
@@ -173,7 +172,6 @@ void Texture::blit(const std::unique_ptr<Texture>& src, const SDL_Rect* srcRect,
     src->convertAlpha();
     RenderTargetGuard target(renderer_, texture_);
     SDL_Check(SDL_RenderCopy(lrenderer.get(), src->get(), srcRect, destRect), "SDL_RenderCopy");
-    //!SDL_Check(SDL_RenderFlush(lrenderer.get()), "SDL_RenderFlush");
 }
 
 
@@ -183,5 +181,4 @@ void Texture::display(const Point& destPos) {
 
     SDL_Rect destRect{destPos.getX(), destPos.getY(), getWidth(), getHeight()};
     SDL_Check(SDL_RenderCopy(lrenderer.get(), texture_.get(), nullptr, &destRect), "SDL_RenderCopy");
-    //!SDL_Check(SDL_RenderFlush(lrenderer.get()), "SDL_RenderFlush");
 }
