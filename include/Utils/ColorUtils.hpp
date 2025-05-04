@@ -58,7 +58,7 @@ namespace ColorUtils
      * @param c Couleur de fond.
      * @return true si la luminosité est supérieure ou égale à 30, false sinon.
      */
-    inline bool textInBlack(const SDL_Color& c) {
+    inline const bool textInBlack(const SDL_Color& c) {
         double lum = 0.2125 * (c.r / 255.0 * 100) +
                     0.7154 * (c.g / 255.0 * 100) +
                     0.0721 * (c.b / 255.0 * 100);
@@ -71,7 +71,7 @@ namespace ColorUtils
      * @param c Couleur de fond.
      * @return true si le texte doit être en blanc, false sinon.
      */
-    inline bool textInWhite(const SDL_Color& c) {
+    inline const bool textInWhite(const SDL_Color& c) {
         return !textInBlack(c);
     }
 

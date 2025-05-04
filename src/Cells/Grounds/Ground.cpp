@@ -13,7 +13,7 @@ std::shared_ptr<Ground> Ground::cast(const std::weak_ptr<Cell>& obj) {
     return lobj ? std::dynamic_pointer_cast<Ground>(lobj) : nullptr;
 }
 
-bool Ground::is(const std::weak_ptr<Cell>& obj) {
+const bool Ground::is(const std::weak_ptr<Cell>& obj) {
     return cast(obj) != nullptr;
 }
 
@@ -55,7 +55,7 @@ const double Ground::getInnerRadius() {
 
 Ground::Ground(const Point& pos): Displayer(pos, getIslandSize()) {}
 
-void Ground::display(const std::weak_ptr<BlitTarget>& target) {
+void Ground::display(const std::weak_ptr<BlitTarget>& target) const {
     if (auto ltarget = target.lock()) {
         std::vector<bool> GroundNeighbors{
             Ground::is(neighbors_[0]),

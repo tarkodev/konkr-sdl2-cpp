@@ -28,11 +28,11 @@ public:
     Rect(const SDL_Rect& r);
 
     // Accesseurs pour x, y, largeur et hauteur
-    int getX() const;
-    int getY() const;
-    Point getPos() const;
-    int getWidth() const;
-    int getHeight() const;
+    const int getX() const;
+    const int getY() const;
+    const Point getPos() const;
+    const int getWidth() const;
+    const int getHeight() const;
     Size getSize() const;
 
     // Modificateurs
@@ -56,10 +56,10 @@ public:
     // Opérateur d'affectation par addition (ex : translation)
     Rect& operator+=(const Rect& other);
 
-    // Détermine si un point (x, y) est contenu dans le rectangle
-    bool contains(const int x, const int y) const;
-    bool contains(const Point& p) const;
-    bool contains(const Size& s) const;
+    // Détermine si un poconst int (x, y) est contenu dans le rectangle
+    const bool contains(const int x, const int y) const;
+    const bool contains(const Point& p) const;
+    const bool contains(const Size& s) const;
     
 private:
     SDL_Rect rect_;

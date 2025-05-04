@@ -11,14 +11,14 @@ public:
     static void init();
     static void quit();
     static std::shared_ptr<Troop> cast(const std::weak_ptr<GameElement>& obj);
-    static bool is(const std::weak_ptr<GameElement>& obj);
+    static const bool is(const std::weak_ptr<GameElement>& obj);
 
     virtual ~Troop() = default;
 
-    bool isFree() const;
+    const bool isFree() const;
     void setFree(const bool& free);
 
-    bool isMovable() const;
+    const bool isMovable() const;
     void setMovable(const bool& movable);
 
 protected:
@@ -30,7 +30,7 @@ protected:
 
     Troop(const Point& pos, const Size& size);
 
-    void displaySprite(const std::weak_ptr<BlitTarget>& target, const std::weak_ptr<Texture>& sprite);
+    void displaySprite(const std::weak_ptr<BlitTarget>& target, const std::weak_ptr<Texture>& sprite) const;
 };
 
 #endif

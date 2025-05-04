@@ -11,26 +11,26 @@ public:
     static void init();
     static void quit();
     static std::shared_ptr<Town> cast(const std::weak_ptr<GameElement>& obj);
-    static bool is(const std::weak_ptr<GameElement>& obj);
+    static const bool is(const std::weak_ptr<GameElement>& obj);
 
     explicit Town(const Point& pos, const int& treasury = 0);
 
     /* Displayer */
     void setPos(const Point& pos) override;
-    void display(const std::weak_ptr<BlitTarget>& target) override;
+    void display(const std::weak_ptr<BlitTarget>& target) const override;
 
     void displayTreasury(const std::weak_ptr<BlitTarget>& target);
 
     /* --- Accesseurs génériques --- */
-    int getStrength() const override;
-    int getCost()     const override;
-    int getUpkeep()   const override;
+    const int getStrength() const override;
+    const int getCost()     const override;
+    const int getUpkeep()   const override;
 
-    int getTreasury() const;
+    const int getTreasury() const;
     void setTreasury(int treasury);
     void updateTreasury();
 
-    int getIncome() const;
+    const int getIncome() const;
     void setIncome(int income);
     void addIncome(int coins);
 

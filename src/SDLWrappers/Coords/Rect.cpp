@@ -13,11 +13,11 @@ Rect::Rect(Point pos, Size size) : rect_{pos.getX(), pos.getY(), size.getWidth()
 
 Rect::Rect(const SDL_Rect& r) : rect_(r) {}
 
-int Rect::getX() const { return rect_.x; }
-int Rect::getY() const { return rect_.y; }
-Point Rect::getPos() const { return Point{rect_.x, rect_.y}; }
-int Rect::getWidth() const { return rect_.w; }
-int Rect::getHeight() const { return rect_.h; }
+const int Rect::getX() const { return rect_.x; }
+const int Rect::getY() const { return rect_.y; }
+const Point Rect::getPos() const { return Point{rect_.x, rect_.y}; }
+const int Rect::getWidth() const { return rect_.w; }
+const int Rect::getHeight() const { return rect_.h; }
 Size Rect::getSize() const { return Size{rect_.w, rect_.h}; }
 
 void Rect::setX(int x) { rect_.x = x; }
@@ -45,17 +45,17 @@ Rect& Rect::operator+=(const Rect& other) {
     return *this;
 }
 
-bool Rect::contains(const int x, const int y) const {
+const bool Rect::contains(const int x, const int y) const {
     return x >= rect_.x && x < rect_.x + rect_.w &&
             y >= rect_.y && y < rect_.y + rect_.h;
 }
 
-bool Rect::contains(const Point& p) const {
+const bool Rect::contains(const Point& p) const {
     return p.getX() >= rect_.x && p.getX() < rect_.x + rect_.w &&
             p.getY() >= rect_.y && p.getY() < rect_.y + rect_.h;
 }
 
-bool Rect::contains(const Size& s) const {
+const bool Rect::contains(const Size& s) const {
     return s.getWidth() >= rect_.x && s.getWidth() < rect_.x + rect_.w &&
             s.getHeight() >= rect_.y && s.getHeight() < rect_.y + rect_.h;
 }

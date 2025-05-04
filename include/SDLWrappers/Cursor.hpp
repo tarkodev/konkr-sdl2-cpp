@@ -28,7 +28,7 @@ public:
     static void requestHand();
     static void update();
 
-    static Point getPos();
+    static const Point getPos();
 
 private:
     static inline std::unordered_map<SystemCursor, SDL_Cursor*> cursors_;

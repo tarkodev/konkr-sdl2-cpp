@@ -22,7 +22,7 @@ std::shared_ptr<PlayableGround> PlayableGround::cast(const std::weak_ptr<Cell>& 
     return lobj ? std::dynamic_pointer_cast<PlayableGround>(lobj) : nullptr;
 }
 
-bool PlayableGround::is(const std::weak_ptr<Cell>& obj) {
+const bool PlayableGround::is(const std::weak_ptr<Cell>& obj) {
     return cast(obj) != nullptr;
 }
 
@@ -111,7 +111,7 @@ std::shared_ptr<Player> PlayableGround::getOldOwner() {
     return oldOwner_;
 }
 
-void PlayableGround::display(const std::weak_ptr<BlitTarget>& target) {
+void PlayableGround::display(const std::weak_ptr<BlitTarget>& target) const {
     if (!hasPlate_) return;
 
     std::vector<bool> similarNeighbors;
@@ -137,7 +137,7 @@ void PlayableGround::display(const std::weak_ptr<BlitTarget>& target) {
     }
 }
 
-bool PlayableGround::hasFences() const {
+const bool PlayableGround::hasFences() const {
     if (element && (Castle::cast(element) || Town::cast(element) || Camp::cast(element)))
         return true;
 
@@ -151,7 +151,7 @@ bool PlayableGround::hasFences() const {
     });
 }
 
-bool PlayableGround::isLinked(std::unordered_set<std::shared_ptr<PlayableGround>>& visited) {
+const bool PlayableGround::isLinked(std::unordered_set<std::shared_ptr<PlayableGround>>& visited) {
     if (!owner_ || visited.find(shared_from_this()) != visited.end()) return false;
     visited.insert(shared_from_this());
 
@@ -167,7 +167,7 @@ bool PlayableGround::isLinked(std::unordered_set<std::shared_ptr<PlayableGround>
     return false;
 }
 
-bool PlayableGround::isLinked() {
+const bool PlayableGround::isLinked() {
     std::unordered_set<std::shared_ptr<PlayableGround>> visited;
     return isLinked(visited);
 }
@@ -403,7 +403,7 @@ std::shared_ptr<GameElement> PlayableGround::getElement() {
     return element;
 }
 
-int PlayableGround::getShield() const {
+const int PlayableGround::getShield() const {
     int maxStrength = element ? element->getStrength() : 0;
 
     for (auto& cell : neighbors_) {

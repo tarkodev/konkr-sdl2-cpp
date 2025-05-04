@@ -26,8 +26,8 @@ public:
      */
     HexagonGrid(const std::pair<int, int>& size, const T& defaultValue = T());
 
-    virtual int getWidth() const { return width_; }
-    virtual int getHeight() const { return height_; }
+    virtual const int getWidth() const { return width_; }
+    virtual const int getHeight() const { return height_; }
 
     /**
      * @brief Récupère la valeur d'une cellule en coordonnées offset (x, y).

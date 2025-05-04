@@ -9,7 +9,7 @@ std::shared_ptr<Town> Town::cast(const std::weak_ptr<GameElement>& obj) {
     return lobj ? std::dynamic_pointer_cast<Town>(lobj) : nullptr;
 }
 
-bool Town::is(const std::weak_ptr<GameElement>& obj) {
+const bool Town::is(const std::weak_ptr<GameElement>& obj) {
     return cast(obj) != nullptr;
 }
 
@@ -39,20 +39,20 @@ void Town::setPos(const Point& pos) {
     treasuryDisplayer_.setPos(pos);
 }
 
-int Town::getStrength() const {
+const int Town::getStrength() const {
     return STRENGTH;
 };
 
-int Town::getCost()     const {
+const int Town::getCost()     const {
     return COST;
 };
 
-int Town::getUpkeep()   const {
+const int Town::getUpkeep()   const {
     return UPKEEP;
 };
 
 
-int Town::getTreasury() const {
+const int Town::getTreasury() const {
     return treasury_;
 }
 
@@ -66,7 +66,7 @@ void Town::updateTreasury() {
     treasuryDisplayer_.setTreasury(treasury_);
 };
 
-int Town::getIncome() const {
+const int Town::getIncome() const {
     return income_;
 }
 
@@ -84,7 +84,7 @@ void Town::setSelected(bool selected) {
     selected_ = selected;
 }
 
-void Town::display(const std::weak_ptr<BlitTarget>& target) {
+void Town::display(const std::weak_ptr<BlitTarget>& target) const {
     auto ltarget = target.lock();
     if (!ltarget || !sprite_) return;
 

@@ -25,8 +25,8 @@ public:
     HexagonDisplayer& getLostPlate();
 
     void updateTowns();
-    bool hasSelected() const { return selected_; };
-    bool hasTowns();
+    const bool hasSelected() const { return selected_; };
+    const bool hasTowns();
     std::vector<std::weak_ptr<PlayableGround>> getTownCells();
 
     void addTownCell(std::weak_ptr<PlayableGround> town);

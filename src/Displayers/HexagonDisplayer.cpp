@@ -19,7 +19,7 @@ HexagonDisplayer::~HexagonDisplayer()
 {}
 
 
-void HexagonDisplayer::display(const std::weak_ptr<BlitTarget>& target, const Point& pos, const std::vector<bool>& neighbors) {
+void HexagonDisplayer::display(const std::weak_ptr<BlitTarget>& target, const Point& pos, const std::vector<bool>& neighbors) const {
     auto [x, y] = pos.get();
     auto ltarget = target.lock();
     if (!ltarget) return;
@@ -43,11 +43,11 @@ void HexagonDisplayer::display(const std::weak_ptr<BlitTarget>& target, const Po
     }
 }
 
-void HexagonDisplayer::display(const std::weak_ptr<BlitTarget>& target, const Point& pos) {
+void HexagonDisplayer::display(const std::weak_ptr<BlitTarget>& target, const Point& pos) const {
     display(target, pos, {false, false, false, false, false, false});
 }
 
-void HexagonDisplayer::display(const std::weak_ptr<BlitTarget>& target) {
+void HexagonDisplayer::display(const std::weak_ptr<BlitTarget>& target) const {
     display(target, pos_, {false, false, false, false, false, false});
 }
 

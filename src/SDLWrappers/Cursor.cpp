@@ -43,7 +43,7 @@ void Cursor::update() {
     requestedCursor_ = SystemCursor::Any;
 }
 
-Point Cursor::getPos() {
+const Point Cursor::getPos() {
     int x, y;
     SDL_GetMouseState(&x, &y);
     return Point{x, y};

@@ -8,7 +8,7 @@ std::shared_ptr<Castle> Castle::cast(const std::weak_ptr<GameElement>& obj) {
     return lobj ? std::dynamic_pointer_cast<Castle>(lobj) : nullptr;
 }
 
-bool Castle::is(const std::weak_ptr<GameElement>& obj) {
+const bool Castle::is(const std::weak_ptr<GameElement>& obj) {
     return cast(obj) != nullptr;
 }
 
@@ -29,7 +29,7 @@ void Castle::quit()
 
 Castle::Castle(const Point& pos): GameElement(pos, sprite_->getSize()) {}
 
-void Castle::display(const std::weak_ptr<BlitTarget>& target) {
+void Castle::display(const std::weak_ptr<BlitTarget>& target) const {
     auto ltarget = target.lock();
     if (!ltarget || !sprite_) return;
 

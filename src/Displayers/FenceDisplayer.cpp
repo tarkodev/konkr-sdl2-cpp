@@ -17,7 +17,7 @@ FenceDisplayer::~FenceDisplayer()
 {}
 
 
-void FenceDisplayer::display(const std::weak_ptr<BlitTarget>& target, const Point& pos, const std::vector<bool>& neighbors) {
+void FenceDisplayer::display(const std::weak_ptr<BlitTarget>& target, const Point& pos, const std::vector<bool>& neighbors) const {
     auto [x, y] = pos.get();
     auto ltarget = target.lock();
     if (!ltarget) return;
@@ -95,10 +95,10 @@ void FenceDisplayer::display(const std::weak_ptr<BlitTarget>& target, const Poin
     }
 }
 
-void FenceDisplayer::display(const std::weak_ptr<BlitTarget>& target, const Point& pos) {
+void FenceDisplayer::display(const std::weak_ptr<BlitTarget>& target, const Point& pos) const {
     display(target, pos, {false, false, false, false, false, false});
 }
 
-void FenceDisplayer::display(const std::weak_ptr<BlitTarget>& target) {
+void FenceDisplayer::display(const std::weak_ptr<BlitTarget>& target) const {
     display(target, pos_, {false, false, false, false, false, false});
 }

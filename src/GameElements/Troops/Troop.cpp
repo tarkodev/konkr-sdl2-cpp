@@ -10,7 +10,7 @@ std::shared_ptr<Troop> Troop::cast(const std::weak_ptr<GameElement>& obj) {
     return lobj ? std::dynamic_pointer_cast<Troop>(lobj) : nullptr;
 }
 
-bool Troop::is(const std::weak_ptr<GameElement>& obj) {
+const bool Troop::is(const std::weak_ptr<GameElement>& obj) {
     return cast(obj) != nullptr;
 }
 
@@ -35,7 +35,7 @@ void Troop::setFree(const bool& free) {
     free_ = free;
 }
 
-bool Troop::isFree() const {
+const bool Troop::isFree() const {
     return free_;
 }
 
@@ -43,11 +43,11 @@ void Troop::setMovable(const bool& movable) {
     movable_ = movable;
 }
 
-bool Troop::isMovable() const {
+const bool Troop::isMovable() const {
     return movable_;
 }
 
-void Troop::displaySprite(const std::weak_ptr<BlitTarget>& target, const std::weak_ptr<Texture>& sprite) {
+void Troop::displaySprite(const std::weak_ptr<BlitTarget>& target, const std::weak_ptr<Texture>& sprite) const {
     auto ltarget = target.lock();
     auto lsprite = sprite.lock();
     if (!ltarget || !lsprite || !shadow_ || !lostSprite_) return;

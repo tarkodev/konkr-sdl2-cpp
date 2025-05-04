@@ -8,7 +8,7 @@ std::shared_ptr<Bandit> Bandit::cast(const std::weak_ptr<GameElement>& obj) {
     return lobj ? std::dynamic_pointer_cast<Bandit>(lobj) : nullptr;
 }
 
-bool Bandit::is(const std::weak_ptr<GameElement>& obj) {
+const bool Bandit::is(const std::weak_ptr<GameElement>& obj) {
     return cast(obj) != nullptr;
 }
 
@@ -29,7 +29,6 @@ void Bandit::quit()
 
 Bandit::Bandit(const Point& pos): Troop(pos, sprite_->getSize()) {}
 
-void Bandit::display(const std::weak_ptr<BlitTarget>& target)
-{
+void Bandit::display(const std::weak_ptr<BlitTarget>& target) const {
     Troop::displaySprite(target, sprite_);
 }

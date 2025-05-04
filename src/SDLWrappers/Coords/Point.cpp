@@ -17,8 +17,8 @@ Point::Point(const SDL_Point& p) : point_(p) {}
 Point::Point(const Size& s) : point_{s.getWidth(), s.getHeight()} {}
 
 // Accesseurs
-int Point::getX() const { return point_.x; }
-int Point::getY() const { return point_.y; }
+const int Point::getX() const { return point_.x; }
+const int Point::getY() const { return point_.y; }
 
 // Mutateurs
 void Point::setX(int x) { point_.x = x; }

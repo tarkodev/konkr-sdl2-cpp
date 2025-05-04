@@ -25,7 +25,7 @@ void Button::setCallback(Callback cb) {
     callback_ = std::move(cb);
 }
 
-bool Button::isHover(const Point& mousePos) const {
+const bool Button::isHover(const Point& mousePos) const {
     return isHover_;
 }
 
@@ -63,7 +63,7 @@ void Button::handleEvent(const SDL_Event& e) {
     }
 }
 
-void Button::display(const std::weak_ptr<BlitTarget>& target) {
+void Button::display(const std::weak_ptr<BlitTarget>& target) const {
     auto ltarget = target.lock();
     if (!ltarget) return;
 

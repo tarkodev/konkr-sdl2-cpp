@@ -46,22 +46,22 @@ public:
 
     void setPos(const Point& pos) override;
 
-    void refresh();
+    void refresh() const;
 
-    int getMaxTreasuryOfCurrentPlayer();
+    const int getMaxTreasuryOfCurrentPlayer();
     void buyTroop(const std::shared_ptr<GameElement>& elt);
 
-    bool hasTroopSelected();
+    const bool hasTroopSelected();
 
     void handleEvent(SDL_Event &event);
-    void display(const std::weak_ptr<BlitTarget>& target) override;
+    void display(const std::weak_ptr<BlitTarget>& target) const override;
 
-    bool gameFinished() const;
+    const bool gameFinished() const;
 
     void nextPlayer();
 
-    int getWidth() const override;
-    int getHeight() const override;
+    const int getWidth() const override;
+    const int getHeight() const override;
 
 private:
     static std::mt19937 gen_;
@@ -95,7 +95,7 @@ private:
     void updateNeighbors();
     void createCalcs();
     void updateSelectedCell();
-    bool isSelectableTroop(const std::weak_ptr<PlayableGround>& pg);
+    const bool isSelectableTroop(const std::weak_ptr<PlayableGround>& pg);
     void updateCursor();
     void searchNextPlayer();
     void updateLinks();
@@ -103,12 +103,12 @@ private:
     void defrayBandits(const std::weak_ptr<Player>& player);
     void checkDeficits(std::weak_ptr<Player>& player);
     void startTurn(std::weak_ptr<Player>& player);
-    bool isMovedTroop(const std::weak_ptr<Troop>& troop);
+    const bool isMovedTroop(const std::weak_ptr<Troop>& troop);
 
     void updateLostElements();
     void updateFreeTroops(const std::weak_ptr<Player>& player);
     std::unordered_map<std::shared_ptr<PlayableGround>, int> getTreasuresOfCurrentPlayers();
-    bool placeCastle(const std::weak_ptr<Castle>& castle, const std::weak_ptr<PlayableGround>& to);
+    const bool placeCastle(const std::weak_ptr<Castle>& castle, const std::weak_ptr<PlayableGround>& to);
     void moveTroop(const std::weak_ptr<PlayableGround>& from, const std::weak_ptr<PlayableGround>& to);
     void moveBandit(const std::weak_ptr<PlayableGround>& from, const std::weak_ptr<PlayableGround>& to);
     void moveBandits();
@@ -121,11 +121,11 @@ private:
     void onMouseMotion(SDL_Event& event);
     void onMouseButtonUp(SDL_Event& event);
 
-    void refreshIslands();
-    void refreshPlates();
-    void refreshSelectables();
-    void refreshFences();
-    void refreshElements();
+    void refreshIslands() const;
+    void refreshPlates() const;
+    void refreshSelectables() const;
+    void refreshFences() const;
+    void refreshElements() const;
 };
 
 #endif

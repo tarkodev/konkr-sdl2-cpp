@@ -8,7 +8,7 @@
 class Camp : public GameElement {
 public:
     static std::shared_ptr<Camp> cast(const std::weak_ptr<GameElement>& obj);
-    static bool is(const std::weak_ptr<GameElement>& obj);
+    static const bool is(const std::weak_ptr<GameElement>& obj);
 
     /* Chargement des ressources partagées */
     static void init();
@@ -18,15 +18,15 @@ public:
 
     /* Displayer */
     void setPos(const Point& pos) override;
-    void display(const std::weak_ptr<BlitTarget>& target) override;
+    void display(const std::weak_ptr<BlitTarget>& target) const override;
 
     /* --- Accesseurs génériques --- */
-    int getStrength() const override { return STRENGTH; };
-    int getCost()     const override { return COST; };
-    int getUpkeep()   const override { return UPKEEP; };
+    const int getStrength() const override { return STRENGTH; };
+    const int getCost()     const override { return COST; };
+    const int getUpkeep()   const override { return UPKEEP; };
 
     void addCoins(int coins);
-    int getTreasury() const;
+    const int getTreasury() const;
     void displayTreasury(const std::weak_ptr<BlitTarget>& target);
 
 protected:

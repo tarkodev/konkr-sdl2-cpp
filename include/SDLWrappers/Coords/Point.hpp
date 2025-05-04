@@ -27,8 +27,8 @@ public:
     Point(const Size& s);
 
     // Accesseurs
-    int getX() const;
-    int getY() const;
+    const int getX() const;
+    const int getY() const;
 
     // Mutateurs
     void setX(int x);

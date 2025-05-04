@@ -9,7 +9,7 @@ std::shared_ptr<Camp> Camp::cast(const std::weak_ptr<GameElement>& obj) {
     return lobj ? std::dynamic_pointer_cast<Camp>(lobj) : nullptr;
 }
 
-bool Camp::is(const std::weak_ptr<GameElement>& obj) {
+const bool Camp::is(const std::weak_ptr<GameElement>& obj) {
     return cast(obj) != nullptr;
 }
 
@@ -44,11 +44,11 @@ void Camp::addCoins(int coins) {
     treasuryDisplayer_.setTreasury(treasury_);
 }
 
-int Camp::getTreasury() const {
+const int Camp::getTreasury() const {
     return treasury_;
 }
 
-void Camp::display(const std::weak_ptr<BlitTarget>& target) {
+void Camp::display(const std::weak_ptr<BlitTarget>& target) const {
     auto ltarget = target.lock();
     if (!ltarget || !sprite_) return;
 

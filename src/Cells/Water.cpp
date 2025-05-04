@@ -5,6 +5,6 @@ std::shared_ptr<Water> Water::cast(const std::weak_ptr<Cell>& obj) {
     return lobj ? std::dynamic_pointer_cast<Water>(lobj) : nullptr;
 }
 
-bool Water::is(const std::weak_ptr<Cell>& obj) {
+const bool Water::is(const std::weak_ptr<Cell>& obj) {
     return cast(obj) != nullptr;
 }

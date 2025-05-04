@@ -20,8 +20,8 @@ Size::Size(const Size& s) : size_{s.getWidth(), s.getHeight()} {}
 Size::Size(const Point& s) : size_{s.getX(), s.getY()} {}
 
 // Accesseurs
-int Size::getWidth() const { return size_.x; }
-int Size::getHeight() const { return size_.y; }
+const int Size::getWidth() const { return size_.x; }
+const int Size::getHeight() const { return size_.y; }
 
 // Mutateurs
 void Size::setWidth(int w) { size_.x = w; }

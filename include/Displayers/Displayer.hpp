@@ -13,14 +13,14 @@ public:
 
     virtual ~Displayer() = default;
     
-    virtual void display(const std::weak_ptr<BlitTarget>& target) = 0; //! rendre const ?
+    virtual void display(const std::weak_ptr<BlitTarget>& target) const = 0;
     
-    virtual Point getPos() const;
+    virtual const Point getPos() const;
     virtual void setPos(const Point& pos);
 
     virtual Size getSize() const;
-    virtual int getWidth() const;
-    virtual int getHeight() const;
+    virtual const int getWidth() const;
+    virtual const int getHeight() const;
 
 
 protected:

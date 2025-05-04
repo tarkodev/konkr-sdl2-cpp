@@ -15,7 +15,7 @@ struct TroopOption {
     std::unique_ptr<Button>    btnBuy;
     bool                       buyable = false;
 
-    Point getPos()  const { return btnBuy->getPos(); }
+    const Point getPos()  const { return btnBuy->getPos(); }
     Size  getSize() const { return btnBuy->getSize(); }
 };
 
@@ -30,14 +30,14 @@ public:
 
     void handleEvent(const SDL_Event& e);
 
-    bool isHover(const Point& mousePos) const;
+    const bool isHover(const Point& mousePos) const;
 
     void setPos(const Point& pos) override;
-    void display(const std::weak_ptr<BlitTarget>& target) override;
+    void display(const std::weak_ptr<BlitTarget>& target) const override;
 
-    bool backRequested();
-    bool turnRequested();
-    bool buyTroopRequested();
+    const bool backRequested();
+    const bool turnRequested();
+    const bool buyTroopRequested();
     std::shared_ptr<GameElement> getTroopBought();
 
     void update(int treasury);

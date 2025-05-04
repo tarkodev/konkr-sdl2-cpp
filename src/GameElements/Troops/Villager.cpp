@@ -8,7 +8,7 @@ std::shared_ptr<Villager> Villager::cast(const std::weak_ptr<GameElement>& obj) 
     return lobj ? std::dynamic_pointer_cast<Villager>(lobj) : nullptr;
 }
 
-bool Villager::is(const std::weak_ptr<GameElement>& obj) {
+const bool Villager::is(const std::weak_ptr<GameElement>& obj) {
     return cast(obj) != nullptr;
 }
 
@@ -29,7 +29,6 @@ void Villager::quit()
 
 Villager::Villager(const Point& pos): Troop(pos, sprite_->getSize()) {}
 
-void Villager::display(const std::weak_ptr<BlitTarget>& target)
-{
+void Villager::display(const std::weak_ptr<BlitTarget>& target) const {
     Troop::displaySprite(target, sprite_);
 }
