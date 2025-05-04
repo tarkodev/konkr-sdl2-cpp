@@ -32,9 +32,7 @@ MapsMenu::MapsMenu(const std::shared_ptr<Window>& window) : MenuBase{window}
     if (mapNames.empty())
         throw std::runtime_error("Aucune map trouvée dans " + mapsDir.string());
 
-    // Init pos of Map
-    Point pos = window_->getSize();
-
+    // Init maps
     for (auto const& name : mapNames) {
         // File of map
         std::string mapFile = (mapsDir / (name + ".ascii")).string();
@@ -56,18 +54,23 @@ MapsMenu::MapsMenu(const std::shared_ptr<Window>& window) : MenuBase{window}
             nextMenu_ = std::make_shared<GameMenu>(window, mapFile);
             loop_ = false;
         });
-
-        pos.addX(-btn.getWidth() / 2);
     }
 
-    // Set pos of maps
-    pos = window_->getSize() / 2;
-    for (auto& btn : buttons_)
-        pos.addX(-btn.getWidth() / 2);
-    for (auto& btn : buttons_) {
-        pos.addX(btn.getWidth() / 2);
-        btn.setPos(pos);
-        pos.addX(btn.getWidth() / 2);
+    // Set pos of buttons
+    int nbBtns = buttons_.size();
+    int nbLines = std::ceil(nbBtns / 5.);
+    Point pos = window_->getSize() / 2 - Point{0, nbLines * buttons_[0].getHeight() / 2};
+    for (int i = 0; i < nbLines; i++) {
+        pos.setX(window_->getWidth() / 2);
+        pos.addY(buttons_[0].getHeight() / 2);
+        for (int j = 0; j < std::min(nbBtns - i*5, 5); j++)
+            pos.addX(-buttons_[i*5 + j].getWidth() / 2);
+        for (int j = 0; j < std::min(nbBtns - i*5, 5); j++) {
+            pos.addX(buttons_[i*5 + j].getWidth() / 2);
+            buttons_[i*5 + j].setPos(pos);
+            pos.addX(buttons_[i*5 + j].getWidth() / 2);
+        }
+        pos.addY(buttons_[0].getHeight() / 2);
     }
 
     // Add back button
