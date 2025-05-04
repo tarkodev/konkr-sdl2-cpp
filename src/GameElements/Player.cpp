@@ -52,7 +52,7 @@ void Player::addTownCell(std::weak_ptr<PlayableGround> townCell) {
 }
 
 void Player::updateTowns() {
-    std::erase_if(townCells_, [](std::weak_ptr<PlayableGround> townCell) {
+    std::erase_if(townCells_, [](const auto& townCell) {
         auto ltownCell = townCell.lock();
         return ltownCell ? !Town::is(ltownCell->getElement()) : true;
     });

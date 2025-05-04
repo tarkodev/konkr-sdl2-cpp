@@ -141,7 +141,7 @@ const bool PlayableGround::hasFences() const {
     if (element && (Castle::cast(element) || Town::cast(element) || Camp::cast(element)))
         return true;
 
-    return owner_ && std::any_of(neighbors_.begin(), neighbors_.end(), [this](auto cell) {
+    return owner_ && std::any_of(neighbors_.begin(), neighbors_.end(), [this](const auto& cell) {
         if (auto pg = PlayableGround::cast(cell)) {
             if (pg->getOwner() != owner_) return false;
             auto elt = pg->getElement();
