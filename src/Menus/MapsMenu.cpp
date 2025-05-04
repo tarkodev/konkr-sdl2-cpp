@@ -11,7 +11,7 @@ namespace fs = std::filesystem;
 
 MapsMenu::MapsMenu(const std::shared_ptr<Window>& window) : MenuBase{window}
 {
-    // 1) Récupère la liste des maps en scannant le dossier
+    // Set filepaths
     const fs::path mapsDir   = "../assets/map/";
     const fs::path imagesDir = "../assets/img/map/";
     std::vector<std::string> mapNames;
@@ -33,7 +33,7 @@ MapsMenu::MapsMenu(const std::shared_ptr<Window>& window) : MenuBase{window}
         throw std::runtime_error("Aucune map trouvée dans " + mapsDir.string());
 
     // Init pos of Map
-    Point pos = window_->getSize() / 2;
+    Point pos = window_->getSize();
 
     for (auto const& name : mapNames) {
         // File of map
