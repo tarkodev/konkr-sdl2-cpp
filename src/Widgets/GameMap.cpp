@@ -41,16 +41,6 @@ void GameMap::init() {
     gen_ = std::mt19937{ std::random_device{}() };
 }
 
-
-GameMap::GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize)
-    : Displayer(pos, size), HexagonGrid<std::shared_ptr<Cell>>(gridSize, nullptr)
-{
-    if (getWidth() < 2 || getHeight() < 2)
-        throw std::runtime_error("Une map doit au moins être de taille 2x2.");
-
-    //! a compléter (ou a retirer)
-}
-
 GameMap::GameMap(const Point& pos, const Size size, const std::string mapFile)
   : GameMap(pos, size, getSizeOfMapFile(mapFile), mapFile)
 {}
