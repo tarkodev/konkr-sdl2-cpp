@@ -1,5 +1,7 @@
 # Konkr - Projet de Programmation Avancée
 
+-  Par **Pierre HAUDEBOURT** et **Gabriel MOURAD**
+
 Ce projet implémente une version du jeu **Konkr** en C++ moderne avec affichage graphique via SDL2. Réalisé en binôme dans le cadre du cours de Programmation Avancée, le projet se base sur une architecture modulaire, l'utilisation intensive de la STL et les bonnes pratiques modernes (C++17 et ultérieur).
 
 ## Fonctionnalités
