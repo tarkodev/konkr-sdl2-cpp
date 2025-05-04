@@ -6,7 +6,7 @@
 #include <memory>
 #include "SDLWrappers/Coords/Point.hpp"
 #include "Displayers/Displayer.hpp"
-#include "Button.hpp"
+#include "Widgets/Button.hpp"
 #include "GameElements/Troops/Troop.hpp"
 
 struct TroopOption {

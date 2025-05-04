@@ -5,9 +5,9 @@
 #include "Menus/MenuBase.hpp"
 #include "SDLWrappers/Renderers/Window.hpp"
 #include "SDLWrappers/Renderers/Texture.hpp"
-#include "Overlay.hpp"
-#include "GameMap.hpp"
-#include "Button.hpp"
+#include "Widgets/Overlay.hpp"
+#include "Widgets/GameMap.hpp"
+#include "Widgets/Button.hpp"
 #include <memory>
 #include <string>
 

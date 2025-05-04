@@ -3,13 +3,13 @@
 
 //! trier du plus bas au plus haut niveau (SDL est l'intermédiaire)
 #include "SDL.h"
-#include "HexagonGrid.hpp"
+#include "Widgets/HexagonGrid.hpp"
 #include "SDLWrappers/Renderers/Texture.hpp"
 #include "Cells/Cell.hpp"
 #include "SDLWrappers/Coords/Rect.hpp"
 #include "SDLWrappers/Coords/Point.hpp"
 #include "SDLWrappers/Coords/Size.hpp"
-#include "Player.hpp"
+#include "GameElements/Player.hpp"
 #include "GameElements/Troops/Troop.hpp"
 #include "GameElements/Castle.hpp"
 #include "GameElements/Camp.hpp"

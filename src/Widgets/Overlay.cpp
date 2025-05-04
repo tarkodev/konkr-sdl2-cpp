@@ -1,11 +1,11 @@
-#include "Overlay.hpp"
+#include "Widgets/Overlay.hpp"
 #include "Utils/ColorUtils.hpp"
 #include "GameElements/Troops/Villager.hpp"
 #include "GameElements/Troops/Pikeman.hpp"
 #include "GameElements/Troops/Knight.hpp"
 #include "GameElements/Troops/Hero.hpp"
 #include "GameElements/Castle.hpp"
-#include "GameMap.hpp"
+#include "Widgets/GameMap.hpp"
 #include "SDLWrappers/Cursor.hpp"
 #include <stdexcept>
 

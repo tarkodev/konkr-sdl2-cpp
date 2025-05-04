@@ -1,7 +1,7 @@
 #include "SDLWrappers/Renderers/Texture.hpp"
 #include "Utils/ColorUtils.hpp"
 #include "SDLWrappers/Coords/Point.hpp"
-#include "RenderTargetGuard.hpp"
+#include "SDLWrappers/Renderers/RenderTargetGuard.hpp"
 #include <sstream>
 #include "Utils/Checker.hpp"
 

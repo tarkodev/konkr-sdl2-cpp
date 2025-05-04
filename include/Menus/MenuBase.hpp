@@ -3,7 +3,7 @@
 
 #include "Displayers/Displayer.hpp"
 #include "SDLWrappers/Renderers/Window.hpp"
-#include "Button.hpp"
+#include "Widgets/Button.hpp"
 #include <vector>
 #include <memory>
 

@@ -4,10 +4,10 @@
 #include <memory>
 #include "SDL.h"
 #include "Utils/ColorUtils.hpp"
-#include "GameMap.hpp"
+#include "Widgets/GameMap.hpp"
 #include "SDLWrappers/Renderers/Window.hpp"
-#include "Player.hpp"
-#include "Overlay.hpp"
+#include "GameElements/Player.hpp"
+#include "Widgets/Overlay.hpp"
 #include "Menus/MainMenu.hpp"
 #include "Menus/MapsMenu.hpp"
 #include "SDLWrappers/Font.hpp"

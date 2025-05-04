@@ -2,7 +2,7 @@
 #define HEXAGONGRID_TPP
 
 #include "Utils/HexagonUtils.hpp"
-#include "HexagonGrid.hpp"
+#include "Widgets/HexagonGrid.hpp"
 #include <cmath>
 #include <stdexcept>
 #include <utility>

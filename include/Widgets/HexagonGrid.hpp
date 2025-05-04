@@ -62,6 +62,6 @@ private:
     std::vector<T> grid_;
 };
 
-#include "HexagonGrid.tpp"
+#include "Widgets/HexagonGrid.tpp"
 
 #endif

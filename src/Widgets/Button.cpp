@@ -1,5 +1,5 @@
 // Button.cpp
-#include "Button.hpp"
+#include "Widgets/Button.hpp"
 #include "SDL.h"
 #include "SDLWrappers/Cursor.hpp"
 

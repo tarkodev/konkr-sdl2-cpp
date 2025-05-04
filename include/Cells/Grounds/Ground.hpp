@@ -6,7 +6,7 @@
 #include "SDLWrappers/Renderers/Texture.hpp"
 #include "Displayers/Displayer.hpp"
 #include "Displayers/HexagonDisplayer.hpp"
-#include "Player.hpp"
+#include "GameElements/Player.hpp"
 #include "Cells/Cell.hpp"
 #include <memory>
 

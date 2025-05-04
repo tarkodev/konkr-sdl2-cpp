@@ -1,4 +1,4 @@
-#include "GameMap.hpp"
+#include "Widgets/GameMap.hpp"
 #include "Utils/ColorUtils.hpp"
 #include "Utils/HexagonUtils.hpp"
 #include "SDL2/SDL2_gfxPrimitives.h"

@@ -4,7 +4,7 @@
 #include "SDL.h"
 #include "SDLWrappers/Renderers/BlitTarget.hpp"
 #include "SDLWrappers/Renderers/Texture.hpp"
-#include "Player.hpp"
+#include "GameElements/Player.hpp"
 #include "Cells/Grounds/Ground.hpp"
 #include "GameElements/GameElement.hpp"
 #include "Displayers/FenceDisplayer.hpp"

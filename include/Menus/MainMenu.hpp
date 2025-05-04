@@ -5,7 +5,7 @@
 #include "Menus/MenuBase.hpp"
 #include "SDLWrappers/Renderers/Window.hpp"
 #include "SDLWrappers/Renderers/Texture.hpp"
-#include "Button.hpp"
+#include "Widgets/Button.hpp"
 #include <memory>
 
 class MapsMenu;
