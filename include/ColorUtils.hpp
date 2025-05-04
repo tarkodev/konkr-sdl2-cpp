@@ -294,7 +294,7 @@ namespace ColorUtils
      */
     inline GroundColor getGroundColor(int index) {
         // Vérifie que l'index est dans les bornes valides
-        if (index < 0 || index >= 6) {
+        if (index < 0 || index > 6) {
             // Retourne Gris comme couleur par défaut si l'index est invalide
             return GroundPalette::GREY;
         }
