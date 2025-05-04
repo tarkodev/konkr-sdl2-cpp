@@ -687,7 +687,7 @@ void GameMap::moveTroop(const std::weak_ptr<PlayableGround>& from, const std::we
                 if (isMovedTroop(fromTroop) || isMovedTroop(toTroop)) {
                     movedTroops_.push_back(troop);
                     updateMovables();
-                }
+                } else troop->setMovable(true);
 
                 lfrom->setElement(nullptr);
                 lto->setElement(troop);
@@ -881,7 +881,8 @@ void GameMap::onMouseButtonUp(SDL_Event& event) {
             if (auto castle = Castle::cast(boughtElt_)) {
                 if (placeCastle(castle, selectedCell_))
                     selectedNewTroopCell_->setElement(nullptr);
-            } else {
+            } else if (auto troop = Troop::cast(boughtElt_)) {
+                troop->setMovable(true);
                 moveTroop(selectedNewTroopCell_, selectedCell_);
             }
 
@@ -899,6 +900,8 @@ void GameMap::onMouseButtonUp(SDL_Event& event) {
                         ltown->setTreasury(0);
                     }
                 }
+                if (auto cp = currentPlayer_.lock())
+                    updateIncomes(cp);
             }
         }
         
@@ -917,6 +920,7 @@ void GameMap::onMouseButtonUp(SDL_Event& event) {
                 int cost = selectedTroop_->getCost();
 
                 // Move troop
+                selectedTroop_->setMovable(true);
                 moveTroop(selectedNewTroopCell_, selectedCell_);
 
                 // Share purchase
@@ -933,6 +937,8 @@ void GameMap::onMouseButtonUp(SDL_Event& event) {
                             ltown->setTreasury(0);
                         }
                     }
+                    if (auto cp = currentPlayer_.lock())
+                        updateIncomes(cp);
                 }
             }
 
