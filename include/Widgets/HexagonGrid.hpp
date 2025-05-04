@@ -1,67 +1,73 @@
 #ifndef HEXAGONGRID_HPP
 #define HEXAGONGRID_HPP
 
-#include <cmath>
-#include <utility>
-#include <vector>
-#include <stdexcept>
+//------------------------------
+// Standard Library
+//------------------------------
+#include <cmath>         // std::round, std::floor for coordinate math
+#include <utility>       // std::pair for grid dimensions
+#include <vector>        // std::vector to store cells in contiguous memory
+#include <stdexcept>     // std::out_of_range for boundary checks
 
 /**
- * @brief Classe représentant une grille d'hexagons générique.
+ * @brief Generic hexagonal grid container.
  *
- * La classe gère à la fois les dimensions et le stockage de la grille (dans un conteneur STL)
- * et fournit des fonctions de conversion entre les coordonnées hexagonales et les coordonnées en pixels.
+ * Manages grid dimensions and storage (using an STL container),
+ * and provides conversion utilities between hex coordinates and pixel positions.
  *
- * @tparam T Type des cellules.
+ * @tparam T Type of each cell in the grid.
  */
 template<typename T>
 class HexagonGrid {
 public:
+    /// Alias for the cell type
     using cell_type = T;
 
     /**
-     * @brief Constructeur.
-     * @param size Pair (width, height) de la grille.
-     * @param defaultValue Valeur par défaut pour chaque cellule.
+     * @brief Construct a hex grid with given size and default cell value.
+     * @param size Pair(width, height) specifying number of columns and rows.
+     * @param defaultValue Value to initialize each cell with (defaults to T()).
      */
     HexagonGrid(const std::pair<int, int>& size, const T& defaultValue = T());
 
+    /// Get the number of columns in the grid
     virtual const int getWidth() const { return width_; }
+    /// Get the number of rows in the grid
     virtual const int getHeight() const { return height_; }
 
     /**
-     * @brief Récupère la valeur d'une cellule en coordonnées offset (x, y).
-     * @param x Numéro de colonne.
-     * @param y Numéro de ligne.
-     * @return La valeur de la cellule.
-     * @throws std::out_of_range si les indices sont invalides.
+     * @brief Retrieve a cell value by offset coordinates.
+     * @param x Column index (0-based).
+     * @param y Row index (0-based).
+     * @return Copy of the cell value.
+     * @throws std::out_of_range if (x,y) is outside grid bounds.
      */
     T get(int x, int y) const;
 
     /**
-     * @brief Affecte une valeur à une cellule en coordonnées offset (x, y).
-     * @param x Numéro de colonne.
-     * @param y Numéro de ligne.
-     * @param value Nouvelle valeur à affecter.
-     * @throws std::out_of_range si les indices sont invalides.
+     * @brief Assign a new value to a cell by offset coordinates.
+     * @param x Column index (0-based).
+     * @param y Row index (0-based).
+     * @param value New value to set.
+     * @throws std::out_of_range if (x,y) is outside grid bounds.
      */
     void set(int x, int y, const T& value);
 
-    auto begin() { return grid_.begin(); }
-    auto end()   { return grid_.end();   }
-
-    auto begin()  const { return grid_.cbegin(); }
-    auto end()    const { return grid_.cend();   }
-
-    auto cbegin() const { return grid_.cbegin(); }
-    auto cend()   const { return grid_.cend();   }
+    // Iterators for range-based loops and STL compatibility
+    auto begin()       { return grid_.begin(); }
+    auto end()         { return grid_.end();   }
+    auto begin()  const{ return grid_.cbegin(); }
+    auto end()    const{ return grid_.cend();   }
+    auto cbegin() const{ return grid_.cbegin(); }
+    auto cend()   const{ return grid_.cend();   }
 
 private:
-    int width_;
-    int height_;
-    std::vector<T> grid_;
+    int width_;            ///< Number of columns
+    int height_;           ///< Number of rows
+    std::vector<T> grid_;  ///< Contiguous storage of cells
 };
 
+// Implementation of template methods
 #include "Widgets/HexagonGrid.tpp"
 
-#endif
+#endif // HEXAGONGRID_HPP

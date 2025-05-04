@@ -1,7 +1,11 @@
+// Forest.cpp
+// Implémentation de la logique et de l'affichage pour les cases de type forêt
+
 #include "Cells/Grounds/Forest.hpp"
 #include "Cells/Cell.hpp"
 #include "Utils/ColorUtils.hpp"
 
+// Stockage statique du sprite de la forêt, partagé entre toutes les instances
 std::shared_ptr<Texture> Forest::forest_ = nullptr;
 
 

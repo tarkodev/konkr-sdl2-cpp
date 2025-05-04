@@ -1,95 +1,143 @@
 #ifndef TEXTURE_HPP
 #define TEXTURE_HPP
 
-#include <string>
-#include "SDL.h"
-#include "SDL2/SDL_image.h"
-#include "SDLWrappers/Coords/Rect.hpp"
-#include "SDLWrappers/Coords/Point.hpp"
-#include "SDLWrappers/Renderers/BlitTarget.hpp"
+//------------------------------
+// C++ STL
+//------------------------------
+#include <string>           // std::string
+#include <memory>           // std::shared_ptr, std::weak_ptr, std::enable_shared_from_this
+#include <stdexcept>        // std::runtime_error
 
-#include <stdexcept>
-#include <memory>
+//------------------------------
+// SDL2 Core & Extensions
+//------------------------------
+#include "SDL.h"            // SDL_Renderer, SDL_Texture, SDL_Color, SDL_Rect
+#include "SDL2/SDL_image.h" // IMG_Load and image formats support
+
+//------------------------------
+// Coordinate Abstractions
+//------------------------------
+#include "SDLWrappers/Coords/Rect.hpp"   // Encapsulates SDL_Rect
+#include "SDLWrappers/Coords/Point.hpp"  // Encapsulates SDL_Point
+#include "SDLWrappers/Coords/Size.hpp"   // Encapsulates width/height
+
+//------------------------------
+// Rendering Interface
+//------------------------------
+#include "SDLWrappers/Renderers/BlitTarget.hpp" // Defines blit() and display() contracts
 
 /**
- * @brief Classe qui encapsule une SDL_Texture*.
+ * @brief RAII wrapper around SDL_Texture.
  *
- * Fournit des méthodes pour charger la texture depuis un fichier, la copier sur le renderer,
- * appliquer un "color mod" (colorize) et obtenir ses dimensions.
+ * Manages creation, rendering, color modulation, and cleanup of an SDL_Texture.
+ * Implements BlitTarget for compositing textures and enable_shared_from_this
+ * to safely hand out std::shared_ptr<Texture>.
  */
-class Texture: public BlitTarget, public std::enable_shared_from_this<Texture> {
+class Texture : public BlitTarget, public std::enable_shared_from_this<Texture> {
 public:
     /**
-     * @brief Construit une texture à partir d'un fichier image.
-     * @param renderer Pointeur vers le renderer SDL.
-     * @param file Chemin vers le fichier image.
-     *
-     * Lève une std::runtime_error si le chargement échoue.
+     * @brief Load a texture from an image file.
+     * @param renderer Weak pointer to the SDL_Renderer.
+     * @param file Path to the image file.
+     * @throws std::runtime_error on load failure.
      */
     Texture(const std::weak_ptr<SDL_Renderer>& renderer, const std::string& file);
+
+    /**
+     * @brief Wrap an existing SDL_Texture.
+     * @param renderer Weak pointer to the SDL_Renderer.
+     * @param texture Shared pointer to an already created SDL_Texture.
+     */
     Texture(const std::weak_ptr<SDL_Renderer>& renderer, const std::shared_ptr<SDL_Texture>& texture);
+
+    /**
+     * @brief Create an empty texture of given dimensions.
+     * @param renderer Weak pointer to the SDL_Renderer.
+     * @param w Width in pixels.
+     * @param h Height in pixels.
+     */
     Texture(const std::weak_ptr<SDL_Renderer>& renderer, int w, int h);
+
+    /**
+     * @brief Create an empty texture of given Size.
+     * @param renderer Weak pointer to the SDL_Renderer.
+     * @param size Size struct (width, height).
+     */
     Texture(const std::weak_ptr<SDL_Renderer>& renderer, const Size& size);
+
+    /**
+     * @brief Move constructor.
+     * Transfers ownership of the underlying SDL_Texture.
+     */
     Texture(Texture&& o);
 
     /**
-     * @brief Destructeur.
+     * @brief Destructor.
      *
-     * Libère la texture associée.
+     * Releases the SDL_Texture resource when the last shared_ptr goes out of scope.
      */
     ~Texture();
 
+    // Disable copy operations
     Texture& operator=(const Texture&) = delete;
+    // Enable move assignment
     Texture& operator=(Texture&&) noexcept;
 
-
     /**
-     * @brief Copie (rend) la texture sur le renderer.
-     * 
-     * Lève une std::runtime_error en cas d'erreur lors du rendu.
+     * @brief Render (copy) this texture to the bound renderer.
+     * @return Shared pointer to self for chaining.
+     * @throws std::runtime_error on render error.
      */
     std::shared_ptr<Texture> copy();
 
     /**
-     * @brief Applique un modulateur de couleur à la texture.
-     *
-     * La méthode modifie les canaux R, G, et B de la texture sans altérer le canal alpha.
-     *
-     * @param color La nouvelle couleur à appliquer.
-     *
-     * Lève une std::runtime_error en cas d'erreur.
+     * @brief Apply color modulation to this texture.
+     * @param color New RGB values (alpha preserved).
+     * @throws std::runtime_error on SDL error.
      */
     void colorize(const SDL_Color& color);
 
     /**
-     * @brief Retourne le SDL_Texture* encapsulé.
+     * @brief Retrieve the raw SDL_Texture pointer.
+     * @return SDL_Texture*
      */
     SDL_Texture* get() const override;
 
     /**
-     * @brief Retourne les dimensions de la texture sous la forme d'un const int (width, height).
-     *
+     * @brief Get texture dimensions.
+     * @return Size struct containing width and height.
      */
     Size getSize() const override;
 
     /**
-     * @brief Retourne la largeur de la texture sous la forme d'un int.
-     *
+     * @brief Get texture width.
+     * @return Width in pixels.
      */
     const int getWidth() const;
 
     /**
-     * @brief Retourne la hauteur de la texture sous la forme d'un int.
-     *
+     * @brief Get texture height.
+     * @return Height in pixels.
      */
     const int getHeight() const;
 
+    /**
+     * @brief Enable alpha blending on the texture.
+     */
     void convertAlpha();
 
+    /**
+     * @brief Disable alpha blending (force opaque).
+     */
     void removeAlpha();
 
+    /**
+     * @brief Fill the entire texture with a solid color.
+     * @param color Color to fill (includes alpha).
+     */
     void fill(const SDL_Color& color) const;
 
+    // BlitTarget interface: various overloads to copy from another Texture
     void blit(const std::weak_ptr<Texture>& src) const override;
     void blit(const std::weak_ptr<Texture>& src, const Point& destPos) const override;
     void blit(const std::weak_ptr<Texture>& src, const Size& destSize) const override;
@@ -98,16 +146,21 @@ public:
     void blit(const std::weak_ptr<Texture>& src, const Rect& srcRect, const Size& destSize) const override;
     void blit(const std::weak_ptr<Texture>& src, const Rect& srcRect, const Rect& destRect) const override;
 
+    /**
+     * @brief Convenience display at a given position.
+     * @param destPos Top-left corner where the texture will be rendered.
+     */
     void display(const Point& destPos = Point{0, 0}) const;
 
 private:
-    std::shared_ptr<SDL_Texture> texture_;
-    std::weak_ptr<SDL_Renderer> renderer_;
-    Size size_;
-    bool alpha_;
+    std::shared_ptr<SDL_Texture> texture_;   ///< Underlying SDL texture resource
+    std::weak_ptr<SDL_Renderer> renderer_;   ///< Renderer used for all draw calls
+    Size size_;                              ///< Cached width/height
+    bool alpha_;                             ///< True if texture uses alpha blending
 
+    // Internal convenience blit implementations taking raw SDL_Rects
     void blit(const std::weak_ptr<Texture>& src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const;
     void blit(const std::unique_ptr<Texture>& src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const;
 };
 
-#endif
+#endif // TEXTURE_HPP
