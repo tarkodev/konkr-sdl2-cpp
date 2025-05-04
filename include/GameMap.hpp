@@ -105,7 +105,7 @@ private:
     std::unordered_map<std::shared_ptr<PlayableGround>, int> getTreasuresOfCurrentPlayers();
     bool placeCastle(const std::weak_ptr<Castle>& castle, const std::weak_ptr<PlayableGround>& to);
     void moveTroop(const std::weak_ptr<PlayableGround>& from, const std::weak_ptr<PlayableGround>& to);
-    void moveBandit(std::weak_ptr<PlayableGround>& from, std::weak_ptr<PlayableGround>& to);
+    void moveBandit(const std::weak_ptr<PlayableGround>& from, const std::weak_ptr<PlayableGround>& to);
     void moveBandits();
     void updateIncomes(std::weak_ptr<Player>& player);
     void updateIncomes(std::shared_ptr<Player>& player);

@@ -12,6 +12,7 @@
 
 FenceDisplayer PlayableGround::fenceDisplayer_ = FenceDisplayer{-1, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 std::vector<std::shared_ptr<Texture>> PlayableGround::shieldSprites_ = std::vector<std::shared_ptr<Texture>>();
+std::shared_ptr<Texture> PlayableGround::smallSelectableSprite_ = nullptr;
 std::shared_ptr<Texture> PlayableGround::selectableSprite_ = nullptr;
 std::shared_ptr<Texture> PlayableGround::crossSprite_ = nullptr;
 
@@ -61,13 +62,16 @@ void PlayableGround::init() {
     crossSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/cross.png");
 
     // Load selectable sprite
+    smallSelectableSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/small_selectable.png");
     selectableSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/selectable.png");
+    smallSelectableSprite_->colorize(ColorUtils::YELLOW);
     selectableSprite_->colorize(ColorUtils::YELLOW);
 }
 
 void PlayableGround::quit() {
     fenceDisplayer_ = FenceDisplayer{-1, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
     shieldSprites_.clear();
+    smallSelectableSprite_ = nullptr;
     selectableSprite_ = nullptr;
 }
 
@@ -372,14 +376,21 @@ void PlayableGround::displayCross(const std::weak_ptr<Texture>& target) {
     });
 }
 
-void PlayableGround::displaySelectable(const std::weak_ptr<Texture>& target) {
+void PlayableGround::displaySelectable(const std::weak_ptr<Texture>& target, const bool& selected) {
     auto ltarget = target.lock();
     if (!ltarget || !selectable_ || (owner_ && owner_->hasSelected())) return;
 
-    ltarget->blit(selectableSprite_, Point{
-        static_cast<int>(pos_.getX() - selectableSprite_->getWidth() / 2.0),
-        static_cast<int>(pos_.getY() - selectableSprite_->getHeight() / 2.0)
-    });
+    if (selected) {
+        ltarget->blit(selectableSprite_, Point{
+            static_cast<int>(pos_.getX() - selectableSprite_->getWidth() / 2.0),
+            static_cast<int>(pos_.getY() - selectableSprite_->getHeight() / 2.0)
+        });
+    } else {
+        ltarget->blit(smallSelectableSprite_, Point{
+            static_cast<int>(pos_.getX() - smallSelectableSprite_->getWidth() / 2.0),
+            static_cast<int>(pos_.getY() - smallSelectableSprite_->getHeight() / 2.0)
+        });
+    }
 }
 
 

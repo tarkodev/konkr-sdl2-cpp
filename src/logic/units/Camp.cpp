@@ -34,6 +34,10 @@ void Camp::addCoins(int coins) {
     treasury_ += coins;
 }
 
+bool Camp::getTreasury() const {
+    return treasury_;
+}
+
 void Camp::display(const std::weak_ptr<BlitTarget>& target) {
     auto ltarget = target.lock();
     if (!ltarget || !sprite_) return;

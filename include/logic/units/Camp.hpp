@@ -24,6 +24,7 @@ public:
     int getUpkeep()   const override { return UPKEEP; };
 
     void addCoins(int coins);
+    bool getTreasury() const;
 
 protected:
     static constexpr int STRENGTH = 1;

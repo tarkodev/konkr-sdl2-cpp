@@ -309,10 +309,13 @@ void GameMap::refreshPlates() {
 }
 
 void GameMap::refreshSelectables() {
+    auto lselectedCell = selectedCell_.lock();
     // Draw selectables
-    for (auto& cell : *this)
-        if (auto pg = PlayableGround::cast(cell))
-            pg->displaySelectable(calc_);
+    for (auto& cell : *this) {
+        if (auto pg = PlayableGround::cast(cell)) {
+            pg->displaySelectable(calc_, lselectedCell && cell == lselectedCell);
+        }
+    }
 }
 
 void GameMap::refreshFences() {
@@ -476,7 +479,6 @@ void GameMap::nextPlayer() {
 
     // Start turn of new current player
     startTurn(currentPlayer_);
-    //!refresh();
 }
 
 void GameMap::startTurn(std::weak_ptr<Player>& player) {
@@ -550,9 +552,6 @@ void GameMap::buyTroop(const std::shared_ptr<GameElement>& elt) {
             townCell->updateSelectable(Troop::is(elt) ? elt->getStrength() : 0);
         }
     }
-
-    // Refresh map
-    //!refresh();
 }
 
 void GameMap::checkDeficits(std::weak_ptr<Player>& player) {
@@ -652,6 +651,8 @@ void GameMap::moveTroop(const std::weak_ptr<PlayableGround>& from, const std::we
 
     // Different owner
     if (fromOwner != toOwner || Bandit::cast(toTroop)) {
+        auto destroyTown = Town::cast(lto->getElement());
+        auto destroyCamp = Camp::cast(lto->getElement());
         lfrom->setElement(nullptr);
         lto->setElement(fromTroop);
 
@@ -660,6 +661,17 @@ void GameMap::moveTroop(const std::weak_ptr<PlayableGround>& from, const std::we
 
         // Give grounds to the new owner
         lto->link(fromOwner);
+
+        // If town has destroyed
+        if (destroyTown) {
+            if (auto receptionTown = lto->getNearestTown())
+                receptionTown->setTreasury(receptionTown->getTreasury() + destroyTown->getTreasury());
+        } else if (destroyCamp) {
+            if (auto receptionTown = lto->getNearestTown())
+                receptionTown->setTreasury(receptionTown->getTreasury() + destroyCamp->getTreasury());
+        }
+
+        // Calculate new income
         updateIncomes(fromOwner);
         if (toOwner) updateIncomes(toOwner);
     }
@@ -698,7 +710,7 @@ void GameMap::moveTroop(const std::weak_ptr<PlayableGround>& from, const std::we
     }
 }
 
-void GameMap::moveBandit(std::weak_ptr<PlayableGround>& from, std::weak_ptr<PlayableGround>& to) {
+void GameMap::moveBandit(const std::weak_ptr<PlayableGround>& from, const std::weak_ptr<PlayableGround>& to) {
     auto lfrom = from.lock();
     auto lto = to.lock();
     if (!lfrom || !lto || lfrom == lto) return;
@@ -714,13 +726,23 @@ void GameMap::moveBandit(std::weak_ptr<PlayableGround>& from, std::weak_ptr<Play
 
 void GameMap::moveBandits() {
     std::unordered_set<std::shared_ptr<Bandit>> movedBandits;
+    std::vector<std::shared_ptr<PlayableGround>> playableGrounds;
+    playableGrounds.reserve(getWidth() * getHeight());
+    bool haveCamp = false;
+    bool haveBandit = false;
 
     for (auto& cell : *this) {
         auto pg = PlayableGround::cast(cell);
         if (!pg) continue;
 
+        // Check if we have camp on the map
+        if (!pg->getOwner() && !pg->getElement())
+            playableGrounds.push_back(pg);
+        haveCamp = haveCamp || Camp::is(pg->getElement());
+
         auto bandit = Bandit::cast(pg->getElement());
         if (!bandit || movedBandits.find(bandit) != movedBandits.end()) continue;
+        haveBandit = true;
 
         // Get free neighbors
         std::vector<std::weak_ptr<PlayableGround>> candidates;
@@ -732,15 +754,17 @@ void GameMap::moveBandits() {
         // Random move bandit
         if (!candidates.empty()) {
             std::uniform_int_distribution<> dist(0, static_cast<int>(candidates.size()) - 1);
-            std::weak_ptr<PlayableGround> wpg = pg;
             auto dest = candidates[dist(gen_)];
 
-            moveBandit(wpg, dest);
+            moveBandit(pg, dest);
             movedBandits.insert(bandit);
         }
     }
 
-    //!refresh();
+    if (!haveCamp && haveBandit && !playableGrounds.empty()) {
+        std::uniform_int_distribution<> dist(0, static_cast<int>(playableGrounds.size()) - 1);
+        playableGrounds[dist(gen_)]->setElement(std::make_shared<Camp>(Point{0, 0}));
+    }
 }
 
 bool GameMap::isMovedTroop(const std::weak_ptr<Troop>& troop) {
@@ -805,8 +829,6 @@ void GameMap::onMouseButtonDown(SDL_Event& event) {
             lselectedCell->updateSelectable(selectedTroop_->getStrength());
             lselectedCell->setElement(nullptr);
         }
-
-        //!refresh();
     }
     
     // If Town is pressed, buy villager
@@ -837,8 +859,6 @@ void GameMap::onMouseButtonDown(SDL_Event& event) {
         selectedTroop_ = v;
         v->setPos(mousePos);
         lselectedCell->updateSelectable(v->getStrength());
-
-        //!refresh();
     }
 }
 
@@ -850,11 +870,9 @@ void GameMap::onMouseMotion(SDL_Event& event) {
     // Move selected troop
     if (selectedTroop_) {
         selectedTroop_->setPos(mousePos);
-        //!refresh();
         return;
     } else if (boughtElt_) {
         boughtElt_->setPos(mousePos);
-        //!refresh();
         return;
     }
 
@@ -864,7 +882,6 @@ void GameMap::onMouseMotion(SDL_Event& event) {
         auto town = Town::cast(lselectedCell->getElement());
         if (town) townToShowTreasury_ = town;
     }
-    //!refresh();
 }
 
 void GameMap::onMouseButtonUp(SDL_Event& event) {
@@ -965,8 +982,6 @@ void GameMap::onMouseButtonUp(SDL_Event& event) {
     selectedTroopCell_.reset();
     selectedTroop_.reset();
     boughtElt_.reset();
-    //!refresh();
-
     updateCursor();
 }
 

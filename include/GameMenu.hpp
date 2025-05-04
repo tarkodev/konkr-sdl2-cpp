@@ -38,6 +38,9 @@ private:
     Size mapCellSize_;
     Point mapPos_;
 
+    int frameCount_;
+    Uint32 lastLogTime_;
+
     std::optional<Point> moveOrigin_;
     bool moved_ = false;
 

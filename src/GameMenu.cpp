@@ -185,27 +185,24 @@ void GameMenu::handleEvents(){
 }
 
 void GameMenu::draw() {
-    static Uint32 lastLogTime = SDL_GetTicks();
-    static int frameCount = 0;
-    
     window_->fill(ColorUtils::SEABLUE);
     
     map_->display(window_);
     overlay_->display(window_);
 
     window_->refresh();
-    frameCount++;
+    frameCount_++;
 
     Uint32 currentTime = SDL_GetTicks();
-    if (currentTime - lastLogTime >= 3000) { // 3000 millisecondes = 3 secondes
-        float fps = static_cast<float>(frameCount) / ((currentTime - lastLogTime) / 1000.0f);
-        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "FPS: %.2f", fps);
-        frameCount = 0;
-        lastLogTime = currentTime;
+    if (currentTime - lastLogTime_ >= 3000) {
+        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "FPS: %.2f", static_cast<float>(frameCount_) / ((currentTime - lastLogTime_) / 1000.0f));
+        lastLogTime_ = currentTime;
+        frameCount_ = 0;
     }
 }
 
 std::shared_ptr<MenuBase> GameMenu::run() {
+    lastLogTime_ = SDL_GetTicks();
     updateShop();
     loop_ = true;
 
