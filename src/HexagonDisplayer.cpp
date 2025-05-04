@@ -1,6 +1,8 @@
 
 #include "HexagonUtils.hpp"
 #include "HexagonDisplayer.hpp"
+#include <SDL2/SDL2_gfxPrimitives.h>   // <-- pour filledPolygonRGBA
+#include <cmath>
 
 HexagonDisplayer::HexagonDisplayer(double hexagonRadius, const std::shared_ptr<Texture> hexagonTexture, const std::shared_ptr<Texture> linkTexture, const std::shared_ptr<Texture> linkBottomLeftTexture, const std::shared_ptr<Texture> linkBottomTexture, const std::shared_ptr<Texture> linkBottomRightTexture)
     : GenericDisplayer(hexagonTexture ? hexagonTexture->getSize() : Size{0, 0}),
