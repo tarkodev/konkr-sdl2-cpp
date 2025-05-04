@@ -126,7 +126,7 @@ namespace ColorUtils
 
     inline GroundColor getGroundColor(int index) {
         // Invalid color
-        if (index < 0 || index >= 6)
+        if (index < 0 || index > 6)
             return GroundPalette::GREY;
 
         // Get good pair of color
