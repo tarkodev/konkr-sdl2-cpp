@@ -53,7 +53,8 @@ void GameMenu::createMap(const std::string& mapPath) {
 
     // Recalculation of size of map
     Size mapSize = map_->getSize();
-    if (Rect{Point{0, 0}, minMapSize_}.contains(mapSize))
+    Rect bounds{Point{minMapSize_}, Size{maxMapSize_ - minMapSize_}};
+    if (!bounds.contains(mapSize))
         minMapSize_ = mapSize;
     mapSize = Size{
         std::min(std::max(mapSize.getWidth(), minMapSize_.getWidth()), maxMapSize_.getWidth()),
