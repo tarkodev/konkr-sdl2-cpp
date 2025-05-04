@@ -12,7 +12,7 @@ void Displayer::init(const std::shared_ptr<SDL_Renderer>& renderer) {
 
 Displayer::Displayer(const Point& pos, const Size& size): pos_(pos), size_(size) {}
 
-Point Displayer::getPos() const {
+const Point Displayer::getPos() const {
     return pos_;
 }
 
@@ -24,10 +24,10 @@ Size Displayer::getSize() const {
     return size_;
 }
 
-int Displayer::getWidth() const {
+const int Displayer::getWidth() const {
     return size_.getWidth();
 }
 
-int Displayer::getHeight() const {
+const int Displayer::getHeight() const {
     return size_.getHeight();
 }

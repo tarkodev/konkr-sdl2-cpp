@@ -15,7 +15,7 @@
 class PlayableGround: public Ground, public std::enable_shared_from_this<PlayableGround> {
 public:
     static std::shared_ptr<PlayableGround> cast(const std::weak_ptr<Cell>& obj);
-    static bool is(const std::weak_ptr<Cell>& obj);
+    static const bool is(const std::weak_ptr<Cell>& obj);
     static void init();
     static void quit();
 
@@ -26,16 +26,16 @@ public:
     std::shared_ptr<Player> getOldOwner();
     void setOwner(std::shared_ptr<Player> owner);
 
-    void display(const std::weak_ptr<BlitTarget>& target) override;
+    void display(const std::weak_ptr<BlitTarget>& target) const override;
 
-    bool hasFences() const;
+    const bool hasFences() const;
     void displayFences(const std::weak_ptr<Texture>& target);
     void displayElement(const std::weak_ptr<Texture>& target);
     void displayShield(const std::weak_ptr<Texture>& target);
     void displayCross(const std::weak_ptr<Texture>& target);
     void displaySelectable(const std::weak_ptr<Texture>& target, const bool& selected = false);
 
-    bool isLinked();
+    const bool isLinked();
     void updateLinked();
     void link(const std::weak_ptr<Player>& owner);
     
@@ -47,9 +47,9 @@ public:
     std::shared_ptr<GameElement> getElement();
     void setElement(const std::shared_ptr<GameElement>& elt);
 
-    int getShield() const;
+    const int getShield() const;
     void updateSelectable(int strength);
-    bool isSelectable() const { return selectable_; }
+    const bool isSelectable() const { return selectable_; }
 
 private:
     static FenceDisplayer fenceDisplayer_;
@@ -66,7 +66,7 @@ private:
     bool hasPlate_ = false;
     bool selectable_ = false;
 
-    bool isLinked(std::unordered_set<std::shared_ptr<PlayableGround>>& visited);
+    const bool isLinked(std::unordered_set<std::shared_ptr<PlayableGround>>& visited);
     void unlink(std::unordered_set<std::shared_ptr<PlayableGround>>& visited);
     void link(const std::weak_ptr<Player>& owner, std::unordered_set<std::shared_ptr<PlayableGround>>& visited);
     void updateSelectable(int strength, std::unordered_set<std::shared_ptr<PlayableGround>>& visited);

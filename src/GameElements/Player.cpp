@@ -58,7 +58,7 @@ void Player::updateTowns() {
     });
 }
 
-bool Player::hasTowns() {
+const bool Player::hasTowns() {
     // Remove destroyed towns
     updateTowns();
 

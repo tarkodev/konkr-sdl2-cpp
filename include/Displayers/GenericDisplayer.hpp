@@ -11,7 +11,7 @@ public:
 
     virtual ~GenericDisplayer() = default;
     
-    virtual void display(const std::weak_ptr<BlitTarget>& target, const Point& pos) = 0;
+    virtual void display(const std::weak_ptr<BlitTarget>& target, const Point& pos) const = 0;
 };
 
 #endif

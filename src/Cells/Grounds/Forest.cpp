@@ -10,7 +10,7 @@ std::shared_ptr<Forest> Forest::cast(const std::weak_ptr<Cell>& obj) {
     return lobj ? std::dynamic_pointer_cast<Forest>(lobj) : nullptr;
 }
 
-bool Forest::is(const std::weak_ptr<Cell>& obj) {
+const bool Forest::is(const std::weak_ptr<Cell>& obj) {
     return cast(obj) != nullptr;
 }
 
@@ -25,7 +25,7 @@ void Forest::quit() {
 
 Forest::Forest(const Point& pos): Ground(pos) {}
 
-void Forest::display(const std::weak_ptr<BlitTarget>& target) {
+void Forest::display(const std::weak_ptr<BlitTarget>& target) const {
     if (auto ltarget = target.lock())
         ltarget->blit(forest_, Point{pos_.getX() - forest_->getWidth() / 2, pos_.getY() - forest_->getHeight() / 2});
 }

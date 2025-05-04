@@ -57,7 +57,7 @@ private:
     void onMouseButtonUp(SDL_Event& event);
     void onMouseWheel(SDL_Event& event);
     void onKeyDown(SDL_Event& event);
-    bool handleOverlay(SDL_Event& event);
+    const bool handleOverlay(SDL_Event& event);
 };
 
 #endif

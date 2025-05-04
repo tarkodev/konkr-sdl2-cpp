@@ -62,6 +62,7 @@ GameMap::GameMap(const Point& pos, const Size size, const std::pair<int, int>& g
         throw std::runtime_error("Une map doit au moins être de taille 2x2.");
 
     loadMap(mapFile);
+    createCalcs();
     initGame();
 }
 
@@ -262,15 +263,15 @@ void GameMap::updateNeighbors() {
     }
 }
 
-bool GameMap::hasTroopSelected() {
+const bool GameMap::hasTroopSelected() {
     return selectedTroop_ || boughtElt_;
 }
 
 
-int GameMap::getWidth() const {
+const int GameMap::getWidth() const {
     return HexagonGrid::getWidth();
 }
-int GameMap::getHeight() const {
+const int GameMap::getHeight() const {
     return HexagonGrid::getHeight();
 }
 
@@ -296,21 +297,21 @@ void GameMap::createCalcs() {
 }
 
 
-void GameMap::refreshIslands() {
+void GameMap::refreshIslands() const {
     // Draw islands
     for (auto& cell : *this)
         if (auto g = Ground::cast(cell))
             g->Ground::display(calc_);
 }
 
-void GameMap::refreshPlates() {
+void GameMap::refreshPlates() const {
     // Draw plates
     for (auto& cell : *this)
         if (auto ground = Ground::cast(cell))
             ground->display(calc_);
 }
 
-void GameMap::refreshSelectables() {
+void GameMap::refreshSelectables() const {
     auto lselectedCell = selectedCell_.lock();
     // Draw selectables
     for (auto& cell : *this) {
@@ -320,14 +321,14 @@ void GameMap::refreshSelectables() {
     }
 }
 
-void GameMap::refreshFences() {
+void GameMap::refreshFences() const {
     // Draw fences
     for (auto& cell : *this)
         if (auto pg = PlayableGround::cast(cell))
             pg->displayFences(calc_);
 }
 
-void GameMap::refreshElements() {
+void GameMap::refreshElements() const {
     auto lselectedCell = selectedCell_.lock();
     bool drawCross = lselectedCell && (selectedTroop_ || boughtElt_);
 
@@ -353,11 +354,9 @@ void GameMap::refreshElements() {
         lcampToShowTreasury_->displayTreasury(calc_);
 }
 
-void GameMap::refresh()
-{
+void GameMap::refresh() const {
     // Create calcs of map if isn't exists
-    if (!calc_)
-        createCalcs();
+    if (!calc_) return;
 
     // Draw transparent background
     calc_->fill(ColorUtils::toTransparent(ColorUtils::SEABLUE));
@@ -424,7 +423,7 @@ void GameMap::searchNextPlayer() {
     }
 }
 
-bool GameMap::gameFinished() const {
+const bool GameMap::gameFinished() const {
     return gameFinished_;
 }
 
@@ -536,7 +535,7 @@ std::unordered_map<std::shared_ptr<PlayableGround>, int> GameMap::getTreasuresOf
     return towns;
 }
 
-int GameMap::getMaxTreasuryOfCurrentPlayer() {
+const int GameMap::getMaxTreasuryOfCurrentPlayer() {
     auto treasures = getTreasuresOfCurrentPlayers();
     if (treasures.empty()) return 0;
 
@@ -647,7 +646,7 @@ void GameMap::checkWin() {
     gameFinished_ = nbPlayerStillTheGame < 2;
 }
 
-bool GameMap::placeCastle(const std::weak_ptr<Castle>& castle, const std::weak_ptr<PlayableGround>& to) {
+const bool GameMap::placeCastle(const std::weak_ptr<Castle>& castle, const std::weak_ptr<PlayableGround>& to) {
     auto lcastle = castle.lock();
     auto lto = to.lock();
     auto cp = currentPlayer_.lock();
@@ -800,7 +799,7 @@ void GameMap::moveBandits() {
     }
 }
 
-bool GameMap::isMovedTroop(const std::weak_ptr<Troop>& troop) {
+const bool GameMap::isMovedTroop(const std::weak_ptr<Troop>& troop) {
     auto ltroop = troop.lock();
     if (!ltroop) return false;
     
@@ -813,7 +812,7 @@ bool GameMap::isMovedTroop(const std::weak_ptr<Troop>& troop) {
     return (it != movedTroops_.end());
 }
 
-bool GameMap::isSelectableTroop(const std::weak_ptr<PlayableGround>& pgCell) {
+const bool GameMap::isSelectableTroop(const std::weak_ptr<PlayableGround>& pgCell) {
     auto pg = pgCell.lock();
     if (!pg) return false;
 
@@ -1029,10 +1028,9 @@ void GameMap::handleEvent(SDL_Event &event) {
     }
 }
 
-void GameMap::display(const std::weak_ptr<BlitTarget>& target)
-{
+void GameMap::display(const std::weak_ptr<BlitTarget>& target) const {
     // Check initialized calcs
-    /*if (!calc_) */refresh();
+    refresh();
 
     // Check target
     auto ltarget = target.lock();
@@ -1040,7 +1038,7 @@ void GameMap::display(const std::weak_ptr<BlitTarget>& target)
 
     // Show map
     Rect dest = {pos_, size_};
-    ltarget->blit(calc_, dest);
+    if (calc_) ltarget->blit(calc_, dest);
 
     // Show selected troop
     if (selectedTroop_) selectedTroop_->display(ltarget);

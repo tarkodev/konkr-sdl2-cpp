@@ -21,7 +21,7 @@ public:
     void setIncome(int income);
     void setNoIncome(bool noIncome);
 
-    void display(const std::weak_ptr<BlitTarget>& target) override;
+    void display(const std::weak_ptr<BlitTarget>& target) const override;
 
 private:
     static std::shared_ptr<Texture> bg_;

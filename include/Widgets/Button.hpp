@@ -29,13 +29,13 @@ public:
     Button(Button&&) noexcept = default;
     Button& operator=(Button&&) noexcept = default;
 
-    bool isHover(const Point& mousePos) const;
+    const bool isHover(const Point& mousePos) const;
 
     void handleEvent(const SDL_Event& e);
     void setCallback(Callback cb);
     void setPressedCallback(Callback cb);
 
-    void display(const std::weak_ptr<BlitTarget>& target) override;
+    void display(const std::weak_ptr<BlitTarget>& target) const override;
 
 private:
     std::shared_ptr<Texture> sprite_;

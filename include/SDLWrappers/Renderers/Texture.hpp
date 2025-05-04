@@ -67,7 +67,7 @@ public:
     SDL_Texture* get() const override;
 
     /**
-     * @brief Retourne les dimensions de la texture sous la forme d'un Point (width, height).
+     * @brief Retourne les dimensions de la texture sous la forme d'un const int (width, height).
      *
      */
     Size getSize() const override;
@@ -76,13 +76,13 @@ public:
      * @brief Retourne la largeur de la texture sous la forme d'un int.
      *
      */
-    int getWidth() const;
+    const int getWidth() const;
 
     /**
      * @brief Retourne la hauteur de la texture sous la forme d'un int.
      *
      */
-    int getHeight() const;
+    const int getHeight() const;
 
     void convertAlpha();
 
@@ -98,7 +98,7 @@ public:
     void blit(const std::weak_ptr<Texture>& src, const Rect& srcRect, const Size& destSize) const override;
     void blit(const std::weak_ptr<Texture>& src, const Rect& srcRect, const Rect& destRect) const override;
 
-    void display(const Point& destPos = Point{0, 0});
+    void display(const Point& destPos = Point{0, 0}) const;
 
 private:
     std::shared_ptr<SDL_Texture> texture_;

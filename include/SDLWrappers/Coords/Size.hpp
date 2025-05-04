@@ -27,8 +27,8 @@ public:
     Size(const Point& p);
 
     // Accesseurs
-    int getWidth() const;
-    int getHeight() const;
+    const int getWidth() const;
+    const int getHeight() const;
 
     // Mutateurs
     void setWidth(int w);

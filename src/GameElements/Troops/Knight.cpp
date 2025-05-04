@@ -8,7 +8,7 @@ std::shared_ptr<Knight> Knight::cast(const std::weak_ptr<GameElement>& obj) {
     return lobj ? std::dynamic_pointer_cast<Knight>(lobj) : nullptr;
 }
 
-bool Knight::is(const std::weak_ptr<GameElement>& obj) {
+const bool Knight::is(const std::weak_ptr<GameElement>& obj) {
     return cast(obj) != nullptr;
 }
 
@@ -29,7 +29,6 @@ void Knight::quit()
 
 Knight::Knight(const Point& pos): Troop(pos, sprite_->getSize()) {}
 
-void Knight::display(const std::weak_ptr<BlitTarget>& target)
-{
+void Knight::display(const std::weak_ptr<BlitTarget>& target) const {
     Troop::displaySprite(target, sprite_);
 }

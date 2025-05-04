@@ -25,8 +25,8 @@ public:
 
     std::shared_ptr<SDL_Renderer> getRenderer() const { return renderer_; }
     Size getSize() const override { return size_; }
-    int getWidth() const { return size_.getWidth(); }
-    int getHeight() const { return size_.getHeight(); }
+    const int getWidth() const { return size_.getWidth(); }
+    const int getHeight() const { return size_.getHeight(); }
     SDL_Texture* get() const override { return nullptr; };
 
     void fill(const SDL_Color& color) const;

@@ -82,7 +82,7 @@ void GameMenu::updateShop() {
     overlay_->update(map_->getMaxTreasuryOfCurrentPlayer());
 }
 
-bool GameMenu::handleOverlay(SDL_Event& event) {
+const bool GameMenu::handleOverlay(SDL_Event& event) {
     overlay_->handleEvent(event);
 
     // If return to MapsMenu

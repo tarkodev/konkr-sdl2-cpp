@@ -55,7 +55,7 @@ void TreasuryDisplayer::setNoIncome(bool noIncome) {
     refreshTexture();
 }
 
-void TreasuryDisplayer::display(const std::weak_ptr<BlitTarget>& target) {
+void TreasuryDisplayer::display(const std::weak_ptr<BlitTarget>& target) const {
     if (auto ltarget = target.lock()) {
         ltarget->blit(bg_, Point{pos_.getX() - bg_->getWidth() / 2, pos_.getY() - bg_->getHeight() / 2});
         ltarget->blit(treasuryTex_, Point{pos_.getX() - treasuryTex_->getWidth() / 2, pos_.getY() - treasuryTex_->getHeight() / 2});

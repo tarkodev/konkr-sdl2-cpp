@@ -88,11 +88,11 @@ Size Texture::getSize() const {
     return size_;
 }
 
-int Texture::getWidth() const {
+const int Texture::getWidth() const {
     return size_.getWidth();
 }
 
-int Texture::getHeight() const {
+const int Texture::getHeight() const {
     return size_.getHeight();
 }
 
@@ -175,7 +175,7 @@ void Texture::blit(const std::unique_ptr<Texture>& src, const SDL_Rect* srcRect,
 }
 
 
-void Texture::display(const Point& destPos) {
+void Texture::display(const Point& destPos) const {
     auto lrenderer = renderer_.lock();
     if (!lrenderer) return;
 

@@ -40,7 +40,7 @@ Overlay::Overlay(const Point& pos) : Displayer(pos) {
     }
 }
 
-bool Overlay::isHover(const Point& mousePos) const {
+const bool Overlay::isHover(const Point& mousePos) const {
     // Hover of bg
     if (Rect{pos_, size_}.contains(mousePos + size_ / 2))
         return true;
@@ -85,19 +85,19 @@ std::shared_ptr<GameElement> Overlay::getTroopBought() {
     return std::shared_ptr<GameElement>(nullptr);
 }
 
-bool Overlay::backRequested() {
+const bool Overlay::backRequested() {
     auto backRequested = backRequested_;
     backRequested_ = false;
     return backRequested;
 };
 
-bool Overlay::turnRequested() {
+const bool Overlay::turnRequested() {
     auto turnRequested = turnRequested_;
     turnRequested_ = false;
     return turnRequested;
 };
 
-bool Overlay::buyTroopRequested() {
+const bool Overlay::buyTroopRequested() {
     return buyTroopRequested_ != '\0';
 };
 
@@ -117,7 +117,7 @@ void Overlay::handleEvent(const SDL_Event& e) {
             opt.btnBuy->handleEvent(e);
 }
 
-void Overlay::display(const std::weak_ptr<BlitTarget>& target) {
+void Overlay::display(const std::weak_ptr<BlitTarget>& target) const {
     if (auto ltarget = target.lock()) {
         // Fond
         ltarget->blit(bg_, bgPos_);

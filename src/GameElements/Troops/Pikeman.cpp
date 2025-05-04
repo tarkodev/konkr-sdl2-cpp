@@ -9,7 +9,7 @@ std::shared_ptr<Pikeman> Pikeman::cast(const std::weak_ptr<GameElement>& obj) {
     return lobj ? std::dynamic_pointer_cast<Pikeman>(lobj) : nullptr;
 }
 
-bool Pikeman::is(const std::weak_ptr<GameElement>& obj) {
+const bool Pikeman::is(const std::weak_ptr<GameElement>& obj) {
     return cast(obj) != nullptr;
 }
 
@@ -30,7 +30,6 @@ void Pikeman::quit()
 
 Pikeman::Pikeman(const Point& pos): Troop(pos, sprite_->getSize()) {}
 
-void Pikeman::display(const std::weak_ptr<BlitTarget>& target)
-{
+void Pikeman::display(const std::weak_ptr<BlitTarget>& target) const {
     Troop::displaySprite(target, sprite_);
 }

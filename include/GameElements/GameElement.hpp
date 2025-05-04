@@ -15,14 +15,14 @@ public:
     virtual ~GameElement() = default;
 
     /* --- Accesseurs génériques --- */
-    virtual int getStrength() const = 0;
-    virtual int getCost()     const = 0;
-    virtual int getUpkeep()   const = 0;
+    virtual const int getStrength() const = 0;
+    virtual const int getCost()     const = 0;
+    virtual const int getUpkeep()   const = 0;
 
     /* --- Displayer --- */
-    virtual void display(const std::weak_ptr<BlitTarget>& target) override = 0;
+    virtual void display(const std::weak_ptr<BlitTarget>& target) const override = 0;
 
-    virtual bool isLost() const { return lost_; };
+    virtual const bool isLost() const { return lost_; };
     virtual void lost() { lost_ = true; };
 
 protected:

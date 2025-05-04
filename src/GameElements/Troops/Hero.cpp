@@ -8,7 +8,7 @@ std::shared_ptr<Hero> Hero::cast(const std::weak_ptr<GameElement>& obj) {
     return lobj ? std::dynamic_pointer_cast<Hero>(lobj) : nullptr;
 }
 
-bool Hero::is(const std::weak_ptr<GameElement>& obj) {
+const bool Hero::is(const std::weak_ptr<GameElement>& obj) {
     return cast(obj) != nullptr;
 }
 
@@ -29,7 +29,6 @@ void Hero::quit()
 
 Hero::Hero(const Point& pos): Troop(pos, sprite_->getSize()) {}
 
-void Hero::display(const std::weak_ptr<BlitTarget>& target)
-{
+void Hero::display(const std::weak_ptr<BlitTarget>& target) const {
     Troop::displaySprite(target, sprite_);
 }
