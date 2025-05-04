@@ -3,6 +3,7 @@
 #include "MainMenu.hpp"
 #include "MapsMenu.hpp"
 #include "Checker.hpp"
+#include "Cursor.hpp"
 
 MainMenu::MainMenu(const std::shared_ptr<Window>& window): MenuBase{window} {
     // Background of menu
@@ -12,20 +13,20 @@ MainMenu::MainMenu(const std::shared_ptr<Window>& window): MenuBase{window} {
     logo_ = std::make_shared<Texture>(window_->getRenderer(), "../assets/img/logo.png");
 
     // Expedition button
-    expeditionBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/expeditions.png");
+    expeditionBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/expeditions.png", "../assets/img/expeditions_hover.png");
     expeditionBtn_->setCallback([this]() {
         loop_ = false;
         nextMenu_ = std::make_shared<MapsMenu>(window_);
     });
 
     // How to play button
-    howToPlayBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/howtoplay.png");
+    howToPlayBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/howtoplay.png", "../assets/img/howtoplay_hover.png");
     howToPlayBtn_->setCallback([]() {
         SDL_Check(SDL_OpenURL("https://www.konkr.io/how-to-play/"), "SDL_OpenURL");
     });
 
     // Quit button
-    exitBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/exit.png");
+    exitBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/exit.png", "../assets/img/exit_hover.png");
     exitBtn_->setCallback([this]() {
         loop_ = false;
     });
@@ -49,6 +50,8 @@ void MainMenu::handleEvents(){
 
         handleEvent(event);
     }
+
+    Cursor::update();
 }
 
 void MainMenu::draw() {

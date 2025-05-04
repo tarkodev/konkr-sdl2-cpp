@@ -6,6 +6,8 @@
 #include <memory>
 #include <string>
 #include "Checker.hpp"
+#include "Cursor.hpp"
+#include "MapsMenu.hpp"
 
 GameMenu::GameMenu(const std::shared_ptr<Window>& window, const std::string& mapPath): MenuBase{window} {
     windowSize_ = window_->getSize();
@@ -64,11 +66,18 @@ void GameMenu::updateMapPos() {
     map_->setPos(mapPos_);
 }
 
+void GameMenu::updateShop() {
+    overlay_->update(map_->getMaxTreasuryOfCurrentPlayer());
+}
+
 void GameMenu::onMouseButtonDown(SDL_Event& event) {
+    Point mp{event.motion.x, event.motion.y};
+    if (overlay_->isHover(mp)) return;
+
     map_->handleEvent(event);
     if (map_->hasTroopSelected()) return;
     
-    moveOrigin_ = Point{event.motion.x, event.motion.y};
+    moveOrigin_ = mp;
     moved_ = false;
 }
 
@@ -90,6 +99,7 @@ void GameMenu::onMouseMotion(SDL_Event& event) {
 void GameMenu::onMouseButtonUp(SDL_Event& event) {
     map_->handleEvent(event);
     moveOrigin_.reset();
+    updateShop();
 }
 
 void GameMenu::onMouseWheel(SDL_Event& event) {
@@ -108,6 +118,7 @@ void GameMenu::onMouseWheel(SDL_Event& event) {
 void GameMenu::onKeyDown(SDL_Event& event) {
     if (event.key.keysym.sym == SDLK_RETURN) {
         map_->nextPlayer();
+        updateShop();
         return;
     }
 
@@ -124,13 +135,39 @@ void GameMenu::onKeyDown(SDL_Event& event) {
     updateMapPos();
 }
 
+bool GameMenu::handleOverlay(SDL_Event& event) {
+    overlay_->handleEvent(event);
+
+    // If return to MapsMenu
+    if (overlay_->backRequested()) {
+        nextMenu_ = std::make_shared<MapsMenu>(window_);
+        loop_ = false;
+        return true;
+    }
+
+    // If next turn
+    else if (overlay_->turnRequested()) {
+        map_->nextPlayer();
+        return true;
+    }
+
+    // If Troop bought
+    else if (overlay_->buyTroopRequested()) {
+        map_->buyTroop(overlay_->getTroopBought());
+        return true;
+    }
+
+    return false;
+}
+
 void GameMenu::handleEvents(){
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
-        overlay_->handleEvent(event);
-        
         handleEvent(event);
+        if (handleOverlay(event))
+            continue;
+        
         if (event.type == SDL_MOUSEBUTTONDOWN)
             onMouseButtonDown(event);
         else if (event.type == SDL_MOUSEMOTION)
@@ -142,6 +179,7 @@ void GameMenu::handleEvents(){
         else if (event.type == SDL_KEYDOWN)
             onKeyDown(event);
     }
+    Cursor::update();
 }
 
 void GameMenu::draw() {
@@ -154,6 +192,7 @@ void GameMenu::draw() {
 }
 
 std::shared_ptr<MenuBase> GameMenu::run() {
+    updateShop();
     loop_ = true;
 
     while (loop_) {

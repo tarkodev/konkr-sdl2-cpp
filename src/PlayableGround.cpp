@@ -370,7 +370,7 @@ void PlayableGround::displaySelectable(const std::weak_ptr<Texture>& target) {
 
 
 
-void PlayableGround::setElement(std::shared_ptr<GameElement> elt) {
+void PlayableGround::setElement(const std::shared_ptr<GameElement>& elt) {
     element = elt;
     if (element) elt->setPos(pos_);
 }

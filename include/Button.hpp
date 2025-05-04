@@ -29,8 +29,11 @@ public:
     Button(Button&&) noexcept = default;
     Button& operator=(Button&&) noexcept = default;
 
+    bool isHover(const Point& mousePos) const;
+
     void handleEvent(const SDL_Event& e);
     void setCallback(Callback cb);
+    void setPressedCallback(Callback cb);
 
     void display(const std::weak_ptr<BlitTarget>& target) override;
 
@@ -39,6 +42,7 @@ private:
     std::shared_ptr<Texture> hoverSprite_;
     std::shared_ptr<Texture> pressedSprite_;
 
+    Callback pressedCallback_ = nullptr;
     Callback callback_ = nullptr;
     bool     isHover_ = false;
     bool     isPressed_ = false;

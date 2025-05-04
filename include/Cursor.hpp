@@ -1,16 +1,19 @@
 #ifndef CURSOR_HPP
 #define CURSOR_HPP
 
-#include <SDL2/SDL.h>
+#include "Point.hpp"
+
+#include "SDL.h"
 #include <unordered_map>
 
 class Cursor {
 public:
     // Liste des curseurs système supportés
     enum class SystemCursor {
+        Any,
         Arrow,
-        Hand,
-        Text
+        Text,
+        Hand
     };
 
     // Initialize default cursors
@@ -20,12 +23,16 @@ public:
     // Set new cursor
     static void set(SDL_Cursor* cursor);
 
-    static void arrow();
-    static void hand();
-    static void text();
+    static void requestArrow();
+    static void requestText();
+    static void requestHand();
+    static void update();
+
+    static Point getPos();
 
 private:
     static inline std::unordered_map<SystemCursor, SDL_Cursor*> cursors_;
+    static inline SystemCursor requestedCursor_ = SystemCursor::Any;
 
     static void create_system_cursor(SystemCursor type, SDL_SystemCursor sdl_type);
     static void activate(SystemCursor type);

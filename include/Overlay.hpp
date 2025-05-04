@@ -1,4 +1,3 @@
-// Overlay.hpp
 #ifndef OVERLAY_HPP
 #define OVERLAY_HPP
 
@@ -8,6 +7,17 @@
 #include "Point.hpp"
 #include "Displayer.hpp"
 #include "Button.hpp"
+#include "logic/Troop.hpp"
+
+struct TroopOption {
+    std::shared_ptr<Texture>   texNoBuy;
+    Point                      texPos;
+    std::unique_ptr<Button>    btnBuy;
+    bool                       buyable = false;
+
+    Point getPos()  const { return btnBuy->getPos(); }
+    Size  getSize() const { return btnBuy->getSize(); }
+};
 
 /**
  * @brief Affiche toujours une collection de boutons par‐dessus la carte.
@@ -20,26 +30,30 @@ public:
 
     void handleEvent(const SDL_Event& e);
 
+    bool isHover(const Point& mousePos) const;
+
     void setPos(const Point& pos) override;
     void display(const std::weak_ptr<BlitTarget>& target) override;
 
-    bool backRequested() { return backRequested_; };
-    bool nextRequested() { return nextRequested_; };
-    bool undoRequested() { return undoRequested_; };
-    bool buyTroopRequested() { return buyTroopRequested_; };
+    bool backRequested();
+    bool turnRequested();
+    bool buyTroopRequested();
+    std::shared_ptr<GameElement> getTroopBought();
+
+    void update(int treasury);
 
 private:
     std::shared_ptr<Texture> bg_;
+
     std::unique_ptr<Button> backBtn_;
+    std::vector<TroopOption> options_;
     std::unique_ptr<Button> turnBtn_;
-    std::vector<Button> troopBtns_;
 
     Point bgPos_;
 
     bool backRequested_ = false;
-    bool nextRequested_ = false;
-    bool undoRequested_ = false;
-    bool buyTroopRequested_ = false;
+    bool turnRequested_ = false;
+    char buyTroopRequested_ = '\0';
 };
 
 #endif

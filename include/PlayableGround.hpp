@@ -44,7 +44,7 @@ public:
     void updateIncome();
 
     std::shared_ptr<GameElement> getElement();
-    void setElement(std::shared_ptr<GameElement> elt);
+    void setElement(const std::shared_ptr<GameElement>& elt);
 
     int getShield() const;
     void updateSelectable(int strength);

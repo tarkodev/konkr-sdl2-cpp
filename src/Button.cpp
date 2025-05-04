@@ -17,29 +17,35 @@ Button::Button(const Point& pos, const std::string& normal, const std::string& h
         pressedSprite_ = std::make_shared<Texture>(renderer_, pressed);
 }
 
+void Button::setPressedCallback(Callback cb) {
+    pressedCallback_ = std::move(cb);
+}
+
 void Button::setCallback(Callback cb) {
     callback_ = std::move(cb);
 }
 
+bool Button::isHover(const Point& mousePos) const {
+    return isHover_;
+}
+
 void Button::handleEvent(const SDL_Event& e) {
     switch (e.type) {
-        case SDL_MOUSEMOTION: {
-            Point pos = (Point{e.motion.x, e.motion.y} + size_ / 2);
-            if (Rect{pos_, size_}.contains(pos)) {
-                if (!isHover_) {
-                    isHover_ = true;
-                    Cursor::hand();
-                }
-            } else if (isHover_) {
-                isHover_ = false;
-                Cursor::arrow();
-            }
+        case SDL_MOUSEBUTTONDOWN: {
+            Point pos = Point{e.button.x, e.button.y} + size_ / 2;
+            isPressed_ = (e.button.button == SDL_BUTTON_LEFT && Rect{pos_, size_}.contains(pos));
+            if (pressedCallback_ && isPressed_ && Rect{pos_, size_}.contains(pos))
+                pressedCallback_();
+            if (isHover_) Cursor::requestHand();
+            else Cursor::requestArrow();
             break;
         }
 
-        case SDL_MOUSEBUTTONDOWN: { 
-            Point pos = Point{e.button.x, e.button.y} + size_ / 2;
-            isPressed_ = (e.button.button == SDL_BUTTON_LEFT && Rect{pos_, size_}.contains(pos));
+        case SDL_MOUSEMOTION: {
+            Point pos = (Point{e.motion.x, e.motion.y} + size_ / 2);
+            isHover_ = Rect{pos_, size_}.contains(pos);
+            if (isHover_) Cursor::requestHand();
+            else Cursor::requestArrow();
             break;
         }
 
@@ -49,6 +55,8 @@ void Button::handleEvent(const SDL_Event& e) {
                 if (callback_ && isPressed_ && Rect{pos_, size_}.contains(pos))
                     callback_();
                 isPressed_ = false;
+                if (isHover_) Cursor::requestHand();
+                else Cursor::requestArrow();
             }
             break;
         }
@@ -62,7 +70,7 @@ void Button::display(const std::weak_ptr<BlitTarget>& target) {
     if (isPressed_ && pressedSprite_)
         ltarget->blit(pressedSprite_, pos_ - (pressedSprite_->getSize() / 2));
     else if (isHover_ && hoverSprite_)
-        ltarget->blit(pressedSprite_, pos_ - (hoverSprite_->getSize() / 2));
+        ltarget->blit(hoverSprite_, pos_ - (hoverSprite_->getSize() / 2));
     else
         ltarget->blit(sprite_, pos_ - (sprite_->getSize() / 2));
 }

@@ -66,19 +66,19 @@ public:
     }
 
     // Détermine si un point (x, y) est contenu dans le rectangle
-    bool contains(int x, int y) const {
+    bool contains(const int x, const int y) const {
         return x >= rect_.x && x < rect_.x + rect_.w &&
                y >= rect_.y && y < rect_.y + rect_.h;
     }
 
     // Détermine si un point (x, y) est contenu dans le rectangle
-    bool contains(Point& p) const {
+    bool contains(const Point& p) const {
         return p.getX() >= rect_.x && p.getX() < rect_.x + rect_.w &&
                p.getY() >= rect_.y && p.getY() < rect_.y + rect_.h;
     }
 
     // Détermine si un point (x, y) est contenu dans le rectangle
-    bool contains(Size& s) const {
+    bool contains(const Size& s) const {
         return s.getWidth() >= rect_.x && s.getWidth() < rect_.x + rect_.w &&
                s.getHeight() >= rect_.y && s.getHeight() < rect_.y + rect_.h;
     }

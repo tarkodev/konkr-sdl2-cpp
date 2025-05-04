@@ -11,6 +11,7 @@
 #include "Size.hpp"
 #include "Player.hpp"
 #include "logic/Troop.hpp"
+#include "logic/units/Castle.hpp"
 #include "Displayer.hpp"
 #include "BlitTarget.hpp"
 #include "Font.hpp"
@@ -22,6 +23,7 @@
 #include <vector>
 #include <algorithm>
 #include <random>
+#include <unordered_map>
 
 /**
  * @brief Classe représentant une carte de jeu.
@@ -32,6 +34,8 @@
 class GameMap : public HexagonGrid<std::shared_ptr<Cell>>, public Displayer {
 public:
     static void init();
+    static std::shared_ptr<Cell> createCell(char letter, Point pos);
+    static std::shared_ptr<GameElement> createGameElement(char letter, Point pos);
     
     GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize);
     GameMap(const Point& pos, const Size size, const std::string mapFile);
@@ -41,12 +45,10 @@ public:
 
     void setPos(const Point& pos) override;
 
-    void refreshIslands();
-    void refreshPlates();
-    void refreshSelectables();
-    void refreshFences();
-    void refreshElements();
     void refresh();
+
+    int getMaxTreasuryOfCurrentPlayer();
+    void buyTroop(const std::shared_ptr<GameElement>& elt);
 
     bool hasTroopSelected();
 
@@ -60,6 +62,26 @@ public:
 
 private:
     static std::mt19937 gen_;
+
+    double ratio_ = 0;
+
+    std::weak_ptr<PlayableGround> selectedCell_;
+    std::weak_ptr<Town> townToShowTreasury_;
+    bool hasSelection_ = false;
+
+    std::vector<std::weak_ptr<Player>> players_;
+    std::weak_ptr<Player> currentPlayer_;
+
+    std::vector<std::weak_ptr<Troop>> movedTroops_;
+    std::shared_ptr<GameElement> boughtElt_;
+    std::shared_ptr<Troop> selectedTroop_;
+    std::weak_ptr<PlayableGround> selectedTroopCell_;
+    std::shared_ptr<PlayableGround> selectedNewTroopCell_;
+    std::unordered_set<std::shared_ptr<PlayableGround>> potentialTownCells_;
+    int selectedPlayerNum_ = 0;
+
+    Size calcSize_;
+    std::shared_ptr<Texture> calc_ = nullptr;
 
     GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize, const std::string mapFile);
     void loadMap(const std::string& mapFile);
@@ -80,7 +102,9 @@ private:
 
     void updateLostElements();
     void updateFreeTroops(const std::weak_ptr<Player>& player);
-    void moveTroop(std::weak_ptr<PlayableGround>& from, std::weak_ptr<PlayableGround>& to);
+    std::unordered_map<std::shared_ptr<PlayableGround>, int> getTreasuresOfCurrentPlayers();
+    bool placeCastle(const std::weak_ptr<Castle>& castle, const std::weak_ptr<PlayableGround>& to);
+    void moveTroop(const std::weak_ptr<PlayableGround>& from, const std::weak_ptr<PlayableGround>& to);
     void moveBandit(std::weak_ptr<PlayableGround>& from, std::weak_ptr<PlayableGround>& to);
     void moveBandits();
     void updateIncomes(std::weak_ptr<Player>& player);
@@ -91,23 +115,11 @@ private:
     void onMouseButtonUp(SDL_Event& event);
     void onKeyDown(SDL_Event& event);
 
-    double ratio_ = 0;
-
-    std::weak_ptr<PlayableGround> selectedCell_;
-    std::weak_ptr<Town> townToShowTreasury_;
-    bool hasSelection_ = false;
-
-    std::vector<std::weak_ptr<Player>> players_;
-    std::weak_ptr<Player> currentPlayer_;
-
-    std::vector<std::weak_ptr<Troop>> movedTroops_;
-    std::shared_ptr<Troop> selectedTroop_;
-    std::weak_ptr<PlayableGround> selectedTroopCell_;
-    std::shared_ptr<PlayableGround> selectedNewTroopCell_;
-    int selectedPlayerNum_ = 0;
-
-    Size calcSize_;
-    std::shared_ptr<Texture> calc_ = nullptr;
+    void refreshIslands();
+    void refreshPlates();
+    void refreshSelectables();
+    void refreshFences();
+    void refreshElements();
 };
 
 #endif

@@ -22,16 +22,31 @@ void Cursor::set(SDL_Cursor* cursor) {
     SDL_SetCursor(cursor);
 }
 
-void Cursor::arrow() {
-    activate(SystemCursor::Arrow);
+void Cursor::requestArrow() {
+    if (requestedCursor_ == SystemCursor::Any)
+        requestedCursor_ = SystemCursor::Arrow;
 }
 
-void Cursor::hand() {
-    activate(SystemCursor::Hand);
+void Cursor::requestText() {
+    if (requestedCursor_ == SystemCursor::Any || requestedCursor_ == SystemCursor::Arrow)
+        requestedCursor_ = SystemCursor::Text;
 }
 
-void Cursor::text() {
-    activate(SystemCursor::Text);
+void Cursor::requestHand() {
+    requestedCursor_ = SystemCursor::Hand;
+}
+
+void Cursor::update() {
+    if (requestedCursor_ != SystemCursor::Any)
+        activate(requestedCursor_);
+        
+    requestedCursor_ = SystemCursor::Any;
+}
+
+Point Cursor::getPos() {
+    int x, y;
+    SDL_GetMouseState(&x, &y);
+    return Point{x, y};
 }
 
 

@@ -43,12 +43,14 @@ private:
 
     void createMap(const std::string& mapPath);
     void updateMapPos();
+    void updateShop();
 
     void onMouseButtonDown(SDL_Event& event);
     void onMouseMotion(SDL_Event& event);
     void onMouseButtonUp(SDL_Event& event);
     void onMouseWheel(SDL_Event& event);
     void onKeyDown(SDL_Event& event);
+    bool handleOverlay(SDL_Event& event);
 };
 
 #endif
