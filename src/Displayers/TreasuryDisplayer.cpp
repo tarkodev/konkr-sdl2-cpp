@@ -1,5 +1,5 @@
 #include "Displayers/TreasuryDisplayer.hpp"
-#include "ColorUtils.hpp"
+#include "Utils/ColorUtils.hpp"
 
 std::shared_ptr<Texture> TreasuryDisplayer::bg_ = nullptr;
 std::shared_ptr<Font> TreasuryDisplayer::font_ = nullptr;

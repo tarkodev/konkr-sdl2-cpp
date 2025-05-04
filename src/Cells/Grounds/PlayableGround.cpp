@@ -1,6 +1,6 @@
 #include "Cells/Grounds/PlayableGround.hpp"
 #include "Cells/Cell.hpp"
-#include "ColorUtils.hpp"
+#include "Utils/ColorUtils.hpp"
 #include "GameElements/Castle.hpp"
 #include "GameElements/Camp.hpp"
 #include "GameElements/Troops/Bandit.hpp"

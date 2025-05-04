@@ -2,7 +2,7 @@
 #define DISPLAYER_HPP
 
 #include "SDLWrappers/Coords/Point.hpp"
-#include "BlitTarget.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
 #include "SDLWrappers/Renderers/Texture.hpp"
 
 class Displayer {

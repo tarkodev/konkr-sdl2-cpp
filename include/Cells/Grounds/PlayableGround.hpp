@@ -2,7 +2,7 @@
 #define PLAYABLEGROUND_HPP
 
 #include "SDL.h"
-#include "BlitTarget.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
 #include "SDLWrappers/Renderers/Texture.hpp"
 #include "Player.hpp"
 #include "Cells/Grounds/Ground.hpp"

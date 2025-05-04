@@ -2,7 +2,7 @@
 #define GROUND_HPP
 
 #include "SDL.h"
-#include "BlitTarget.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
 #include "SDLWrappers/Renderers/Texture.hpp"
 #include "Displayers/Displayer.hpp"
 #include "Displayers/HexagonDisplayer.hpp"

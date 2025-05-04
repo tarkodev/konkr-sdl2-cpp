@@ -3,7 +3,7 @@
 
 #include "SDLWrappers/Coords/Point.hpp"
 #include "Displayers/Displayer.hpp"
-#include "BlitTarget.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
 
 class GenericDisplayer: public Displayer {
 public:

@@ -2,7 +2,7 @@
 #define LOGIC_GAMEELEMENT_HPP
 
 #include <string>
-#include "BlitTarget.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
 #include "Displayers/Displayer.hpp"
 
 class Player;

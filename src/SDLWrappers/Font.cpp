@@ -1,5 +1,5 @@
 #include "SDLWrappers/Font.hpp"
-#include "Checker.hpp"
+#include "Utils/Checker.hpp"
 #include <stdexcept>
 
 Font::Font(const std::shared_ptr<SDL_Renderer>& renderer, const std::string& file, int pointSize)

@@ -1,4 +1,4 @@
-#include "MenuBase.hpp"
+#include "Menus/MenuBase.hpp"
 
 void MenuBase::handleEvent(const SDL_Event& e) {
     switch (e.type) {

@@ -1,9 +1,9 @@
-#include "MapsMenu.hpp"
+#include "Menus/MapsMenu.hpp"
 #include "SDL.h"
-#include "MainMenu.hpp"
-#include "ColorUtils.hpp"
-#include "GameMenu.hpp"
-#include "Checker.hpp"
+#include "Menus/MainMenu.hpp"
+#include "Utils/ColorUtils.hpp"
+#include "Menus/GameMenu.hpp"
+#include "Utils/Checker.hpp"
 #include "SDLWrappers/Cursor.hpp"
 #include <filesystem>
 

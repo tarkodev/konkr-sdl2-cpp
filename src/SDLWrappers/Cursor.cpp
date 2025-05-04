@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <string>
-#include "Checker.hpp"
+#include "Utils/Checker.hpp"
 
 void Cursor::init() {
     create_system_cursor(SystemCursor::Arrow, SDL_SYSTEM_CURSOR_ARROW);

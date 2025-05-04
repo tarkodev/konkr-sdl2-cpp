@@ -3,15 +3,15 @@
 
 #include <memory>
 #include "SDL.h"
-#include "ColorUtils.hpp"
+#include "Utils/ColorUtils.hpp"
 #include "GameMap.hpp"
 #include "SDLWrappers/Renderers/Window.hpp"
 #include "Player.hpp"
 #include "Overlay.hpp"
-#include "MainMenu.hpp"
-#include "MapsMenu.hpp"
+#include "Menus/MainMenu.hpp"
+#include "Menus/MapsMenu.hpp"
 #include "SDLWrappers/Font.hpp"
-#include "MenuBase.hpp"
+#include "Menus/MenuBase.hpp"
 
 class Game {
 public:

@@ -2,7 +2,7 @@
 #include "SDL.h"
 #include "SDL2/SDL_ttf.h"
 #include "RenderTargetGuard.hpp"
-#include "Checker.hpp"
+#include "Utils/Checker.hpp"
 
 #include <stdexcept>
 #include <memory>

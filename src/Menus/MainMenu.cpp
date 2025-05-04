@@ -1,8 +1,8 @@
 #include "SDL.h"
-#include "ColorUtils.hpp"
-#include "MainMenu.hpp"
-#include "MapsMenu.hpp"
-#include "Checker.hpp"
+#include "Utils/ColorUtils.hpp"
+#include "Menus/MainMenu.hpp"
+#include "Menus/MapsMenu.hpp"
+#include "Utils/Checker.hpp"
 #include "SDLWrappers/Cursor.hpp"
 
 MainMenu::MainMenu(const std::shared_ptr<Window>& window): MenuBase{window} {

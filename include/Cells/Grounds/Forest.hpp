@@ -3,7 +3,7 @@
 
 #include "SDL.h"
 #include "SDLWrappers/Renderers/Texture.hpp"
-#include "BlitTarget.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
 #include "Player.hpp"
 #include "Cells/Grounds/PlayableGround.hpp"
 

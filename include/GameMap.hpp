@@ -14,7 +14,7 @@
 #include "GameElements/Castle.hpp"
 #include "GameElements/Camp.hpp"
 #include "Displayers/Displayer.hpp"
-#include "BlitTarget.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
 #include "SDLWrappers/Font.hpp"
 #include "Displayers/TreasuryDisplayer.hpp"
 

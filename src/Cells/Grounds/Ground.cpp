@@ -1,6 +1,6 @@
 #include "Cells/Grounds/Ground.hpp"
-#include "ColorUtils.hpp"
-#include "HexagonUtils.hpp"
+#include "Utils/ColorUtils.hpp"
+#include "Utils/HexagonUtils.hpp"
 #include <memory>
 
 HexagonDisplayer Ground::islandDisplayer_ = HexagonDisplayer{-1, nullptr, nullptr, nullptr, nullptr, nullptr};

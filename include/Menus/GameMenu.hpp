@@ -2,7 +2,7 @@
 #define GAMEMENU_HPP
 
 #include "SDLWrappers/Coords/Point.hpp"
-#include "MenuBase.hpp"
+#include "Menus/MenuBase.hpp"
 #include "SDLWrappers/Renderers/Window.hpp"
 #include "SDLWrappers/Renderers/Texture.hpp"
 #include "Overlay.hpp"

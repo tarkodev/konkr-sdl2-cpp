@@ -1,7 +1,7 @@
 #ifndef UNIT_HERO_HPP
 #define UNIT_HERO_HPP
 
-#include "BlitTarget.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
 #include "GameElements/Troops/Troop.hpp"
 
 class Hero : public Troop {

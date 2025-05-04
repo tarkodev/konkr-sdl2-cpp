@@ -1,7 +1,7 @@
 #ifndef UNIT_CASTLE_HPP
 #define UNIT_CASTLE_HPP
 
-#include "BlitTarget.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
 #include "GameElements/GameElement.hpp"
 
 class Castle : public GameElement {

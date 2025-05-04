@@ -1,9 +1,9 @@
 #include "SDLWrappers/Renderers/Texture.hpp"
-#include "ColorUtils.hpp"
+#include "Utils/ColorUtils.hpp"
 #include "SDLWrappers/Coords/Point.hpp"
 #include "RenderTargetGuard.hpp"
 #include <sstream>
-#include "Checker.hpp"
+#include "Utils/Checker.hpp"
 
 // Constructeur : charge la texture depuis le fichier
 Texture::Texture(const std::weak_ptr<SDL_Renderer>& renderer, const std::string& file): renderer_(renderer) {

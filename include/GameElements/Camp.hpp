@@ -1,7 +1,7 @@
 #ifndef UNIT_CAMP_HPP
 #define UNIT_CAMP_HPP
 
-#include "BlitTarget.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
 #include "GameElements/GameElement.hpp"
 #include "Displayers/TreasuryDisplayer.hpp"
 

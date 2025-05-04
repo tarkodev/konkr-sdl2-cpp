@@ -1,5 +1,5 @@
 #include "Overlay.hpp"
-#include "ColorUtils.hpp"
+#include "Utils/ColorUtils.hpp"
 #include "GameElements/Troops/Villager.hpp"
 #include "GameElements/Troops/Pikeman.hpp"
 #include "GameElements/Troops/Knight.hpp"

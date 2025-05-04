@@ -1,7 +1,7 @@
 #ifndef UNIT_PIKEMAN_HPP
 #define UNIT_PIKEMAN_HPP
 
-#include "BlitTarget.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
 #include "GameElements/Troops/Troop.hpp"
 
 class Pikeman : public Troop {

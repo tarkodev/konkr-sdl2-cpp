@@ -4,7 +4,7 @@
 #include <vector>
 #include "SDL.h"
 #include "SDLWrappers/Renderers/Texture.hpp"
-#include "BlitTarget.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
 #include "GenericDisplayer.hpp"
 
 class FenceDisplayer: public GenericDisplayer {

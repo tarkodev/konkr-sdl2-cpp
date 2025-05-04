@@ -47,24 +47,6 @@ public:
      */
     void set(int x, int y, const T& value);
 
-    /**
-     * @brief Récupère la valeur d'une cellule en coordonnées axiales (q, r).
-     * @param q Coordonnée axiale q.
-     * @param r Coordonnée axiale r.
-     * @return La valeur de la cellule.
-     * @throws std::out_of_range si les indices sont invalides.
-     */
-    T getAxial(int q, int r) const;
-
-    /**
-     * @brief Affecte une valeur à une cellule en coordonnées axiales (q, r).
-     * @param q Coordonnée axiale q.
-     * @param r Coordonnée axiale r.
-     * @param value Nouvelle valeur à affecter.
-     * @throws std::out_of_range si les indices sont invalides.
-     */
-    void setAxial(int q, int r, const T& value);
-
     auto begin() { return grid_.begin(); }
     auto end()   { return grid_.end();   }
 

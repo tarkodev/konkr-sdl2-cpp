@@ -1,6 +1,6 @@
 #include "GameMap.hpp"
-#include "ColorUtils.hpp"
-#include "HexagonUtils.hpp"
+#include "Utils/ColorUtils.hpp"
+#include "Utils/HexagonUtils.hpp"
 #include "SDL2/SDL2_gfxPrimitives.h"
 #include "SDL2/SDL_image.h"
 #include "Cells/Water.hpp"
@@ -21,7 +21,7 @@
 #include "SDLWrappers/Font.hpp"
 #include "Displayers/TreasuryDisplayer.hpp"
 #include "SDLWrappers/Cursor.hpp"
-#include "Checker.hpp"
+#include "Utils/Checker.hpp"
 
 #include <stdexcept>
 #include <ranges>

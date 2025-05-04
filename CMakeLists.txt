@@ -119,10 +119,10 @@ set(SRC_FILES
     "${CMAKE_SOURCE_DIR}/src/Button.cpp"
     "${CMAKE_SOURCE_DIR}/src/Overlay.cpp"
 
-    "${CMAKE_SOURCE_DIR}/src/MenuBase.cpp"
-    "${CMAKE_SOURCE_DIR}/src/MainMenu.cpp"
-    "${CMAKE_SOURCE_DIR}/src/MapsMenu.cpp"
-    "${CMAKE_SOURCE_DIR}/src/GameMenu.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Menus/MenuBase.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Menus/MainMenu.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Menus/MapsMenu.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Menus/GameMenu.cpp"
     
     "${CMAKE_SOURCE_DIR}/src/Game.cpp"
     "${CMAKE_SOURCE_DIR}/src/main.cpp"

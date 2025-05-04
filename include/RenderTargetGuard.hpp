@@ -2,7 +2,7 @@
 #define RENDERTARGETGUARD_HPP
 
 #include "SDL.h"
-#include "Checker.hpp"
+#include "Utils/Checker.hpp"
 #include <memory>
 #include <stdexcept>
 

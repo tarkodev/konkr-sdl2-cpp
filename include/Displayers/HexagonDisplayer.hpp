@@ -2,7 +2,7 @@
 #define HEXAGONDISPLAYER_HPP
 
 #include "SDL.h"
-#include "BlitTarget.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
 #include "SDLWrappers/Renderers/Texture.hpp"
 #include "GenericDisplayer.hpp"
 #include <vector>

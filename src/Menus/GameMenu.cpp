@@ -1,13 +1,13 @@
-#include "GameMenu.hpp"
+#include "Menus/GameMenu.hpp"
 #include "SDL.h"
-#include "ColorUtils.hpp"
+#include "Utils/ColorUtils.hpp"
 #include "GameMap.hpp"
 #include "Overlay.hpp"
 #include <memory>
 #include <string>
-#include "Checker.hpp"
+#include "Utils/Checker.hpp"
 #include "SDLWrappers/Cursor.hpp"
-#include "MapsMenu.hpp"
+#include "Menus/MapsMenu.hpp"
 
 GameMenu::GameMenu(const std::shared_ptr<Window>& window, const std::string& mapPath): MenuBase{window} {
     windowSize_ = window_->getSize();

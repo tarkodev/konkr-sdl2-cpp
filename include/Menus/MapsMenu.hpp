@@ -1,7 +1,7 @@
 #ifndef MAPSMENU_HPP
 #define MAPSMENU_HPP
 
-#include "MenuBase.hpp"
+#include "Menus/MenuBase.hpp"
 
 class MainMenu;
 

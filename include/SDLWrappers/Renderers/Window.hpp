@@ -4,9 +4,9 @@
 #include <memory>
 #include "SDL.h"
 #include "SDLWrappers/Coords/Size.hpp"
-#include "BlitTarget.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
 #include "SDLWrappers/Renderers/Texture.hpp"
-#include "Checker.hpp"
+#include "Utils/Checker.hpp"
 
 // To free window memory on closing
 struct SDLWindowDeleter {

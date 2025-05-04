@@ -1,5 +1,5 @@
 #include "Displayers/FenceDisplayer.hpp"
-#include "HexagonUtils.hpp"
+#include "Utils/HexagonUtils.hpp"
 
 
 FenceDisplayer::FenceDisplayer(double hexagonRadius, 

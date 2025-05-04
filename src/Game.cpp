@@ -1,5 +1,5 @@
 #include "Game.hpp"
-#include "HexagonUtils.hpp"
+#include "Utils/HexagonUtils.hpp"
 #include "HexagonGrid.hpp"
 #include "SDLWrappers/Renderers/Texture.hpp"
 #include "Cells/Water.hpp"
