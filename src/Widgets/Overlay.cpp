@@ -50,7 +50,7 @@ const bool Overlay::isHover(const Point& mousePos) const {
         return true;
 
     // hover of troop btns
-    return std::any_of(options_.begin(), options_.end(), [&](const TroopOption& option) { return option.btnBuy && option.btnBuy->isHover(mousePos); });
+    return std::any_of(options_.begin(), options_.end(), [&](const auto& option) { return option.btnBuy && option.btnBuy->isHover(mousePos); });
 }
 
 void Overlay::setPos(const Point& pos) {
