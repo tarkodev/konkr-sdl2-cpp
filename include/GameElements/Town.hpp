@@ -2,7 +2,7 @@
 #define UNIT_TOWN_HPP
 
 #include "BlitTarget.hpp"
-#include "TreasuryDisplayer.hpp"
+#include "Displayers/TreasuryDisplayer.hpp"
 #include "GameElements/GameElement.hpp"
 
 class Town : public GameElement {

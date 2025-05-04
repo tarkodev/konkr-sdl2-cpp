@@ -4,8 +4,8 @@
 #include "SDL.h"
 #include "BlitTarget.hpp"
 #include "SDLWrappers/Renderers/Texture.hpp"
-#include "Displayer.hpp"
-#include "HexagonDisplayer.hpp"
+#include "Displayers/Displayer.hpp"
+#include "Displayers/HexagonDisplayer.hpp"
 #include "Player.hpp"
 #include "Cells/Cell.hpp"
 #include <memory>

@@ -19,7 +19,7 @@
 #include "GameElements/Troops/Knight.hpp"
 #include "GameElements/Troops/Hero.hpp"
 #include "SDLWrappers/Font.hpp"
-#include "TreasuryDisplayer.hpp"
+#include "Displayers/TreasuryDisplayer.hpp"
 #include "SDLWrappers/Cursor.hpp"
 #include "Checker.hpp"
 

@@ -1,6 +1,6 @@
 
 #include "HexagonUtils.hpp"
-#include "HexagonDisplayer.hpp"
+#include "Displayers/HexagonDisplayer.hpp"
 #include <SDL2/SDL2_gfxPrimitives.h>   // <-- pour filledPolygonRGBA
 #include <cmath>
 

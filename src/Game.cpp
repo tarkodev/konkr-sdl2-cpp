@@ -19,8 +19,8 @@
 #include "GameElements/Troops/Hero.hpp"
 #include "Button.hpp"
 #include "SDLWrappers/Font.hpp"
-#include "Displayer.hpp"
-#include "TreasuryDisplayer.hpp"
+#include "Displayers/Displayer.hpp"
+#include "Displayers/TreasuryDisplayer.hpp"
 #include "SDLWrappers/Cursor.hpp"
 
 #include <memory>

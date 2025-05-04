@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 #include "SDLWrappers/Coords/Point.hpp"
-#include "Displayer.hpp"
+#include "Displayers/Displayer.hpp"
 #include "Button.hpp"
 #include "GameElements/Troops/Troop.hpp"
 

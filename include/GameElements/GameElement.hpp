@@ -3,7 +3,7 @@
 
 #include <string>
 #include "BlitTarget.hpp"
-#include "Displayer.hpp"
+#include "Displayers/Displayer.hpp"
 
 class Player;
 

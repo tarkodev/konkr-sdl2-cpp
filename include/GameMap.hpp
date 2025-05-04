@@ -13,10 +13,10 @@
 #include "GameElements/Troops/Troop.hpp"
 #include "GameElements/Castle.hpp"
 #include "GameElements/Camp.hpp"
-#include "Displayer.hpp"
+#include "Displayers/Displayer.hpp"
 #include "BlitTarget.hpp"
 #include "SDLWrappers/Font.hpp"
-#include "TreasuryDisplayer.hpp"
+#include "Displayers/TreasuryDisplayer.hpp"
 
 #include <memory>
 #include <utility>

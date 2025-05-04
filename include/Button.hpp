@@ -4,7 +4,7 @@
 
 #include "SDL.h"
 #include "SDLWrappers/Renderers/Texture.hpp"
-#include "Displayer.hpp"
+#include "Displayers/Displayer.hpp"
 #include "SDLWrappers/Coords/Rect.hpp"
 #include "SDLWrappers/Coords/Point.hpp"
 #include "SDLWrappers/Coords/Size.hpp"

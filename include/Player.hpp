@@ -4,7 +4,7 @@
 #include <string>
 #include <memory>
 #include "SDLWrappers/Renderers/Texture.hpp"
-#include "HexagonDisplayer.hpp"
+#include "Displayers/HexagonDisplayer.hpp"
 #include "ColorUtils.hpp"
 #include "GameElements/Town.hpp"
 #include <unordered_set>

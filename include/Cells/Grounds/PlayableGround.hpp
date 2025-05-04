@@ -7,7 +7,7 @@
 #include "Player.hpp"
 #include "Cells/Grounds/Ground.hpp"
 #include "GameElements/GameElement.hpp"
-#include "FenceDisplayer.hpp"
+#include "Displayers/FenceDisplayer.hpp"
 #include <unordered_set>
 #include <queue>
 #include <memory>

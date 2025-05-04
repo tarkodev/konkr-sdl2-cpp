@@ -2,7 +2,7 @@
 #define GENERICDISPLAYER_HPP
 
 #include "SDLWrappers/Coords/Point.hpp"
-#include "Displayer.hpp"
+#include "Displayers/Displayer.hpp"
 #include "BlitTarget.hpp"
 
 class GenericDisplayer: public Displayer {

@@ -3,7 +3,7 @@
 
 #include "BlitTarget.hpp"
 #include "GameElements/GameElement.hpp"
-#include "TreasuryDisplayer.hpp"
+#include "Displayers/TreasuryDisplayer.hpp"
 
 class Camp : public GameElement {
 public:

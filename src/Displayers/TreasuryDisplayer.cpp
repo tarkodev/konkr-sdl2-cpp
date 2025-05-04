@@ -1,4 +1,4 @@
-#include "TreasuryDisplayer.hpp"
+#include "Displayers/TreasuryDisplayer.hpp"
 #include "ColorUtils.hpp"
 
 std::shared_ptr<Texture> TreasuryDisplayer::bg_ = nullptr;
