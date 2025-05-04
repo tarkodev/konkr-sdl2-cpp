@@ -661,6 +661,12 @@ void GameMap::moveTroop(const std::weak_ptr<PlayableGround>& from, const std::we
     if (fromOwner != toOwner || Bandit::cast(toTroop)) {
         auto destroyTown = Town::cast(lto->getElement());
         auto destroyCamp = Camp::cast(lto->getElement());
+        if (toTroop && lto->hasFences())
+            for (auto& nc : lto->getNeighbors())
+                if (auto ng = PlayableGround::cast(nc))
+                    if (ng->getOwner() == toOwner && !ng->getElement() && ng->hasFences())
+                        ng->setElement(lto->getElement());
+
         lfrom->setElement(nullptr);
         lto->setElement(fromTroop);
 
@@ -1071,7 +1077,7 @@ void GameMap::updateMovables() {
     for (auto& cell : *this)
         if (auto pg = PlayableGround::cast(cell))
             if (auto troop = Troop::cast(pg->getElement()))
-                troop->setMovable(cp && cp == pg->getOwner() && !isMovedTroop(troop));
+                troop->setMovable(cp && cp == pg->getOwner() && !Bandit::is(troop) && !isMovedTroop(troop));
 }
 
 void GameMap::updateFreeTroops(const std::weak_ptr<Player>& player) {
