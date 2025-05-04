@@ -76,14 +76,6 @@ public:
     static std::shared_ptr<GameElement> createGameElement(char letter, Point pos);
 
     /**
-     * @brief Construct a new empty GameMap with given position, size, and grid dimensions.
-     * @param pos      Top-left corner of the map in world coordinates.
-     * @param size     Pixel size of the entire map area.
-     * @param gridSize Number of columns and rows.
-     */
-    GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize);
-
-    /**
      * @brief Construct a GameMap by loading layout from a file.
      * @param pos     Top-left corner in world coords.
      * @param size    Pixel dimensions.
