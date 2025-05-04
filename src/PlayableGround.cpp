@@ -13,6 +13,7 @@
 FenceDisplayer PlayableGround::fenceDisplayer_ = FenceDisplayer{-1, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 std::vector<std::shared_ptr<Texture>> PlayableGround::shieldSprites_ = std::vector<std::shared_ptr<Texture>>();
 std::shared_ptr<Texture> PlayableGround::selectableSprite_ = nullptr;
+std::shared_ptr<Texture> PlayableGround::crossSprite_ = nullptr;
 
 
 std::shared_ptr<PlayableGround> PlayableGround::cast(const std::weak_ptr<Cell>& obj) {
@@ -55,6 +56,9 @@ void PlayableGround::init() {
     shieldSprites_.push_back(std::make_shared<Texture>(renderer_, "../assets/img/shield2.png"));
     shieldSprites_.push_back(std::make_shared<Texture>(renderer_, "../assets/img/shield3.png"));
     shieldSprites_.push_back(std::make_shared<Texture>(renderer_, "../assets/img/shield3.png"));
+
+    // Load cross
+    crossSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/cross.png");
 
     // Load selectable sprite
     selectableSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/selectable.png");
@@ -358,6 +362,16 @@ void PlayableGround::displayShield(const std::weak_ptr<Texture>& target) {
     }
 }
 
+void PlayableGround::displayCross(const std::weak_ptr<Texture>& target) {
+    auto ltarget = target.lock();
+    if (!ltarget || element) return;
+
+    ltarget->blit(crossSprite_, Point{
+        static_cast<int>(pos_.getX() - crossSprite_->getWidth() / 2.0),
+        static_cast<int>(pos_.getY() - crossSprite_->getHeight() / 2.0)
+    });
+}
+
 void PlayableGround::displaySelectable(const std::weak_ptr<Texture>& target) {
     auto ltarget = target.lock();
     if (!ltarget || !selectable_ || (owner_ && owner_->hasSelected())) return;
@@ -406,12 +420,12 @@ void PlayableGround::updateSelectable(int strength, std::unordered_set<std::shar
     if (visited.find(shared_from_this()) != visited.end()) return;
     visited.insert(shared_from_this());
 
-    selectable_ = strength > 0;
+    selectable_ = strength >= 0;
     
     for (auto& cell : neighbors_) {
         if (auto pg = PlayableGround::cast(cell)) {
             if (pg->getOwner() == owner_) pg->updateSelectable(strength, visited);
-            else pg->setSelectable(pg->getShield() < strength);
+            else pg->setSelectable(strength > 0 && pg->getShield() < strength);
         }
     }
 }

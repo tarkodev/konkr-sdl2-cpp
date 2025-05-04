@@ -32,6 +32,7 @@ public:
     void displayFences(const std::weak_ptr<Texture>& target);
     void displayElement(const std::weak_ptr<Texture>& target);
     void displayShield(const std::weak_ptr<Texture>& target);
+    void displayCross(const std::weak_ptr<Texture>& target);
     void displaySelectable(const std::weak_ptr<Texture>& target);
 
     bool isLinked();
@@ -54,6 +55,7 @@ private:
     static FenceDisplayer fenceDisplayer_;
     static std::vector<std::shared_ptr<Texture>> shieldSprites_;
     static std::shared_ptr<Texture> selectableSprite_;
+    static std::shared_ptr<Texture> crossSprite_;
 
     std::shared_ptr<Player> oldOwner_;
     std::shared_ptr<Player> owner_;

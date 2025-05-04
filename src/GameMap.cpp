@@ -323,11 +323,17 @@ void GameMap::refreshFences() {
 }
 
 void GameMap::refreshElements() {
+    auto lselectedCell = selectedCell_.lock();
+    bool drawCross = lselectedCell && (selectedTroop_ || boughtElt_);
+
     // Draw game elements
     for (auto& cell : *this) {
         if (auto pg = PlayableGround::cast(cell)) {
             pg->displayElement(calc_);
-            pg->displayShield(calc_);
+            if (!drawCross || pg != lselectedCell || !pg->isSelectable())
+                pg->displayShield(calc_);
+            else
+                pg->displayCross(calc_);
         }
     }
 
@@ -537,12 +543,10 @@ void GameMap::buyTroop(const std::shared_ptr<GameElement>& elt) {
     selectedNewTroopCell_->setOwner(cp);
 
     // Search potential towns
-    bool troopElement = Troop::is(elt);
     for (auto& [townCell, treasury] : getTreasuresOfCurrentPlayers()) {
         if (townCell && treasury >= elt->getCost()) {
             potentialTownCells_.insert(townCell);
-            if (troopElement)
-                townCell->updateSelectable(elt->getStrength());
+            townCell->updateSelectable(Troop::is(elt) ? elt->getStrength() : 0);
         }
     }
 
@@ -895,7 +899,7 @@ void GameMap::onMouseButtonUp(SDL_Event& event) {
         
         // Remove possibilities
         for (auto& townCell : potentialTownCells_)
-            townCell->updateSelectable(0);
+            townCell->updateSelectable(-1);
     }
 
     // Buy by Town / Move troop
@@ -928,7 +932,7 @@ void GameMap::onMouseButtonUp(SDL_Event& event) {
             }
 
             // Remove possibilities
-            lselectedTroopCell->updateSelectable(0);
+            lselectedTroopCell->updateSelectable(-1);
         }
 
         // Move Troop
@@ -940,7 +944,7 @@ void GameMap::onMouseButtonUp(SDL_Event& event) {
                 moveTroop(selectedTroopCell_, selectedCell_);
     
             // Remove possibilities
-            lselectedTroopCell->updateSelectable(0);
+            lselectedTroopCell->updateSelectable(-1);
         }
     }
 

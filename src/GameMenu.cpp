@@ -165,8 +165,10 @@ void GameMenu::handleEvents(){
 
     while (SDL_PollEvent(&event)) {
         handleEvent(event);
-        if (handleOverlay(event))
+        if (handleOverlay(event)) {
+            updateShop();
             continue;
+        }
         
         if (event.type == SDL_MOUSEBUTTONDOWN)
             onMouseButtonDown(event);
