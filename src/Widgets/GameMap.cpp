@@ -96,8 +96,7 @@ std::shared_ptr<Cell> GameMap::createCell(char letter, Point pos) {
     switch (letter) {
         case 'F': return std::make_shared<Forest>(pos);
         case 'W': return std::make_shared<Water>();
-        case '0': return std::make_shared<PlayableGround>(pos);
-        default: if (std::isdigit(letter)) return std::make_shared<PlayableGround>(pos);
+        default: if (std::isdigit(letter) || std::islower(letter)) return std::make_shared<PlayableGround>(pos);
     }
 
     throw std::runtime_error(std::string("Caractère inattendu: ") + letter);
@@ -114,6 +113,7 @@ std::shared_ptr<GameElement> GameMap::createGameElement(char letter, Point pos) 
         case 'K': return std::make_shared<Knight>(pos);
         case 'H': return std::make_shared<Hero>(pos);
         case '.': return std::shared_ptr<GameElement>(nullptr);
+        default: if (std::islower(letter)) return std::make_shared<Town>(pos, letter - 'a' + 1);
     }
 
     throw std::runtime_error(std::string("Caractère inattendu: ") + letter);
@@ -168,9 +168,11 @@ void GameMap::loadMap(const std::string& mapFile) {
             std::shared_ptr<GameElement> gameElt = createGameElement(gameEltType, pos);
 
             // Set element on cell
-            if (gameEltType != '.' && (cellType != '0' || gameEltType == 'B' || gameEltType == 'A')) {
+            if (std::islower(cellType)) pg->setElement(std::make_shared<Camp>(pos, cellType - 'a' + 1));
+            else if (gameEltType != '.' && (cellType != '0' || gameEltType == 'B' || gameEltType == 'A')) {
                 pg->setElement(gameElt);
-                if (gameEltType == 'T') pg->getOwner()->addTownCell(pg);
+                if (std::islower(gameEltType) || gameEltType == 'T')
+                    pg->getOwner()->addTownCell(pg);
             }
         }
         

@@ -30,8 +30,8 @@ void Town::quit()
 }
 
 
-Town::Town(const Point& pos)
-    : GameElement(pos, sprite_->getSize()), treasuryDisplayer_(Point{pos.getX(), pos.getY() + sprite_->getHeight() / 2})
+Town::Town(const Point& pos, const int& treasury)
+    : GameElement(pos, sprite_->getSize()), treasuryDisplayer_(Point{pos.getX(), pos.getY() + sprite_->getHeight() / 2}, treasury), treasury_(treasury)
 {}
 
 void Town::setPos(const Point& pos) {

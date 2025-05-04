@@ -28,8 +28,8 @@ void Camp::quit()
 }
 
 
-Camp::Camp(const Point& pos): 
-    GameElement(pos, sprite_->getSize()), treasuryDisplayer_(Point{pos.getX(), pos.getY() + sprite_->getHeight() / 2})
+Camp::Camp(const Point& pos, const int& treasury): 
+    GameElement(pos, sprite_->getSize()), treasuryDisplayer_(Point{pos.getX(), pos.getY() + sprite_->getHeight() / 2}, treasury), treasury_(treasury)
 {
     treasuryDisplayer_.setNoIncome(true);
 }

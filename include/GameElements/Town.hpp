@@ -13,7 +13,7 @@ public:
     static std::shared_ptr<Town> cast(const std::weak_ptr<GameElement>& obj);
     static bool is(const std::weak_ptr<GameElement>& obj);
 
-    explicit Town(const Point& pos);
+    explicit Town(const Point& pos, const int& treasury = 0);
 
     /* Displayer */
     void setPos(const Point& pos) override;

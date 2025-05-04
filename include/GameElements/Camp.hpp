@@ -14,7 +14,7 @@ public:
     static void init();
     static void quit();
 
-    explicit Camp(const Point& pos);
+    explicit Camp(const Point& pos, const int& treasury = 0);
 
     /* Displayer */
     void setPos(const Point& pos) override;

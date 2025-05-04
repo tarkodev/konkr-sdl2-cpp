@@ -119,14 +119,17 @@ namespace ColorUtils
         const GroundColor BROWN   = { fromHtml("#a27654"), fromHtml("#886347") };
         const GroundColor GREY    = { fromHtml("#6a747c"), fromHtml("#545c62") };
         const GroundColor LIME    = { fromHtml("#7fc83a"), fromHtml("#6fae33") };
+        const GroundColor BLUE    = { fromHtml("#3a7fc8"), fromHtml("#336fae") };
+        const GroundColor VIOLET  = { fromHtml("#8a3ac8"), fromHtml("#7b33ae") };
+        const GroundColor ROSE    = { fromHtml("#c83a7f"), fromHtml("#ae336f") };
 
         // An array or vector to access by index
-        const GroundColor Palette[] = { GROUND, GREEN, ORANGE, YELLOW, BROWN, GREY, LIME };
+        const GroundColor Palette[] = { GROUND, GREEN, ORANGE, YELLOW, BROWN, GREY, LIME, BLUE, VIOLET, ROSE };
     }
 
-    inline GroundColor getGroundColor(int index) {
+    inline GroundColor getGroundColor(const int& index) {
         // Invalid color
-        if (index < 0 || index > 6)
+        if (index < 0 || index > 9)
             return GroundPalette::GREY;
 
         // Get good pair of color
