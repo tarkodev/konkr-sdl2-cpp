@@ -41,6 +41,31 @@ Ce projet implémente une version du jeu **Konkr** en C++ moderne avec affichage
 └── src                    # Code source (implémentations des classes et main)
 ```
 
+## Format des cartes
+
+Chaque map est chargée depuis un fichier ASCII. Chaque case est représentée par deux caractères :
+
+- **Premier caractère** :
+  - `F` : Forêt
+  - `W` : Eau
+  - `0` : Terrain libre
+  - `1-9` : Joueur (numéro de faction)
+  - `a-z` : Camp (avec `a` = 1 pièce, ..., `z` = 26 pièces)
+
+- **Deuxième caractère** :
+  - `B` : Bandit
+  - `C` : Château
+  - `A` : Camp
+  - `V` : Villageois
+  - `P` : Piquier
+  - `K` : Cavalier
+  - `H` : Héros
+  - `.` : Vide
+  - `T` : Ville générique
+  - `a-z` : Ville (Town) avec `a` = 1 pièce, ..., `z` = 26 pièces
+
+Exemple disponible dans le dossier `assets/map/*.ascii`
+
 ## Construction et exécution
 
 ### Prérequis

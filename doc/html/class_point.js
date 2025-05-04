@@ -1,0 +1,28 @@
+var class_point =
+[
+    [ "Point", "class_point.html#ad92f2337b839a94ce97dcdb439b4325a", null ],
+    [ "Point", "class_point.html#a001c4958c310b248f5c26037aea38a9c", null ],
+    [ "Point", "class_point.html#a186260e5466b01512b4fdae8300a55f3", null ],
+    [ "Point", "class_point.html#ab6cae9f299b648b625abcaf586a40e4a", null ],
+    [ "addX", "class_point.html#a705f5a4f4637f73857d1005220a612d3", null ],
+    [ "addY", "class_point.html#a5d32fac032039dbc55359af8d1a111cd", null ],
+    [ "get", "class_point.html#a48a1d7311ce5415ed8d7c75dc670841f", null ],
+    [ "get", "class_point.html#a587f5c9eaa5115daad8aca36629bac4f", null ],
+    [ "getX", "class_point.html#a77c203ce0d6966dcd078ac4615e2fdb8", null ],
+    [ "getY", "class_point.html#a99a20dac9b0d6c3d655e5afb2711c8ca", null ],
+    [ "operator SDL_Point", "class_point.html#ab45a8de157dc2c5cc9fa68945bd38faa", null ],
+    [ "operator*", "class_point.html#a7c85026363932d88da1b4ab06cd8daa9", null ],
+    [ "operator*=", "class_point.html#ad30f56c2df9c96e006523a75c07a1aa1", null ],
+    [ "operator+", "class_point.html#a8bc39ec95c27d83d84e1df3fd8124fa2", null ],
+    [ "operator+", "class_point.html#adb5940a5dc4fffaab417dd37b39cdecf", null ],
+    [ "operator+=", "class_point.html#a417c3ccb0ae5c2ce47428855d92f9ea6", null ],
+    [ "operator+=", "class_point.html#a2f5a241dd33685e90b9786de48a10310", null ],
+    [ "operator-", "class_point.html#a17b65599126120074e6295ddad1ca906", null ],
+    [ "operator-", "class_point.html#a1bb2ebf4f9cb2a0c941eee1247f57de2", null ],
+    [ "operator-=", "class_point.html#ad2bd9ee9159d56301a53cf2d173fb18e", null ],
+    [ "operator-=", "class_point.html#aae5df77ff9fbc47d10c7f9617d4849f9", null ],
+    [ "operator/", "class_point.html#ab2621dc0e9c0a8ef29cc4628272142a9", null ],
+    [ "operator/=", "class_point.html#ad5ed942f992653e38805a49b155ca5a0", null ],
+    [ "setX", "class_point.html#acdc86ab607b2ae8415152883e2629015", null ],
+    [ "setY", "class_point.html#afccad787a359f062efc1af5e935a99ba", null ]
+];
