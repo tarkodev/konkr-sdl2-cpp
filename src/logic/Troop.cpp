@@ -1,5 +1,6 @@
 #include "logic/Troop.hpp"
 #include <memory>
+#include <cmath>
 
 std::shared_ptr<Texture> Troop::shadow_ = nullptr;
 std::shared_ptr<Texture> Troop::lostSprite_ = nullptr;
@@ -30,20 +31,30 @@ void Troop::quit() {
 
 Troop::Troop(const Point& pos, const Size& size) : GameElement(pos, size) {}
 
-void Troop::displaySprite(const std::weak_ptr<BlitTarget>& target, const std::weak_ptr<Texture>& sprite) {
-    auto ltarget = target.lock();
-    auto lsprite = sprite.lock();
-    if (!ltarget || !lsprite || !shadow_ || !lostSprite_) return;
-    
-    if (lost_ || free_) ltarget->blit(lostSprite_, Point{pos_.getX() - lostSprite_->getWidth() / 2, pos_.getY() - lostSprite_->getHeight() / 2});
-    ltarget->blit(shadow_, Point{pos_.getX() - shadow_->getWidth() / 2, pos_.getY() - shadow_->getHeight() / 2});
-    ltarget->blit(sprite, Point{pos_.getX() - lsprite->getWidth() / 2, pos_.getY() - lsprite->getHeight() / 2});
-}
-
-void Troop::setFree(bool free) {
+void Troop::setFree(const bool& free) {
     free_ = free;
 }
 
 bool Troop::isFree() const {
     return free_;
+}
+
+void Troop::setMovable(const bool& movable) {
+    movable_ = movable;
+}
+
+bool Troop::isMovable() const {
+    return movable_;
+}
+
+void Troop::displaySprite(const std::weak_ptr<BlitTarget>& target, const std::weak_ptr<Texture>& sprite) {
+    auto ltarget = target.lock();
+    auto lsprite = sprite.lock();
+    if (!ltarget || !lsprite || !shadow_ || !lostSprite_) return;
+    
+    // Display troop
+    int offsetY = movable_ ? static_cast<int>((1 - std::pow((static_cast<int>(SDL_GetTicks64()) % 500 - 250) / 250., 2)) * lsprite->getHeight() / 2) : 0;
+    if (lost_ || free_) ltarget->blit(lostSprite_, pos_ - lostSprite_->getSize() / 2 - Point{0, offsetY});
+    ltarget->blit(shadow_, pos_ - shadow_->getSize() / 2);
+    ltarget->blit(sprite, pos_ - lsprite->getSize() / 2 - Point{0, offsetY});
 }

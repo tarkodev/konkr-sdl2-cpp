@@ -487,6 +487,7 @@ void GameMap::startTurn(std::weak_ptr<Player>& player) {
         updateFreeTroops(player);
         updateIncomes(player);
         movedTroops_.clear();
+        updateMovables();
     }
 }
 
@@ -655,6 +656,7 @@ void GameMap::moveTroop(const std::weak_ptr<PlayableGround>& from, const std::we
         lto->setElement(fromTroop);
 
         movedTroops_.push_back(fromTroop);
+        updateMovables();
 
         // Give grounds to the new owner
         lto->link(fromOwner);
@@ -682,8 +684,10 @@ void GameMap::moveTroop(const std::weak_ptr<PlayableGround>& from, const std::we
 
             if (troop) {
                 // Set merged troop
-                if (isMovedTroop(fromTroop) || isMovedTroop(toTroop))
+                if (isMovedTroop(fromTroop) || isMovedTroop(toTroop)) {
                     movedTroops_.push_back(troop);
+                    updateMovables();
+                }
 
                 lfrom->setElement(nullptr);
                 lto->setElement(troop);
@@ -796,6 +800,7 @@ void GameMap::onMouseButtonDown(SDL_Event& event) {
 
         if (selectedTroop_) {
             selectedTroop_->setPos(mousePos);
+            selectedTroop_->setMovable(false);
 
             lselectedCell->updateSelectable(selectedTroop_->getStrength());
             lselectedCell->setElement(nullptr);
@@ -938,6 +943,7 @@ void GameMap::onMouseButtonUp(SDL_Event& event) {
         // Move Troop
         else {
             lselectedTroopCell->setElement(selectedTroop_);
+            selectedTroop_->setMovable(true);
     
             // Move troop
             if (lselectedCell)
@@ -1026,6 +1032,14 @@ void GameMap::updateIncomes(std::weak_ptr<Player>& player) {
 void GameMap::updateIncomes(std::shared_ptr<Player>& player) {
     std::weak_ptr<Player> wplayer = player;
     updateIncomes(wplayer);
+}
+
+void GameMap::updateMovables() {
+    auto cp = currentPlayer_.lock();
+    for (auto& cell : *this)
+        if (auto pg = PlayableGround::cast(cell))
+            if (auto troop = Troop::cast(pg->getElement()))
+                troop->setMovable(cp && cp == pg->getOwner() && !isMovedTroop(troop));
 }
 
 void GameMap::updateFreeTroops(const std::weak_ptr<Player>& player) {

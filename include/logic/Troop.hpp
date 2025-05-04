@@ -16,13 +16,17 @@ public:
     virtual ~Troop() = default;
 
     bool isFree() const;
-    void setFree(bool free);
+    void setFree(const bool& free);
+
+    bool isMovable() const;
+    void setMovable(const bool& movable);
 
 protected:
     static std::shared_ptr<Texture> shadow_;
     static std::shared_ptr<Texture> lostSprite_;
 
     bool free_ = false;
+    bool movable_ = false;
 
     Troop(const Point& pos, const Size& size);
 

@@ -109,6 +109,7 @@ private:
     void moveBandits();
     void updateIncomes(std::weak_ptr<Player>& player);
     void updateIncomes(std::shared_ptr<Player>& player);
+    void updateMovables();
 
     void onMouseButtonDown(SDL_Event& event);
     void onMouseMotion(SDL_Event& event);
