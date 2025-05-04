@@ -3,11 +3,11 @@
 
 #include "SDL.h"
 #include "BlitTarget.hpp"
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 #include "Displayer.hpp"
 #include "HexagonDisplayer.hpp"
 #include "Player.hpp"
-#include "Cell.hpp"
+#include "Cells/Cell.hpp"
 #include <memory>
 
 class Ground: public Cell, public Displayer {

@@ -1,5 +1,5 @@
 #include "GameElements/Camp.hpp"
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 #include <memory>
 
 std::shared_ptr<Texture> Camp::sprite_ = nullptr;

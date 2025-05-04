@@ -1,7 +1,7 @@
 #include "Displayer.hpp"
-#include "Point.hpp"
+#include "SDLWrappers/Coords/Point.hpp"
 #include "BlitTarget.hpp"
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 
 std::weak_ptr<SDL_Renderer> Displayer::renderer_ = {};
 

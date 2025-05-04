@@ -1,5 +1,5 @@
 #include "GameElements/Castle.hpp"
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 
 std::shared_ptr<Texture> Castle::sprite_ = nullptr;
 

@@ -3,7 +3,7 @@
 
 #include <string>
 #include <memory>
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 #include "HexagonDisplayer.hpp"
 #include "ColorUtils.hpp"
 #include "GameElements/Town.hpp"

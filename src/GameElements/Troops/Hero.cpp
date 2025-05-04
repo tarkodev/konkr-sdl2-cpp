@@ -1,5 +1,5 @@
 #include "GameElements/Troops/Hero.hpp"
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 
 std::shared_ptr<Texture> Hero::sprite_ = nullptr;
 

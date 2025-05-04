@@ -3,7 +3,7 @@
 
 #include "SDL.h"
 #include "GameElements/GameElement.hpp"
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 
 class Troop: public GameElement {
 public:

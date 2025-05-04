@@ -1,5 +1,5 @@
 #include "GameElements/Troops/Bandit.hpp"
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 
 std::shared_ptr<Texture> Bandit::sprite_ = nullptr;
 

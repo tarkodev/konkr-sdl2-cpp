@@ -3,9 +3,9 @@
 
 #include "SDL.h"
 #include "BlitTarget.hpp"
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 #include "Player.hpp"
-#include "Ground.hpp"
+#include "Cells/Grounds/Ground.hpp"
 #include "GameElements/GameElement.hpp"
 #include "FenceDisplayer.hpp"
 #include <unordered_set>

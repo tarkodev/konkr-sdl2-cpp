@@ -1,5 +1,5 @@
 #include "GameElements/Town.hpp"
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 
 std::shared_ptr<Texture> Town::sprite_ = nullptr;
 std::shared_ptr<Texture> Town::selectSprite_ = nullptr;

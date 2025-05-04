@@ -4,8 +4,8 @@
 #include <string>
 #include "SDL.h"
 #include "SDL2/SDL_image.h"
-#include "Rect.hpp"
-#include "Point.hpp"
+#include "SDLWrappers/Coords/Rect.hpp"
+#include "SDLWrappers/Coords/Point.hpp"
 #include "BlitTarget.hpp"
 
 #include <stdexcept>

@@ -5,12 +5,12 @@
 #include "SDL.h"
 #include "ColorUtils.hpp"
 #include "GameMap.hpp"
-#include "Window.hpp"
+#include "SDLWrappers/Renderers/Window.hpp"
 #include "Player.hpp"
 #include "Overlay.hpp"
 #include "MainMenu.hpp"
 #include "MapsMenu.hpp"
-#include "Font.hpp"
+#include "SDLWrappers/Font.hpp"
 #include "MenuBase.hpp"
 
 class Game {

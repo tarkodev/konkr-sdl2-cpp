@@ -1,7 +1,7 @@
 #ifndef CURSOR_HPP
 #define CURSOR_HPP
 
-#include "Point.hpp"
+#include "SDLWrappers/Coords/Point.hpp"
 
 #include "SDL.h"
 #include <unordered_map>

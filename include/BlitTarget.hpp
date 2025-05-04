@@ -2,9 +2,9 @@
 #define BLITTARGET_HPP
 
 #include "SDL.h"
-#include "Point.hpp"
-#include "Size.hpp"
-#include "Rect.hpp"
+#include "SDLWrappers/Coords/Point.hpp"
+#include "SDLWrappers/Coords/Size.hpp"
+#include "SDLWrappers/Coords/Rect.hpp"
 #include <memory>
 
 class Texture;

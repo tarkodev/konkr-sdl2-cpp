@@ -1,5 +1,5 @@
 #include "GameElements/Troops/Pikeman.hpp"
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 #include <memory>
 
 std::shared_ptr<Texture> Pikeman::sprite_ = nullptr;

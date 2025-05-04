@@ -6,7 +6,7 @@
 #include "GameElements/Troops/Hero.hpp"
 #include "GameElements/Castle.hpp"
 #include "GameMap.hpp"
-#include "Cursor.hpp"
+#include "SDLWrappers/Cursor.hpp"
 #include <stdexcept>
 
 Overlay::Overlay(const Point& pos) : Displayer(pos) {

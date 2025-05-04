@@ -3,9 +3,9 @@
 
 #include <memory>
 #include "SDL.h"
-#include "Size.hpp"
+#include "SDLWrappers/Coords/Size.hpp"
 #include "BlitTarget.hpp"
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 #include "Checker.hpp"
 
 // To free window memory on closing

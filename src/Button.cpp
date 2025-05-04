@@ -1,7 +1,7 @@
 // Button.cpp
 #include "Button.hpp"
 #include "SDL.h"
-#include "Cursor.hpp"
+#include "SDLWrappers/Cursor.hpp"
 
 Button::Button(const Point& pos, const std::string& normal, const std::string& hover, const std::string& pressed)
     : Displayer(pos)

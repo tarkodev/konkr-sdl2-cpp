@@ -1,5 +1,5 @@
 #include "GameElements/Troops/Knight.hpp"
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 
 std::shared_ptr<Texture> Knight::sprite_ = nullptr;
 

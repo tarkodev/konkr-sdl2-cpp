@@ -1,7 +1,7 @@
 #ifndef WATER_HPP
 #define WATER_HPP
 
-#include "Cell.hpp"
+#include "Cells/Cell.hpp"
 
 class Water: public Cell {
 public:

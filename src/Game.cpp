@@ -1,12 +1,12 @@
 #include "Game.hpp"
 #include "HexagonUtils.hpp"
 #include "HexagonGrid.hpp"
-#include "Texture.hpp"
-#include "Water.hpp"
-#include "Ground.hpp"
-#include "PlayableGround.hpp"
-#include "PlayableGround.hpp"
-#include "Forest.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
+#include "Cells/Water.hpp"
+#include "Cells/Grounds/Ground.hpp"
+#include "Cells/Grounds/PlayableGround.hpp"
+#include "Cells/Grounds/PlayableGround.hpp"
+#include "Cells/Grounds/Forest.hpp"
 #include <iostream>
 #include <stdexcept>
 #include "GameElements/Troops/Bandit.hpp"
@@ -18,10 +18,10 @@
 #include "GameElements/Troops/Knight.hpp"
 #include "GameElements/Troops/Hero.hpp"
 #include "Button.hpp"
-#include "Font.hpp"
+#include "SDLWrappers/Font.hpp"
 #include "Displayer.hpp"
 #include "TreasuryDisplayer.hpp"
-#include "Cursor.hpp"
+#include "SDLWrappers/Cursor.hpp"
 
 #include <memory>
 #include <vector>

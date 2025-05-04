@@ -1,6 +1,6 @@
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 #include "ColorUtils.hpp"
-#include "Point.hpp"
+#include "SDLWrappers/Coords/Point.hpp"
 #include "RenderTargetGuard.hpp"
 #include <sstream>
 #include "Checker.hpp"

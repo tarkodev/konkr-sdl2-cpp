@@ -1,5 +1,5 @@
-#include "PlayableGround.hpp"
-#include "Cell.hpp"
+#include "Cells/Grounds/PlayableGround.hpp"
+#include "Cells/Cell.hpp"
 #include "ColorUtils.hpp"
 #include "GameElements/Castle.hpp"
 #include "GameElements/Camp.hpp"

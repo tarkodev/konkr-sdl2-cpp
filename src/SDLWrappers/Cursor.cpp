@@ -1,5 +1,5 @@
 #include "SDL.h"
-#include "Cursor.hpp"
+#include "SDLWrappers/Cursor.hpp"
 #include <stdexcept>
 #include <unordered_map>
 #include <string>

@@ -1,6 +1,6 @@
 #include "SDL.h"
-#include "Point.hpp"
-#include "Size.hpp"
+#include "SDLWrappers/Coords/Point.hpp"
+#include "SDLWrappers/Coords/Size.hpp"
 
 #include <iostream>
 

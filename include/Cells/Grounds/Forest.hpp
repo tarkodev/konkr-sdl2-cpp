@@ -2,10 +2,10 @@
 #define FOREST_HPP
 
 #include "SDL.h"
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 #include "BlitTarget.hpp"
 #include "Player.hpp"
-#include "PlayableGround.hpp"
+#include "Cells/Grounds/PlayableGround.hpp"
 
 class Forest: public Ground {
 public:

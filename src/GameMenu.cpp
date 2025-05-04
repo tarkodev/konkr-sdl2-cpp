@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 #include "Checker.hpp"
-#include "Cursor.hpp"
+#include "SDLWrappers/Cursor.hpp"
 #include "MapsMenu.hpp"
 
 GameMenu::GameMenu(const std::shared_ptr<Window>& window, const std::string& mapPath): MenuBase{window} {

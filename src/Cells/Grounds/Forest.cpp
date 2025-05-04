@@ -1,5 +1,5 @@
-#include "Forest.hpp"
-#include "Cell.hpp"
+#include "Cells/Grounds/Forest.hpp"
+#include "Cells/Cell.hpp"
 #include "ColorUtils.hpp"
 
 std::shared_ptr<Texture> Forest::forest_ = nullptr;

@@ -5,7 +5,7 @@
 #include <memory>
 #include "SDL.h"
 #include "SDL2/SDL_ttf.h"
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 
 /**
  * @brief Encapsulation de TTF_Font similaire à pygame.font.Font

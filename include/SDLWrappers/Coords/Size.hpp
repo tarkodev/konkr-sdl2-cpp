@@ -2,7 +2,7 @@
 #define SIZE_HPP
 
 #include "SDL.h"
-#include "Point.hpp"
+#include "SDLWrappers/Coords/Point.hpp"
 
 #include <algorithm>
 
