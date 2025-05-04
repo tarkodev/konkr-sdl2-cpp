@@ -19,8 +19,8 @@ void Town::init()
         throw std::runtime_error("Displayer not initialized");
 
     if (sprite_) return;
-    sprite_ = std::make_shared<Texture>(renderer_, "../assets/img/town.png");
-    selectSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/bgtown.png");
+    sprite_ = std::make_shared<Texture>(renderer_, "../assets/img/builds/town.png");
+    selectSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/builds/bgtown.png");
 }
 
 void Town::quit()

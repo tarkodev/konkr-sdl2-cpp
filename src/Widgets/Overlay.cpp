@@ -10,25 +10,25 @@
 #include <stdexcept>
 
 Overlay::Overlay(const Point& pos) : Displayer(pos) {
-    bg_ = std::make_shared<Texture>(renderer_, "../assets/img/overlay.png");
+    bg_ = std::make_shared<Texture>(renderer_, "../assets/img/shop/overlay.png");
     size_ = bg_->getSize();
     bgPos_ = pos_ - size_ / 2;
 
     // Back button
-    backBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/back_btn.png", "../assets/img/back_btn_hover.png", "../assets/img/back_btn_pressed.png");
+    backBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/buttons/back_btn.png", "../assets/img/buttons/back_btn_hover.png", "../assets/img/buttons/back_btn_pressed.png");
     backBtn_->setCallback([this]() { backRequested_ = true; });
 
     // Trun button
-    turnBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/turn_btn.png", "../assets/img/turn_btn_hover.png", "../assets/img/turn_btn_pressed.png");
+    turnBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/buttons/turn_btn.png", "../assets/img/buttons/turn_btn_hover.png", "../assets/img/buttons/turn_btn_pressed.png");
     turnBtn_->setCallback([this]() { turnRequested_ = true; });
 
     // Sprites of buyables troops
     struct Entry { const char troop; const char* noBuy; const char* buy; } spritePaths[] = {
-        {'V', "../assets/img/villager_no_buy.png", "../assets/img/villager_buy.png"},
-        {'P', "../assets/img/pikeman_no_buy.png",  "../assets/img/pikeman_buy.png"},
-        {'K', "../assets/img/knight_no_buy.png",  "../assets/img/knight_buy.png"},
-        {'H', "../assets/img/hero_no_buy.png",    "../assets/img/hero_buy.png"},
-        {'C', "../assets/img/castle_no_buy.png",  "../assets/img/castle_buy.png"}
+        {'V', "../assets/img/shop/villager_no_buy.png", "../assets/img/shop/villager_buy.png"},
+        {'P', "../assets/img/shop/pikeman_no_buy.png",  "../assets/img/shop/pikeman_buy.png"},
+        {'K', "../assets/img/shop/knight_no_buy.png",  "../assets/img/shop/knight_buy.png"},
+        {'H', "../assets/img/shop/hero_no_buy.png",    "../assets/img/shop/hero_buy.png"},
+        {'C', "../assets/img/shop/castle_no_buy.png",  "../assets/img/shop/castle_buy.png"}
     };
 
     for (auto& path : spritePaths) {

@@ -18,7 +18,7 @@ void Hero::init()
         throw std::runtime_error("Displayer not initialized");
         
     if (sprite_) return;
-    sprite_ = std::make_shared<Texture>(renderer_, "../assets/img/hero.png");
+    sprite_ = std::make_shared<Texture>(renderer_, "../assets/img/troops/hero.png");
 }
 
 void Hero::quit()

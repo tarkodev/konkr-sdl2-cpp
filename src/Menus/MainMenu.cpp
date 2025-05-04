@@ -13,20 +13,20 @@ MainMenu::MainMenu(const std::shared_ptr<Window>& window): MenuBase{window} {
     logo_ = std::make_shared<Texture>(window_->getRenderer(), "../assets/img/logo.png");
 
     // Expedition button
-    expeditionBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/expeditions.png", "../assets/img/expeditions_hover.png");
+    expeditionBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/buttons/expeditions.png", "../assets/img/buttons/expeditions_hover.png");
     expeditionBtn_->setCallback([this]() {
         loop_ = false;
         nextMenu_ = std::make_shared<MapsMenu>(window_);
     });
 
     // How to play button
-    howToPlayBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/howtoplay.png", "../assets/img/howtoplay_hover.png");
+    howToPlayBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/buttons/howtoplay.png", "../assets/img/buttons/howtoplay_hover.png");
     howToPlayBtn_->setCallback([]() {
         SDL_Check(SDL_OpenURL("https://www.konkr.io/how-to-play/"), "SDL_OpenURL");
     });
 
     // Quit button
-    exitBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/exit.png", "../assets/img/exit_hover.png");
+    exitBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/buttons/exit.png", "../assets/img/buttons/exit_hover.png");
     exitBtn_->setCallback([this]() {
         loop_ = false;
     });

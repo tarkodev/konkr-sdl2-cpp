@@ -28,7 +28,7 @@ GameMenu::GameMenu(const std::shared_ptr<Window>& window, const std::string& map
     finishTex_ = std::make_shared<Texture>(window_->getRenderer(), "../assets/img/win.png");
 
     // Create finish game button
-    finishBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/finish_btn.png", "../assets/img/finish_btn_hover.png", "../assets/img/finish_btn_pressed.png");
+    finishBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/buttons/finish_btn.png", "../assets/img/buttons/finish_btn_hover.png", "../assets/img/buttons/finish_btn_pressed.png");
     finishBtn_->setPos(windowSize_ / 2 + Point{0, (finishTex_->getHeight() + finishBtn_->getHeight()) / 2});
     finishBtn_->setCallback([this]() {
         nextMenu_ = std::make_shared<MapsMenu>(window_);

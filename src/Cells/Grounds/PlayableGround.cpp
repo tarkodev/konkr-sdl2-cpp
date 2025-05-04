@@ -31,18 +31,18 @@ void PlayableGround::init() {
         throw std::runtime_error("Displayer not initialized");
 
     // Load fence
-    std::shared_ptr<Texture> fenceTop = std::make_shared<Texture>(renderer_, "../assets/img/fence_top.png");
-    std::shared_ptr<Texture> fenceTopLeft = std::make_shared<Texture>(renderer_, "../assets/img/fence_top_left.png");
-    std::shared_ptr<Texture> fenceTopRight = std::make_shared<Texture>(renderer_, "../assets/img/fence_top_right.png");
-    std::shared_ptr<Texture> fenceBottom = std::make_shared<Texture>(renderer_, "../assets/img/fence_bottom.png");
-    std::shared_ptr<Texture> fenceBottomLeft = std::make_shared<Texture>(renderer_, "../assets/img/fence_bottom_left.png");
-    std::shared_ptr<Texture> fenceBottomRight = std::make_shared<Texture>(renderer_, "../assets/img/fence_bottom_right.png");
-    std::shared_ptr<Texture> fenceLinkTop = std::make_shared<Texture>(renderer_, "../assets/img/fence_link_top.png");
-    std::shared_ptr<Texture> fenceLinkTopLeft = std::make_shared<Texture>(renderer_, "../assets/img/fence_link_top_left.png");
-    std::shared_ptr<Texture> fenceLinkTopRight = std::make_shared<Texture>(renderer_, "../assets/img/fence_link_top_right.png");
-    std::shared_ptr<Texture> fenceLinkBottom = std::make_shared<Texture>(renderer_, "../assets/img/fence_link_bottom.png");
-    std::shared_ptr<Texture> fenceLinkBottomLeft = std::make_shared<Texture>(renderer_, "../assets/img/fence_link_bottom_left.png");
-    std::shared_ptr<Texture> fenceLinkBottomRight = std::make_shared<Texture>(renderer_, "../assets/img/fence_link_bottom_right.png");
+    std::shared_ptr<Texture> fenceTop = std::make_shared<Texture>(renderer_, "../assets/img/fences/fence_top.png");
+    std::shared_ptr<Texture> fenceTopLeft = std::make_shared<Texture>(renderer_, "../assets/img/fences/fence_top_left.png");
+    std::shared_ptr<Texture> fenceTopRight = std::make_shared<Texture>(renderer_, "../assets/img/fences/fence_top_right.png");
+    std::shared_ptr<Texture> fenceBottom = std::make_shared<Texture>(renderer_, "../assets/img/fences/fence_bottom.png");
+    std::shared_ptr<Texture> fenceBottomLeft = std::make_shared<Texture>(renderer_, "../assets/img/fences/fence_bottom_left.png");
+    std::shared_ptr<Texture> fenceBottomRight = std::make_shared<Texture>(renderer_, "../assets/img/fences/fence_bottom_right.png");
+    std::shared_ptr<Texture> fenceLinkTop = std::make_shared<Texture>(renderer_, "../assets/img/fences/fence_link_top.png");
+    std::shared_ptr<Texture> fenceLinkTopLeft = std::make_shared<Texture>(renderer_, "../assets/img/fences/fence_link_top_left.png");
+    std::shared_ptr<Texture> fenceLinkTopRight = std::make_shared<Texture>(renderer_, "../assets/img/fences/fence_link_top_right.png");
+    std::shared_ptr<Texture> fenceLinkBottom = std::make_shared<Texture>(renderer_, "../assets/img/fences/fence_link_bottom.png");
+    std::shared_ptr<Texture> fenceLinkBottomLeft = std::make_shared<Texture>(renderer_, "../assets/img/fences/fence_link_bottom_left.png");
+    std::shared_ptr<Texture> fenceLinkBottomRight = std::make_shared<Texture>(renderer_, "../assets/img/fences/fence_link_bottom_right.png");
 
     // Set displayer of territory
     fenceDisplayer_ = FenceDisplayer{Ground::getRadius(), 
@@ -53,17 +53,17 @@ void PlayableGround::init() {
     };
 
     // Load sprites of shields
-    shieldSprites_.push_back(std::make_shared<Texture>(renderer_, "../assets/img/shield1.png"));
-    shieldSprites_.push_back(std::make_shared<Texture>(renderer_, "../assets/img/shield2.png"));
-    shieldSprites_.push_back(std::make_shared<Texture>(renderer_, "../assets/img/shield3.png"));
-    shieldSprites_.push_back(std::make_shared<Texture>(renderer_, "../assets/img/shield3.png"));
+    shieldSprites_.push_back(std::make_shared<Texture>(renderer_, "../assets/img/shields/shield1.png"));
+    shieldSprites_.push_back(std::make_shared<Texture>(renderer_, "../assets/img/shields/shield2.png"));
+    shieldSprites_.push_back(std::make_shared<Texture>(renderer_, "../assets/img/shields/shield3.png"));
+    shieldSprites_.push_back(std::make_shared<Texture>(renderer_, "../assets/img/shields/shield3.png"));
 
     // Load cross
-    crossSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/cross.png");
+    crossSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/gameelements/cross.png");
 
     // Load selectable sprite
-    smallSelectableSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/small_selectable.png");
-    selectableSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/selectable.png");
+    smallSelectableSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/gameelements/small_selectable.png");
+    selectableSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/gameelements/selectable.png");
     smallSelectableSprite_->colorize(ColorUtils::YELLOW);
     selectableSprite_->colorize(ColorUtils::YELLOW);
 }

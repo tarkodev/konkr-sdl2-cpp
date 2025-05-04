@@ -14,11 +14,11 @@ void Player::init(const std::shared_ptr<SDL_Renderer>& renderer) {
         throw std::runtime_error("Renderer isn't initialized.");
 
     // Load plate
-    std::shared_ptr<Texture> plate = std::make_shared<Texture>(renderer, "../assets/img/plate.png");
-    std::shared_ptr<Texture> plateLink = std::make_shared<Texture>(renderer, "../assets/img/plate_link.png");
-    std::shared_ptr<Texture> plateLinkBottomLeft = std::make_shared<Texture>(renderer, "../assets/img/plate_link_bottom_left.png");
-    std::shared_ptr<Texture> plateLinkBottom = std::make_shared<Texture>(renderer, "../assets/img/plate_link_bottom.png");
-    std::shared_ptr<Texture> plateLinkBottomRight = std::make_shared<Texture>(renderer, "../assets/img/plate_link_bottom_right.png");
+    std::shared_ptr<Texture> plate = std::make_shared<Texture>(renderer, "../assets/img/plate/plate.png");
+    std::shared_ptr<Texture> plateLink = std::make_shared<Texture>(renderer, "../assets/img/plate/plate_link.png");
+    std::shared_ptr<Texture> plateLinkBottomLeft = std::make_shared<Texture>(renderer, "../assets/img/plate/plate_link_bottom_left.png");
+    std::shared_ptr<Texture> plateLinkBottom = std::make_shared<Texture>(renderer, "../assets/img/plate/plate_link_bottom.png");
+    std::shared_ptr<Texture> plateLinkBottomRight = std::make_shared<Texture>(renderer, "../assets/img/plate/plate_link_bottom_right.png");
 
     plateDisplayer_ = HexagonDisplayer{Ground::getRadius(), plate, plateLink, plateLinkBottomLeft, plateLinkBottom, plateLinkBottomRight};
 }

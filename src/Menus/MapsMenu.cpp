@@ -71,7 +71,7 @@ MapsMenu::MapsMenu(const std::shared_ptr<Window>& window) : MenuBase{window}
     }
 
     // Add back button
-    buttons_.emplace_back(Point{0, 0}, "../assets/img/back_btn.png", "../assets/img/back_btn_hover.png", "../assets/img/back_btn_pressed.png");
+    buttons_.emplace_back(Point{0, 0}, "../assets/img/buttons/back_btn.png", "../assets/img/buttons/back_btn_hover.png", "../assets/img/buttons/back_btn_pressed.png");
     auto& backBtn = buttons_.back();
     backBtn.setPos(Point{window_->getWidth() / 8, window_->getHeight() - backBtn.getHeight() - 10});
     backBtn.setCallback([this, window](){

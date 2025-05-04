@@ -22,11 +22,11 @@ void Ground::init() {
         throw std::runtime_error("Displayer not initialized");
 
     // Load island
-    std::shared_ptr<Texture> island = std::make_shared<Texture>(renderer_, "../assets/img/hexagon.png");
-    std::shared_ptr<Texture> link = std::make_shared<Texture>(renderer_, "../assets/img/hexagon_link.png");
-    std::shared_ptr<Texture> linkBottomLeft = std::make_shared<Texture>(renderer_, "../assets/img/hexagon_link_bottom_left.png");
-    std::shared_ptr<Texture> linkBottom = std::make_shared<Texture>(renderer_, "../assets/img/hexagon_link_bottom.png");
-    std::shared_ptr<Texture> linkBottomRight = std::make_shared<Texture>(renderer_, "../assets/img/hexagon_link_bottom_right.png");
+    std::shared_ptr<Texture> island = std::make_shared<Texture>(renderer_, "../assets/img/island/hexagon.png");
+    std::shared_ptr<Texture> link = std::make_shared<Texture>(renderer_, "../assets/img/island/hexagon_link.png");
+    std::shared_ptr<Texture> linkBottomLeft = std::make_shared<Texture>(renderer_, "../assets/img/island/hexagon_link_bottom_left.png");
+    std::shared_ptr<Texture> linkBottom = std::make_shared<Texture>(renderer_, "../assets/img/island/hexagon_link_bottom.png");
+    std::shared_ptr<Texture> linkBottomRight = std::make_shared<Texture>(renderer_, "../assets/img/island/hexagon_link_bottom_right.png");
 
     // Get radius of hexagon of island
     islandInnerRadius_ = island->getWidth() / 2;

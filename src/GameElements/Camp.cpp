@@ -19,7 +19,7 @@ void Camp::init()
         throw std::runtime_error("Displayer not initialized");
         
     if (sprite_) return;
-    sprite_ = std::make_shared<Texture>(renderer_, "../assets/img/camp.png");
+    sprite_ = std::make_shared<Texture>(renderer_, "../assets/img/builds/camp.png");
 }
 
 void Camp::quit()

@@ -15,7 +15,7 @@ bool Forest::is(const std::weak_ptr<Cell>& obj) {
 }
 
 void Forest::init() {
-    forest_ = std::make_shared<Texture>(renderer_, "../assets/img/forest.png");
+    forest_ = std::make_shared<Texture>(renderer_, "../assets/img/gameelements/forest.png");
 }
 
 void Forest::quit() {

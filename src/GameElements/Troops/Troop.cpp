@@ -19,8 +19,8 @@ void Troop::init() {
         throw std::runtime_error("Displayer not initialized");
 
     if (shadow_) return;
-    shadow_ = std::make_shared<Texture>(renderer_, "../assets/img/shadow.png");
-    lostSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/lost.png");
+    shadow_ = std::make_shared<Texture>(renderer_, "../assets/img/troops/shadow.png");
+    lostSprite_ = std::make_shared<Texture>(renderer_, "../assets/img/troops/lost.png");
 }
 
 void Troop::quit() {

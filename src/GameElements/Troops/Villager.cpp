@@ -18,7 +18,7 @@ void Villager::init()
         throw std::runtime_error("Displayer not initialized");
 
     if (sprite_) return;
-    sprite_ = std::make_shared<Texture>(renderer_, "../assets/img/villager.png");
+    sprite_ = std::make_shared<Texture>(renderer_, "../assets/img/troops/villager.png");
 }
 
 void Villager::quit()

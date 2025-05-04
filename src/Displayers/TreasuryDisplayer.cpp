@@ -10,7 +10,7 @@ void TreasuryDisplayer::init() {
         throw std::runtime_error("Displayer not initialized");
 
     // Load bg
-    bg_ = std::make_shared<Texture>(lrenderer, "../assets/img/treasury_bg.png");
+    bg_ = std::make_shared<Texture>(lrenderer, "../assets/img/builds/treasury_bg.png");
 
     // Load Font
     font_ = std::make_shared<Font>(lrenderer, "../assets/fonts/Inter/static/Inter_18pt-SemiBold.ttf", 25);
