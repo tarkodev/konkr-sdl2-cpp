@@ -5,42 +5,78 @@
 #include "GameMenu.hpp"
 #include "Checker.hpp"
 #include "Cursor.hpp"
+#include <filesystem>
 
-static const struct { const char* label; const char* file; } MAPS[] = {
-    {"Ten Paces",   "../assets/map/Ten Paces.txt"},
-    {"Unity",       "../assets/map/Unity.txt"},
-};
+namespace fs = std::filesystem;
 
 MapsMenu::MapsMenu(const std::shared_ptr<Window>& window) : MenuBase{window}
 {
-    // Create map buttons
+    // 1) Récupère la liste des maps en scannant le dossier
+    const fs::path mapsDir   = "../assets/map/";
+    const fs::path imagesDir = "../assets/img/map/";
+    std::vector<std::string> mapNames;
+
+    // Check dir exists
+    if (!fs::exists(mapsDir) || !fs::is_directory(mapsDir))
+        throw std::runtime_error("Dossier de maps introuvable : " + mapsDir.string());
+
+    // Get names of files
+    for (auto& entry : fs::directory_iterator(mapsDir)) {
+        if (!entry.is_regular_file()) continue;
+        const fs::path& path = entry.path();
+        if (path.extension() != ".ascii") continue;
+
+        auto stem = path.stem().string();
+        mapNames.push_back(stem);
+    }
+    if (mapNames.empty())
+        throw std::runtime_error("Aucune map trouvée dans " + mapsDir.string());
+
+    // Init pos of Map
     Point pos = window_->getSize() / 2;
-    for (auto& map : MAPS){
-        buttons_.emplace_back(Point{0, 0}, std::string("../assets/img/map/")+map.label+".png");
+
+    for (auto const& name : mapNames) {
+        // File of map
+        std::string mapFile = (mapsDir / (name + ".ascii")).string();
+
+        // Verify if image exists
+        fs::path imgPath = imagesDir / (name + ".png");
+        if (!fs::exists(imgPath))
+            imgPath = imagesDir / "unknown_map.png";
+
+        // Create button
+        buttons_.emplace_back(
+            Point{0, 0},
+            imgPath.string()
+        );
         auto& btn = buttons_.back();
-        btn.setCallback([this, map](){
-            nextMenu_ = std::make_shared<GameMenu>(window_, map.file);
+
+        // Callback to go to the map
+        btn.setCallback([this, window, mapFile](){
+            nextMenu_ = std::make_shared<GameMenu>(window, mapFile);
             loop_ = false;
         });
 
         pos.addX(-btn.getWidth() / 2);
     }
 
-    // Set pos of buttons
-    for (auto& button : buttons_) {
-        int cbtn = button.getWidth() / 2;
-        pos.addX(cbtn);
-        button.setPos(pos);
-        pos.addX(cbtn);
+    // Set pos of maps
+    pos = window_->getSize() / 2;
+    for (auto& btn : buttons_)
+        pos.addX(-btn.getWidth() / 2);
+    for (auto& btn : buttons_) {
+        pos.addX(btn.getWidth() / 2);
+        btn.setPos(pos);
+        pos.addX(btn.getWidth() / 2);
     }
 
-    // Back button
+    // Add back button
     buttons_.emplace_back(Point{0, 0}, "../assets/img/back_btn.png", "../assets/img/back_btn_hover.png", "../assets/img/back_btn_pressed.png");
     auto& backBtn = buttons_.back();
-    backBtn.setPos(Point{window_->getWidth() / 8, window_->getHeight() - backBtn.getHeight()});
-    backBtn.setCallback([this](){
+    backBtn.setPos(Point{window_->getWidth() / 8, window_->getHeight() - backBtn.getHeight() - 10});
+    backBtn.setCallback([this, window](){
         loop_ = false;
-        nextMenu_ = std::make_shared<MainMenu>(window_);
+        nextMenu_ = std::make_shared<MainMenu>(window);
     });
 }
 
