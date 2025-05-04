@@ -1,7 +1,7 @@
 #ifndef UNIT_KNIGHT_HPP
 #define UNIT_KNIGHT_HPP
 
-#include "BlitTarget.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
 #include "GameElements/Troops/Troop.hpp"
 
 class Knight : public Troop {

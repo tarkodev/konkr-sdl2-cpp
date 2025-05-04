@@ -2,11 +2,11 @@
 #define GROUND_HPP
 
 #include "SDL.h"
-#include "BlitTarget.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
 #include "SDLWrappers/Renderers/Texture.hpp"
-#include "Displayer.hpp"
-#include "HexagonDisplayer.hpp"
-#include "Player.hpp"
+#include "Displayers/Displayer.hpp"
+#include "Displayers/HexagonDisplayer.hpp"
+#include "GameElements/Player.hpp"
 #include "Cells/Cell.hpp"
 #include <memory>
 

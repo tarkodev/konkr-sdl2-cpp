@@ -6,7 +6,7 @@
 #include "SDL2/SDL_image.h"
 #include "SDLWrappers/Coords/Rect.hpp"
 #include "SDLWrappers/Coords/Point.hpp"
-#include "BlitTarget.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
 
 #include <stdexcept>
 #include <memory>

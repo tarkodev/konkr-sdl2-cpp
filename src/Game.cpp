@@ -1,6 +1,6 @@
 #include "Game.hpp"
-#include "HexagonUtils.hpp"
-#include "HexagonGrid.hpp"
+#include "Utils/HexagonUtils.hpp"
+#include "Widgets/HexagonGrid.hpp"
 #include "SDLWrappers/Renderers/Texture.hpp"
 #include "Cells/Water.hpp"
 #include "Cells/Grounds/Ground.hpp"
@@ -17,10 +17,10 @@
 #include "GameElements/Troops/Pikeman.hpp"
 #include "GameElements/Troops/Knight.hpp"
 #include "GameElements/Troops/Hero.hpp"
-#include "Button.hpp"
+#include "Widgets/Button.hpp"
 #include "SDLWrappers/Font.hpp"
-#include "Displayer.hpp"
-#include "TreasuryDisplayer.hpp"
+#include "Displayers/Displayer.hpp"
+#include "Displayers/TreasuryDisplayer.hpp"
 #include "SDLWrappers/Cursor.hpp"
 
 #include <memory>

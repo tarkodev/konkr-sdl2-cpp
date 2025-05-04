@@ -1,7 +1,7 @@
 #ifndef UNIT_BANDIT_HPP
 #define UNIT_BANDIT_HPP
 
-#include "BlitTarget.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
 #include "GameElements/Troops/Troop.hpp"
 
 class Bandit : public Troop {

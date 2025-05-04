@@ -1,7 +1,7 @@
 #ifndef UNIT_VILLAGER_HPP
 #define UNIT_VILLAGER_HPP
 
-#include "BlitTarget.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
 #include "GameElements/Troops/Troop.hpp"
 
 class Villager : public Troop {

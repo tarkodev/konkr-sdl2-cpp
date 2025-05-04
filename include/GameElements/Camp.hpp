@@ -1,9 +1,9 @@
 #ifndef UNIT_CAMP_HPP
 #define UNIT_CAMP_HPP
 
-#include "BlitTarget.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
 #include "GameElements/GameElement.hpp"
-#include "TreasuryDisplayer.hpp"
+#include "Displayers/TreasuryDisplayer.hpp"
 
 class Camp : public GameElement {
 public:

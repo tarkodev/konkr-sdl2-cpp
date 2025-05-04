@@ -86,12 +86,15 @@ set(SRC_FILES
     "${CMAKE_SOURCE_DIR}/src/SDLWrappers/Coords/Rect.cpp"
     
     "${CMAKE_SOURCE_DIR}/src/SDLWrappers/Renderers/Texture.cpp"
+    "${CMAKE_SOURCE_DIR}/src/SDLWrappers/Renderers/RenderTargetGuard.cpp"
     "${CMAKE_SOURCE_DIR}/src/SDLWrappers/Renderers/Window.cpp"
 
-    "${CMAKE_SOURCE_DIR}/src/Displayer.cpp"
-    "${CMAKE_SOURCE_DIR}/src/HexagonDisplayer.cpp"
-    "${CMAKE_SOURCE_DIR}/src/FenceDisplayer.cpp"
-    "${CMAKE_SOURCE_DIR}/src/TreasuryDisplayer.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Displayers/Displayer.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Displayers/HexagonDisplayer.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Displayers/FenceDisplayer.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Displayers/TreasuryDisplayer.cpp"
+
+    "${CMAKE_SOURCE_DIR}/src/GameElements/Player.cpp"
     
     "${CMAKE_SOURCE_DIR}/src/GameElements/GameElement.cpp"
     "${CMAKE_SOURCE_DIR}/src/GameElements/Town.cpp"
@@ -110,18 +113,17 @@ set(SRC_FILES
     "${CMAKE_SOURCE_DIR}/src/Cells/Grounds/Ground.cpp"
     "${CMAKE_SOURCE_DIR}/src/Cells/Grounds/PlayableGround.cpp"
     "${CMAKE_SOURCE_DIR}/src/Cells/Grounds/Forest.cpp"
+    
+    "${CMAKE_SOURCE_DIR}/src/Widgets/Button.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Widgets/HexagonGrid.tpp"
+    "${CMAKE_SOURCE_DIR}/src/Widgets/GameMap.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Widgets/Overlay.cpp"
 
-    "${CMAKE_SOURCE_DIR}/src/Player.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Menus/MenuBase.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Menus/MainMenu.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Menus/MapsMenu.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Menus/GameMenu.cpp"
     
-    "${CMAKE_SOURCE_DIR}/src/HexagonGrid.tpp"
-    "${CMAKE_SOURCE_DIR}/src/GameMap.cpp"
-    
-    "${CMAKE_SOURCE_DIR}/src/Button.cpp"
-    "${CMAKE_SOURCE_DIR}/src/Overlay.cpp"
-    "${CMAKE_SOURCE_DIR}/src/MenuBase.cpp"
-    "${CMAKE_SOURCE_DIR}/src/MainMenu.cpp"
-    "${CMAKE_SOURCE_DIR}/src/MapsMenu.cpp"
-    "${CMAKE_SOURCE_DIR}/src/GameMenu.cpp"
     "${CMAKE_SOURCE_DIR}/src/Game.cpp"
     "${CMAKE_SOURCE_DIR}/src/main.cpp"
 )

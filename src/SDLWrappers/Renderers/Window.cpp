@@ -1,8 +1,8 @@
 #include "SDLWrappers/Renderers/Window.hpp"
 #include "SDL.h"
 #include "SDL2/SDL_ttf.h"
-#include "RenderTargetGuard.hpp"
-#include "Checker.hpp"
+#include "SDLWrappers/Renderers/RenderTargetGuard.hpp"
+#include "Utils/Checker.hpp"
 
 #include <stdexcept>
 #include <memory>

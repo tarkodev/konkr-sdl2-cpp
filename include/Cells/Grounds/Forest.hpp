@@ -3,8 +3,8 @@
 
 #include "SDL.h"
 #include "SDLWrappers/Renderers/Texture.hpp"
-#include "BlitTarget.hpp"
-#include "Player.hpp"
+#include "SDLWrappers/Renderers/BlitTarget.hpp"
+#include "GameElements/Player.hpp"
 #include "Cells/Grounds/PlayableGround.hpp"
 
 class Forest: public Ground {
