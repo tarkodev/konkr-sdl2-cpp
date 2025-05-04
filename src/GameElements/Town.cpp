@@ -1,4 +1,4 @@
-#include "logic/units/Town.hpp"
+#include "GameElements/Town.hpp"
 #include "Texture.hpp"
 
 std::shared_ptr<Texture> Town::sprite_ = nullptr;

@@ -1,4 +1,4 @@
-#include "logic/units/Camp.hpp"
+#include "GameElements/Camp.hpp"
 #include "Texture.hpp"
 #include <memory>
 

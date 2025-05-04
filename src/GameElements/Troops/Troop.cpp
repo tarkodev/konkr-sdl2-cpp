@@ -1,4 +1,4 @@
-#include "logic/Troop.hpp"
+#include "GameElements/Troops/Troop.hpp"
 #include <memory>
 #include <cmath>
 

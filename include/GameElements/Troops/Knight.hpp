@@ -1,19 +1,19 @@
-#ifndef UNIT_PIKEMAN_HPP
-#define UNIT_PIKEMAN_HPP
+#ifndef UNIT_KNIGHT_HPP
+#define UNIT_KNIGHT_HPP
 
 #include "BlitTarget.hpp"
-#include "logic/Troop.hpp"
+#include "GameElements/Troops/Troop.hpp"
 
-class Pikeman : public Troop {
+class Knight : public Troop {
 public:
-    static std::shared_ptr<Pikeman> cast(const std::weak_ptr<GameElement>& obj);
+    static std::shared_ptr<Knight> cast(const std::weak_ptr<GameElement>& obj);
     static bool is(const std::weak_ptr<GameElement>& obj);
-    
+
     /* Chargement des ressources partagées */
     static void init();
     static void quit();
 
-    explicit Pikeman(const Point& pos);
+    explicit Knight(const Point& pos);
 
     /* Displayer */
     void display(const std::weak_ptr<BlitTarget>& target) override;
@@ -24,9 +24,9 @@ public:
     int getUpkeep()   const override { return UPKEEP; };
 
 protected:
-    static constexpr int STRENGTH = 2;
-    static constexpr int COST     = 20;
-    static constexpr int UPKEEP   = 6;
+    static constexpr int STRENGTH = 3;
+    static constexpr int COST     = 40;
+    static constexpr int UPKEEP   = 18;
 
 private:
     static std::shared_ptr<Texture> sprite_;

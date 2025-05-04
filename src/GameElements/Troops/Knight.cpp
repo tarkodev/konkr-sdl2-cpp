@@ -1,4 +1,4 @@
-#include "logic/units/Knight.hpp"
+#include "GameElements/Troops/Knight.hpp"
 #include "Texture.hpp"
 
 std::shared_ptr<Texture> Knight::sprite_ = nullptr;

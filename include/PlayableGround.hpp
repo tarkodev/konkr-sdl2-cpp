@@ -6,7 +6,7 @@
 #include "Texture.hpp"
 #include "Player.hpp"
 #include "Ground.hpp"
-#include "logic/GameElement.hpp"
+#include "GameElements/GameElement.hpp"
 #include "FenceDisplayer.hpp"
 #include <unordered_set>
 #include <queue>

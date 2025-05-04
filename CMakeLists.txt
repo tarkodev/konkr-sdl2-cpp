@@ -88,17 +88,17 @@ set(SRC_FILES
     "${CMAKE_SOURCE_DIR}/src/FenceDisplayer.cpp"
     "${CMAKE_SOURCE_DIR}/src/TreasuryDisplayer.cpp"
     
-    "${CMAKE_SOURCE_DIR}/src/logic/GameElement.cpp"
-    "${CMAKE_SOURCE_DIR}/src/logic/Troop.cpp"
-
-    "${CMAKE_SOURCE_DIR}/src/logic/units/Bandit.cpp"
-    "${CMAKE_SOURCE_DIR}/src/logic/units/Town.cpp"
-    "${CMAKE_SOURCE_DIR}/src/logic/units/Castle.cpp"
-    "${CMAKE_SOURCE_DIR}/src/logic/units/Camp.cpp"
-    "${CMAKE_SOURCE_DIR}/src/logic/units/Villager.cpp"
-    "${CMAKE_SOURCE_DIR}/src/logic/units/Pikeman.cpp"
-    "${CMAKE_SOURCE_DIR}/src/logic/units/Knight.cpp"
-    "${CMAKE_SOURCE_DIR}/src/logic/units/Hero.cpp"
+    "${CMAKE_SOURCE_DIR}/src/GameElements/GameElement.cpp"
+    "${CMAKE_SOURCE_DIR}/src/GameElements/Town.cpp"
+    "${CMAKE_SOURCE_DIR}/src/GameElements/Castle.cpp"
+    "${CMAKE_SOURCE_DIR}/src/GameElements/Camp.cpp"
+    
+    "${CMAKE_SOURCE_DIR}/src/GameElements/Troops/Troop.cpp"
+    "${CMAKE_SOURCE_DIR}/src/GameElements/Troops/Bandit.cpp"
+    "${CMAKE_SOURCE_DIR}/src/GameElements/Troops/Villager.cpp"
+    "${CMAKE_SOURCE_DIR}/src/GameElements/Troops/Pikeman.cpp"
+    "${CMAKE_SOURCE_DIR}/src/GameElements/Troops/Knight.cpp"
+    "${CMAKE_SOURCE_DIR}/src/GameElements/Troops/Hero.cpp"
     
     "${CMAKE_SOURCE_DIR}/src/Cell.cpp"
     "${CMAKE_SOURCE_DIR}/src/Water.cpp"

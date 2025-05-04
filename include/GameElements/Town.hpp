@@ -3,7 +3,7 @@
 
 #include "BlitTarget.hpp"
 #include "TreasuryDisplayer.hpp"
-#include "logic/GameElement.hpp"
+#include "GameElements/GameElement.hpp"
 
 class Town : public GameElement {
 public:

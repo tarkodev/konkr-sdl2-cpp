@@ -6,7 +6,7 @@
 #include "Texture.hpp"
 #include "HexagonDisplayer.hpp"
 #include "ColorUtils.hpp"
-#include "logic/units/Town.hpp"
+#include "GameElements/Town.hpp"
 #include <unordered_set>
 
 class PlayableGround;

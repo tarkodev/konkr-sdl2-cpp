@@ -1,4 +1,4 @@
-#include "logic/units/Hero.hpp"
+#include "GameElements/Troops/Hero.hpp"
 #include "Texture.hpp"
 
 std::shared_ptr<Texture> Hero::sprite_ = nullptr;

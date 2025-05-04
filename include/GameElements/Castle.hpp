@@ -1,19 +1,18 @@
-#ifndef UNIT_KNIGHT_HPP
-#define UNIT_KNIGHT_HPP
+#ifndef UNIT_CASTLE_HPP
+#define UNIT_CASTLE_HPP
 
 #include "BlitTarget.hpp"
-#include "logic/Troop.hpp"
+#include "GameElements/GameElement.hpp"
 
-class Knight : public Troop {
+class Castle : public GameElement {
 public:
-    static std::shared_ptr<Knight> cast(const std::weak_ptr<GameElement>& obj);
-    static bool is(const std::weak_ptr<GameElement>& obj);
-
     /* Chargement des ressources partagées */
     static void init();
     static void quit();
+    static std::shared_ptr<Castle> cast(const std::weak_ptr<GameElement>& obj);
+    static bool is(const std::weak_ptr<GameElement>& obj);
 
-    explicit Knight(const Point& pos);
+    explicit Castle(const Point& pos);
 
     /* Displayer */
     void display(const std::weak_ptr<BlitTarget>& target) override;
@@ -24,9 +23,9 @@ public:
     int getUpkeep()   const override { return UPKEEP; };
 
 protected:
-    static constexpr int STRENGTH = 3;
-    static constexpr int COST     = 40;
-    static constexpr int UPKEEP   = 18;
+    static constexpr int STRENGTH = 2;
+    static constexpr int COST     = 0;
+    static constexpr int UPKEEP   = 0;
 
 private:
     static std::shared_ptr<Texture> sprite_;

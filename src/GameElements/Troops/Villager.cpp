@@ -1,4 +1,4 @@
-#include "logic/units/Villager.hpp"
+#include "GameElements/Troops/Villager.hpp"
 #include "Texture.hpp"
 
 std::shared_ptr<Texture> Villager::sprite_ = nullptr;

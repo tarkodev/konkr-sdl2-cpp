@@ -2,7 +2,7 @@
 #define UNIT_CAMP_HPP
 
 #include "BlitTarget.hpp"
-#include "logic/GameElement.hpp"
+#include "GameElements/GameElement.hpp"
 #include "TreasuryDisplayer.hpp"
 
 class Camp : public GameElement {

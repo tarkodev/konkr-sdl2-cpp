@@ -1,10 +1,10 @@
 #include "PlayableGround.hpp"
 #include "Cell.hpp"
 #include "ColorUtils.hpp"
-#include "logic/units/Castle.hpp"
-#include "logic/units/Camp.hpp"
-#include "logic/units/Bandit.hpp"
-#include "logic/Troop.hpp"
+#include "GameElements/Castle.hpp"
+#include "GameElements/Camp.hpp"
+#include "GameElements/Troops/Bandit.hpp"
+#include "GameElements/Troops/Troop.hpp"
 #include <algorithm>
 #include <ranges>
 #include <queue>
@@ -192,7 +192,6 @@ void PlayableGround::unlink(std::unordered_set<std::shared_ptr<PlayableGround>>&
         troop->lost();
 }
 
-//! check si voisin.owner == null && oldowner = owner
 void PlayableGround::link(const std::weak_ptr<Player>& owner, std::unordered_set<std::shared_ptr<PlayableGround>>& visited) {
     if (visited.find(shared_from_this()) != visited.end()) return;
     visited.insert(shared_from_this());

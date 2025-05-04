@@ -2,7 +2,7 @@
 #define LOGIC_TROOP_HPP
 
 #include "SDL.h"
-#include "logic/GameElement.hpp"
+#include "GameElements/GameElement.hpp"
 #include "Texture.hpp"
 
 class Troop: public GameElement {

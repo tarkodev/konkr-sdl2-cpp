@@ -1,4 +1,4 @@
-#include "logic/units/Bandit.hpp"
+#include "GameElements/Troops/Bandit.hpp"
 #include "Texture.hpp"
 
 std::shared_ptr<Texture> Bandit::sprite_ = nullptr;

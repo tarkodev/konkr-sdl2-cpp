@@ -1,4 +1,4 @@
-#include "logic/units/Castle.hpp"
+#include "GameElements/Castle.hpp"
 #include "Texture.hpp"
 
 std::shared_ptr<Texture> Castle::sprite_ = nullptr;

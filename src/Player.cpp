@@ -1,6 +1,6 @@
 #include "Player.hpp"
 #include "Ground.hpp"
-#include "logic/units/Town.hpp"
+#include "GameElements/Town.hpp"
 #include <stdexcept>
 #include <algorithm>
 #include "PlayableGround.hpp"
