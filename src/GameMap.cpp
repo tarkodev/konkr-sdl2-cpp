@@ -476,7 +476,7 @@ void GameMap::nextPlayer() {
 
     // Start turn of new current player
     startTurn(currentPlayer_);
-    refresh();
+    //!refresh();
 }
 
 void GameMap::startTurn(std::weak_ptr<Player>& player) {
@@ -551,7 +551,7 @@ void GameMap::buyTroop(const std::shared_ptr<GameElement>& elt) {
     }
 
     // Refresh map
-    refresh();
+    //!refresh();
 }
 
 void GameMap::checkDeficits(std::weak_ptr<Player>& player) {
@@ -736,7 +736,7 @@ void GameMap::moveBandits() {
         }
     }
 
-    refresh();
+    //!refresh();
 }
 
 bool GameMap::isMovedTroop(const std::weak_ptr<Troop>& troop) {
@@ -801,7 +801,7 @@ void GameMap::onMouseButtonDown(SDL_Event& event) {
             lselectedCell->setElement(nullptr);
         }
 
-        refresh();
+        //!refresh();
     }
     
     // If Town is pressed, buy villager
@@ -833,7 +833,7 @@ void GameMap::onMouseButtonDown(SDL_Event& event) {
         v->setPos(mousePos);
         lselectedCell->updateSelectable(v->getStrength());
 
-        refresh();
+        //!refresh();
     }
 }
 
@@ -845,11 +845,11 @@ void GameMap::onMouseMotion(SDL_Event& event) {
     // Move selected troop
     if (selectedTroop_) {
         selectedTroop_->setPos(mousePos);
-        refresh();
+        //!refresh();
         return;
     } else if (boughtElt_) {
         boughtElt_->setPos(mousePos);
-        refresh();
+        //!refresh();
         return;
     }
 
@@ -859,7 +859,7 @@ void GameMap::onMouseMotion(SDL_Event& event) {
         auto town = Town::cast(lselectedCell->getElement());
         if (town) townToShowTreasury_ = town;
     }
-    refresh();
+    //!refresh();
 }
 
 void GameMap::onMouseButtonUp(SDL_Event& event) {
@@ -953,13 +953,9 @@ void GameMap::onMouseButtonUp(SDL_Event& event) {
     selectedTroopCell_.reset();
     selectedTroop_.reset();
     boughtElt_.reset();
-    refresh();
+    //!refresh();
 
     updateCursor();
-}
-
-void GameMap::onKeyDown(SDL_Event& event) {
-
 }
 
 void GameMap::handleEvent(SDL_Event &event) {
@@ -973,7 +969,7 @@ void GameMap::handleEvent(SDL_Event &event) {
 void GameMap::display(const std::weak_ptr<BlitTarget>& target)
 {
     // Check initialized calcs
-    if (!calc_) refresh();
+    /*if (!calc_) */refresh();
 
     // Check target
     auto ltarget = target.lock();

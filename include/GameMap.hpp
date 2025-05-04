@@ -113,7 +113,6 @@ private:
     void onMouseButtonDown(SDL_Event& event);
     void onMouseMotion(SDL_Event& event);
     void onMouseButtonUp(SDL_Event& event);
-    void onKeyDown(SDL_Event& event);
 
     void refreshIslands();
     void refreshPlates();
