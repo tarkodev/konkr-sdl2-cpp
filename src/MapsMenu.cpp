@@ -4,7 +4,7 @@
 #include "ColorUtils.hpp"
 #include "GameMenu.hpp"
 #include "Checker.hpp"
-#include "Cursor.hpp"
+#include "SDLWrappers/Cursor.hpp"
 #include <filesystem>
 
 namespace fs = std::filesystem;

@@ -78,39 +78,43 @@ endfunction()
 
 # --- Définition des fichiers sources ---
 set(SRC_FILES 
-    "${CMAKE_SOURCE_DIR}/src/Point.cpp"
-    "${CMAKE_SOURCE_DIR}/src/Size.cpp"
-    "${CMAKE_SOURCE_DIR}/src/Texture.cpp"
-    "${CMAKE_SOURCE_DIR}/src/Cursor.cpp"
-    "${CMAKE_SOURCE_DIR}/src/Font.cpp"
+    "${CMAKE_SOURCE_DIR}/src/SDLWrappers/Cursor.cpp"
+    "${CMAKE_SOURCE_DIR}/src/SDLWrappers/Font.cpp"
+
+    "${CMAKE_SOURCE_DIR}/src/SDLWrappers/Coords/Point.cpp"
+    "${CMAKE_SOURCE_DIR}/src/SDLWrappers/Coords/Size.cpp"
+    "${CMAKE_SOURCE_DIR}/src/SDLWrappers/Coords/Rect.cpp"
+    
+    "${CMAKE_SOURCE_DIR}/src/SDLWrappers/Renderers/Texture.cpp"
+    "${CMAKE_SOURCE_DIR}/src/SDLWrappers/Renderers/Window.cpp"
+
     "${CMAKE_SOURCE_DIR}/src/Displayer.cpp"
     "${CMAKE_SOURCE_DIR}/src/HexagonDisplayer.cpp"
     "${CMAKE_SOURCE_DIR}/src/FenceDisplayer.cpp"
     "${CMAKE_SOURCE_DIR}/src/TreasuryDisplayer.cpp"
     
-    "${CMAKE_SOURCE_DIR}/src/logic/GameElement.cpp"
-    "${CMAKE_SOURCE_DIR}/src/logic/Troop.cpp"
+    "${CMAKE_SOURCE_DIR}/src/GameElements/GameElement.cpp"
+    "${CMAKE_SOURCE_DIR}/src/GameElements/Town.cpp"
+    "${CMAKE_SOURCE_DIR}/src/GameElements/Castle.cpp"
+    "${CMAKE_SOURCE_DIR}/src/GameElements/Camp.cpp"
 
-    "${CMAKE_SOURCE_DIR}/src/logic/units/Bandit.cpp"
-    "${CMAKE_SOURCE_DIR}/src/logic/units/Town.cpp"
-    "${CMAKE_SOURCE_DIR}/src/logic/units/Castle.cpp"
-    "${CMAKE_SOURCE_DIR}/src/logic/units/Camp.cpp"
-    "${CMAKE_SOURCE_DIR}/src/logic/units/Villager.cpp"
-    "${CMAKE_SOURCE_DIR}/src/logic/units/Pikeman.cpp"
-    "${CMAKE_SOURCE_DIR}/src/logic/units/Knight.cpp"
-    "${CMAKE_SOURCE_DIR}/src/logic/units/Hero.cpp"
+    "${CMAKE_SOURCE_DIR}/src/GameElements/Troops/Troop.cpp"
+    "${CMAKE_SOURCE_DIR}/src/GameElements/Troops/Bandit.cpp"
+    "${CMAKE_SOURCE_DIR}/src/GameElements/Troops/Villager.cpp"
+    "${CMAKE_SOURCE_DIR}/src/GameElements/Troops/Pikeman.cpp"
+    "${CMAKE_SOURCE_DIR}/src/GameElements/Troops/Knight.cpp"
+    "${CMAKE_SOURCE_DIR}/src/GameElements/Troops/Hero.cpp"
     
-    "${CMAKE_SOURCE_DIR}/src/Cell.cpp"
-    "${CMAKE_SOURCE_DIR}/src/Water.cpp"
-    "${CMAKE_SOURCE_DIR}/src/Ground.cpp"
-    "${CMAKE_SOURCE_DIR}/src/PlayableGround.cpp"
-    "${CMAKE_SOURCE_DIR}/src/Forest.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Cells/Cell.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Cells/Water.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Cells/Grounds/Ground.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Cells/Grounds/PlayableGround.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Cells/Grounds/Forest.cpp"
 
     "${CMAKE_SOURCE_DIR}/src/Player.cpp"
     
     "${CMAKE_SOURCE_DIR}/src/HexagonGrid.tpp"
     "${CMAKE_SOURCE_DIR}/src/GameMap.cpp"
-    "${CMAKE_SOURCE_DIR}/src/Window.cpp"
     
     "${CMAKE_SOURCE_DIR}/src/Button.cpp"
     "${CMAKE_SOURCE_DIR}/src/Overlay.cpp"

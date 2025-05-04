@@ -3,7 +3,7 @@
 #include "MainMenu.hpp"
 #include "MapsMenu.hpp"
 #include "Checker.hpp"
-#include "Cursor.hpp"
+#include "SDLWrappers/Cursor.hpp"
 
 MainMenu::MainMenu(const std::shared_ptr<Window>& window): MenuBase{window} {
     // Background of menu

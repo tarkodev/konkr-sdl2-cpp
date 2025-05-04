@@ -1,10 +1,10 @@
 #ifndef GAMEMENU_HPP
 #define GAMEMENU_HPP
 
-#include "Point.hpp"
+#include "SDLWrappers/Coords/Point.hpp"
 #include "MenuBase.hpp"
-#include "Window.hpp"
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Window.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 #include "Overlay.hpp"
 #include "GameMap.hpp"
 #include "Button.hpp"

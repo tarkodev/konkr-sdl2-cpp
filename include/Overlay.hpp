@@ -4,10 +4,10 @@
 #include "SDL.h"
 #include <vector>
 #include <memory>
-#include "Point.hpp"
+#include "SDLWrappers/Coords/Point.hpp"
 #include "Displayer.hpp"
 #include "Button.hpp"
-#include "logic/Troop.hpp"
+#include "GameElements/Troops/Troop.hpp"
 
 struct TroopOption {
     std::shared_ptr<Texture>   texNoBuy;

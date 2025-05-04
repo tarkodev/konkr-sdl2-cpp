@@ -2,7 +2,7 @@
 #define MENUBASE_HPP
 
 #include "Displayer.hpp"
-#include "Window.hpp"
+#include "SDLWrappers/Renderers/Window.hpp"
 #include "Button.hpp"
 #include <vector>
 #include <memory>

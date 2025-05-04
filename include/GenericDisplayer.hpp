@@ -1,7 +1,7 @@
 #ifndef GENERICDISPLAYER_HPP
 #define GENERICDISPLAYER_HPP
 
-#include "Point.hpp"
+#include "SDLWrappers/Coords/Point.hpp"
 #include "Displayer.hpp"
 #include "BlitTarget.hpp"
 

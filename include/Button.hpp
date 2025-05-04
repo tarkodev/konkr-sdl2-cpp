@@ -3,11 +3,11 @@
 #define BUTTON_HPP
 
 #include "SDL.h"
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 #include "Displayer.hpp"
-#include "Rect.hpp"
-#include "Point.hpp"
-#include "Size.hpp"
+#include "SDLWrappers/Coords/Rect.hpp"
+#include "SDLWrappers/Coords/Point.hpp"
+#include "SDLWrappers/Coords/Size.hpp"
 #include <functional>
 #include <memory>
 

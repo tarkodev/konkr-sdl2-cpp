@@ -3,7 +3,7 @@
 
 #include "SDL.h"
 #include "BlitTarget.hpp"
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 #include "GenericDisplayer.hpp"
 #include <vector>
 #include <memory>

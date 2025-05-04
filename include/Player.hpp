@@ -3,10 +3,10 @@
 
 #include <string>
 #include <memory>
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 #include "HexagonDisplayer.hpp"
 #include "ColorUtils.hpp"
-#include "logic/units/Town.hpp"
+#include "GameElements/Town.hpp"
 #include <unordered_set>
 
 class PlayableGround;

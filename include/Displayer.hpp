@@ -1,9 +1,9 @@
 #ifndef DISPLAYER_HPP
 #define DISPLAYER_HPP
 
-#include "Point.hpp"
+#include "SDLWrappers/Coords/Point.hpp"
 #include "BlitTarget.hpp"
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 
 class Displayer {
 public:

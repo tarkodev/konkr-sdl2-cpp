@@ -1,9 +1,9 @@
 #include "Player.hpp"
-#include "Ground.hpp"
-#include "logic/units/Town.hpp"
+#include "Cells/Grounds/Ground.hpp"
+#include "GameElements/Town.hpp"
 #include <stdexcept>
 #include <algorithm>
-#include "PlayableGround.hpp"
+#include "Cells/Grounds/PlayableGround.hpp"
 
 HexagonDisplayer Player::plateDisplayer_ = HexagonDisplayer{-1, nullptr, nullptr, nullptr, nullptr, nullptr};
 std::weak_ptr<SDL_Renderer> Player::renderer_ = {};

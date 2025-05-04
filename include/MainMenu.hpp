@@ -1,10 +1,10 @@
 #ifndef MAINMENU_HPP
 #define MAINMENU_HPP
 
-#include "Point.hpp"
+#include "SDLWrappers/Coords/Point.hpp"
 #include "MenuBase.hpp"
-#include "Window.hpp"
-#include "Texture.hpp"
+#include "SDLWrappers/Renderers/Window.hpp"
+#include "SDLWrappers/Renderers/Texture.hpp"
 #include "Button.hpp"
 #include <memory>
 
