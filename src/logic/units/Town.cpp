@@ -34,6 +34,10 @@ Town::Town(const Point& pos)
     : GameElement(pos, sprite_->getSize()), treasuryDisplayer_(Point{pos.getX(), pos.getY() + sprite_->getHeight() / 2})
 {}
 
+void Town::setPos(const Point& pos) {
+    GameElement::setPos(pos);
+    treasuryDisplayer_.setPos(pos);
+}
 
 int Town::getStrength() const {
     return STRENGTH;
@@ -90,7 +94,6 @@ void Town::display(const std::weak_ptr<BlitTarget>& target) {
     ltarget->blit(sprite_, pos_ - sprite_->getSize() / 2);
 }
 
-void Town::displayTreasury(const std::weak_ptr<BlitTarget>& target)
-{
+void Town::displayTreasury(const std::weak_ptr<BlitTarget>& target) {
     treasuryDisplayer_.display(target);
 }

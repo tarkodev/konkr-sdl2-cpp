@@ -16,6 +16,7 @@ public:
     explicit Town(const Point& pos);
 
     /* Displayer */
+    void setPos(const Point& pos) override;
     void display(const std::weak_ptr<BlitTarget>& target) override;
 
     void displayTreasury(const std::weak_ptr<BlitTarget>& target);

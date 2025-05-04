@@ -8,7 +8,7 @@
 
 static const struct { const char* label; const char* file; } MAPS[] = {
     {"Ten Paces",   "../assets/map/Ten Paces.txt"},
-    {"Unity",       "../assets/map/Unity.txt"}
+    {"Unity",       "../assets/map/Unity.txt"},
 };
 
 MapsMenu::MapsMenu(const std::shared_ptr<Window>& window) : MenuBase{window}
@@ -16,7 +16,7 @@ MapsMenu::MapsMenu(const std::shared_ptr<Window>& window) : MenuBase{window}
     // Create map buttons
     Point pos = window_->getSize() / 2;
     for (auto& map : MAPS){
-        buttons_.emplace_back(Point{0, 0}, std::string("../assets/map/")+map.label+".png");
+        buttons_.emplace_back(Point{0, 0}, std::string("../assets/img/map/")+map.label+".png");
         auto& btn = buttons_.back();
         btn.setCallback([this, map](){
             nextMenu_ = std::make_shared<GameMenu>(window_, map.file);

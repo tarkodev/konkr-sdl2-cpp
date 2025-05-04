@@ -3,6 +3,7 @@
 
 #include "BlitTarget.hpp"
 #include "logic/GameElement.hpp"
+#include "TreasuryDisplayer.hpp"
 
 class Camp : public GameElement {
 public:
@@ -16,6 +17,7 @@ public:
     explicit Camp(const Point& pos);
 
     /* Displayer */
+    void setPos(const Point& pos) override;
     void display(const std::weak_ptr<BlitTarget>& target) override;
 
     /* --- Accesseurs génériques --- */
@@ -24,7 +26,8 @@ public:
     int getUpkeep()   const override { return UPKEEP; };
 
     void addCoins(int coins);
-    bool getTreasury() const;
+    int getTreasury() const;
+    void displayTreasury(const std::weak_ptr<BlitTarget>& target);
 
 protected:
     static constexpr int STRENGTH = 1;
@@ -33,6 +36,8 @@ protected:
 
 private:
     static std::shared_ptr<Texture> sprite_;
+
+    TreasuryDisplayer treasuryDisplayer_;
     int treasury_ = 0;
 };
 

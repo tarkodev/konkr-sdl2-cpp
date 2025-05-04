@@ -344,6 +344,11 @@ void GameMap::refreshElements() {
     auto ltownToShowTreasury_ = townToShowTreasury_.lock();
     if (ltownToShowTreasury_)
         ltownToShowTreasury_->displayTreasury(calc_);
+
+    // draw treasury of camp
+    auto lcampToShowTreasury_ = campToShowTreasury_.lock();
+    if (lcampToShowTreasury_)
+        lcampToShowTreasury_->displayTreasury(calc_);
 }
 
 void GameMap::refresh()
@@ -418,19 +423,22 @@ void GameMap::searchNextPlayer() {
 }
 
 void GameMap::initGame() {
+    // Any player found
     if (players_.empty()) {
-        SDL_Log("Aucun joueur sur la carte");
-        return; //! retourner au menu (popup ? Ou SDL_Log ?)
+        refresh();
+        return;
     }
     updateLinks();
 
     // Set the current player
     currentPlayer_ = players_[selectedPlayerNum_];
     searchNextPlayer();
+
+    // Any player has Town
     auto cp = currentPlayer_.lock();
     if (!cp) {
-        SDL_Log("Aucun joueur n'a de chateau sur la carte");
-        return; //! Aucun joueur sur la map, retourner au menu (popup ? Ou SDL_Log ?)
+        refresh();
+        return;
     }
 
     // Update next income of players
@@ -866,6 +874,7 @@ void GameMap::onMouseMotion(SDL_Event& event) {
     Point mousePos{event.motion.x, event.motion.y};
     selectCell(mousePos - pos_);
     townToShowTreasury_.reset();
+    campToShowTreasury_.reset();
 
     // Move selected troop
     if (selectedTroop_) {
@@ -879,8 +888,10 @@ void GameMap::onMouseMotion(SDL_Event& event) {
     // Check hover of elements
     updateCursor();
     if (auto lselectedCell = selectedCell_.lock()) {
-        auto town = Town::cast(lselectedCell->getElement());
-        if (town) townToShowTreasury_ = town;
+        if (auto town = Town::cast(lselectedCell->getElement()))
+            townToShowTreasury_ = town;
+        else if (auto camp = Camp::cast(lselectedCell->getElement()))
+            campToShowTreasury_ = camp;
     }
 }
 

@@ -34,7 +34,10 @@ TreasuryDisplayer::TreasuryDisplayer(
 }
 
 void TreasuryDisplayer::refreshTexture() {
-    treasuryTex_ = std::make_shared<Texture>(font_->render(std::to_string(treasury_) + " + " + std::to_string(income_) + " -> " + std::to_string(treasury_ + income_), income_ < 0 ? ColorUtils::DARK_RED : ColorUtils::BLACK));
+    if (noIncome_)
+        treasuryTex_ = std::make_shared<Texture>(font_->render(std::to_string(treasury_), ColorUtils::BLACK));
+    else
+        treasuryTex_ = std::make_shared<Texture>(font_->render(std::to_string(treasury_) + " + " + std::to_string(income_) + " -> " + std::to_string(treasury_ + income_), income_ < 0 ? ColorUtils::DARK_RED : ColorUtils::BLACK));
 }
 
 void TreasuryDisplayer::setTreasury(int treasury) {
@@ -44,6 +47,11 @@ void TreasuryDisplayer::setTreasury(int treasury) {
 
 void TreasuryDisplayer::setIncome(int income) {
     income_ = income;
+    refreshTexture();
+}
+
+void TreasuryDisplayer::setNoIncome(bool noIncome) {
+    noIncome_ = noIncome;
     refreshTexture();
 }
 

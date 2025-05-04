@@ -19,6 +19,7 @@ public:
 
     void setTreasury(int treasury);
     void setIncome(int income);
+    void setNoIncome(bool noIncome);
 
     void display(const std::weak_ptr<BlitTarget>& target) override;
 
@@ -29,6 +30,7 @@ private:
     std::shared_ptr<Texture> treasuryTex_;
     int treasury_;
     int income_;
+    bool noIncome_ = false;
 
     void refreshTexture();
 };

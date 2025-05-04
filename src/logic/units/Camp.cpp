@@ -28,13 +28,23 @@ void Camp::quit()
 }
 
 
-Camp::Camp(const Point& pos): GameElement(pos, sprite_->getSize()) {}
+Camp::Camp(const Point& pos): 
+    GameElement(pos, sprite_->getSize()), treasuryDisplayer_(Point{pos.getX(), pos.getY() + sprite_->getHeight() / 2})
+{
+    treasuryDisplayer_.setNoIncome(true);
+}
+
+void Camp::setPos(const Point& pos) {
+    GameElement::setPos(pos);
+    treasuryDisplayer_.setPos(pos);
+}
 
 void Camp::addCoins(int coins) {
     treasury_ += coins;
+    treasuryDisplayer_.setTreasury(treasury_);
 }
 
-bool Camp::getTreasury() const {
+int Camp::getTreasury() const {
     return treasury_;
 }
 
@@ -43,4 +53,8 @@ void Camp::display(const std::weak_ptr<BlitTarget>& target) {
     if (!ltarget || !sprite_) return;
 
     ltarget->blit(sprite_, pos_ - sprite_->getSize() / 2);
+}
+
+void Camp::displayTreasury(const std::weak_ptr<BlitTarget>& target) {
+    treasuryDisplayer_.display(target);
 }

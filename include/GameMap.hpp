@@ -12,6 +12,7 @@
 #include "Player.hpp"
 #include "logic/Troop.hpp"
 #include "logic/units/Castle.hpp"
+#include "logic/units/Camp.hpp"
 #include "Displayer.hpp"
 #include "BlitTarget.hpp"
 #include "Font.hpp"
@@ -67,6 +68,7 @@ private:
 
     std::weak_ptr<PlayableGround> selectedCell_;
     std::weak_ptr<Town> townToShowTreasury_;
+    std::weak_ptr<Camp> campToShowTreasury_;
     bool hasSelection_ = false;
 
     std::vector<std::weak_ptr<Player>> players_;
