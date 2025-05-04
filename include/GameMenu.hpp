@@ -7,6 +7,7 @@
 #include "Texture.hpp"
 #include "Overlay.hpp"
 #include "GameMap.hpp"
+#include "Button.hpp"
 #include <memory>
 #include <string>
 
@@ -27,6 +28,8 @@ protected:
 private:
     std::unique_ptr<GameMap> map_;
     std::unique_ptr<Overlay> overlay_;
+    std::unique_ptr<Button> finishBtn_;
+    std::shared_ptr<Texture> finishTex_;
 
     Size windowSize_;
 
@@ -43,6 +46,7 @@ private:
 
     std::optional<Point> moveOrigin_;
     bool moved_ = false;
+    bool gameFinished_ = false;
 
     void createMap(const std::string& mapPath);
     void updateMapPos();

@@ -56,6 +56,8 @@ public:
     void handleEvent(SDL_Event &event);
     void display(const std::weak_ptr<BlitTarget>& target) override;
 
+    bool gameFinished() const;
+
     void nextPlayer();
 
     int getWidth() const override;
@@ -84,6 +86,7 @@ private:
 
     Size calcSize_;
     std::shared_ptr<Texture> calc_ = nullptr;
+    bool gameFinished_ = false;
 
     GameMap(const Point& pos, const Size size, const std::pair<int, int>& gridSize, const std::string mapFile);
     void loadMap(const std::string& mapFile);
@@ -112,6 +115,7 @@ private:
     void updateIncomes(std::weak_ptr<Player>& player);
     void updateIncomes(std::shared_ptr<Player>& player);
     void updateMovables();
+    void checkWin();
 
     void onMouseButtonDown(SDL_Event& event);
     void onMouseMotion(SDL_Event& event);

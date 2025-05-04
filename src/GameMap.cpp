@@ -422,6 +422,10 @@ void GameMap::searchNextPlayer() {
     }
 }
 
+bool GameMap::gameFinished() const {
+    return gameFinished_;
+}
+
 void GameMap::initGame() {
     // Any player found
     if (players_.empty()) {
@@ -454,8 +458,8 @@ void GameMap::initGame() {
 void GameMap::nextPlayer() {
     auto cp = currentPlayer_.lock();
     if (!cp || players_.empty()) {
-        SDL_Log("Plus de joueur en jeu, même le joueur actuel");
-        return; //! Comportement innatendu, retourner au menu
+        gameFinished_ = true;
+        return;
     }
 
     // Finish turn of current player
@@ -471,11 +475,11 @@ void GameMap::nextPlayer() {
     // Check new current player
     cp = currentPlayer_.lock();
     if (!cp) {
-        SDL_Log("Plus de joueur en jeu.");
-        return; //! Comportement innatendu, retourner au menu
+        gameFinished_ = true;
+        return;
     } else if (cp == lastCp) {
-        SDL_Log("Vous avez gagné !");
-        return; //! Victoire
+        gameFinished_ = true;
+        return;
     }
 
     // If first player
@@ -630,6 +634,17 @@ void GameMap::updateSelectedCell() {
     selectCell(Cursor::getPos() - pos_);
 }
 
+void GameMap::checkWin() {
+    int nbPlayerStillTheGame = 0;
+
+    for (auto player : players_)
+        if (auto lplayer = player.lock())
+            if (lplayer->getTownCells().size())
+                nbPlayerStillTheGame++;
+
+    gameFinished_ = nbPlayerStillTheGame < 2;
+}
+
 bool GameMap::placeCastle(const std::weak_ptr<Castle>& castle, const std::weak_ptr<PlayableGround>& to) {
     auto lcastle = castle.lock();
     auto lto = to.lock();
@@ -678,8 +693,10 @@ void GameMap::moveTroop(const std::weak_ptr<PlayableGround>& from, const std::we
 
         // If town has destroyed
         if (destroyTown) {
-            if (auto receptionTown = lto->getNearestTown())
+            if (auto receptionTown = lto->getNearestTown()) {
                 receptionTown->setTreasury(receptionTown->getTreasury() + destroyTown->getTreasury());
+                checkWin();
+            }
         } else if (destroyCamp) {
             if (auto receptionTown = lto->getNearestTown())
                 receptionTown->setTreasury(receptionTown->getTreasury() + destroyCamp->getTreasury());

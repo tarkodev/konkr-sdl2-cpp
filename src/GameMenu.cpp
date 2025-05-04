@@ -22,6 +22,17 @@ GameMenu::GameMenu(const std::shared_ptr<Window>& window, const std::string& map
     // Create Overlay
     overlay_ = std::make_unique<Overlay>(Point{0, 0});
     overlay_->setPos(Point{windowSize_.getWidth() / 2, windowSize_.getHeight() - overlay_->getHeight() / 2});
+
+    // Create win texture
+    finishTex_ = std::make_shared<Texture>(window_->getRenderer(), "../assets/img/win.png");
+
+    // Create finish game button
+    finishBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/finish_btn.png", "../assets/img/finish_btn_hover.png", "../assets/img/finish_btn_pressed.png");
+    finishBtn_->setPos(windowSize_ / 2 + Point{0, (finishTex_->getHeight() + finishBtn_->getHeight()) / 2});
+    finishBtn_->setCallback([this]() {
+        nextMenu_ = std::make_shared<MapsMenu>(window_);
+        loop_ = false; 
+    });
 }
 
 void GameMenu::createMap(const std::string& mapPath) {
@@ -70,6 +81,31 @@ void GameMenu::updateShop() {
     overlay_->update(map_->getMaxTreasuryOfCurrentPlayer());
 }
 
+bool GameMenu::handleOverlay(SDL_Event& event) {
+    overlay_->handleEvent(event);
+
+    // If return to MapsMenu
+    if (overlay_->backRequested()) {
+        nextMenu_ = std::make_shared<MapsMenu>(window_);
+        loop_ = false;
+        return true;
+    }
+
+    // If next turn
+    else if (overlay_->turnRequested()) {
+        map_->nextPlayer();
+        return true;
+    }
+
+    // If Troop bought
+    else if (overlay_->buyTroopRequested()) {
+        map_->buyTroop(overlay_->getTroopBought());
+        return true;
+    }
+
+    return false;
+}
+
 void GameMenu::onMouseButtonDown(SDL_Event& event) {
     Point mp{event.motion.x, event.motion.y};
     if (overlay_->isHover(mp)) return;
@@ -92,7 +128,7 @@ void GameMenu::onMouseMotion(SDL_Event& event) {
         moved_ = true;
     }
 
-    if (true || map_->hasTroopSelected()/*//! || !overlay.isHover()*/)
+    if (true || map_->hasTroopSelected())
         map_->handleEvent(event);
 }
 
@@ -135,41 +171,25 @@ void GameMenu::onKeyDown(SDL_Event& event) {
     updateMapPos();
 }
 
-bool GameMenu::handleOverlay(SDL_Event& event) {
-    overlay_->handleEvent(event);
-
-    // If return to MapsMenu
-    if (overlay_->backRequested()) {
-        nextMenu_ = std::make_shared<MapsMenu>(window_);
-        loop_ = false;
-        return true;
-    }
-
-    // If next turn
-    else if (overlay_->turnRequested()) {
-        map_->nextPlayer();
-        return true;
-    }
-
-    // If Troop bought
-    else if (overlay_->buyTroopRequested()) {
-        map_->buyTroop(overlay_->getTroopBought());
-        return true;
-    }
-
-    return false;
-}
-
 void GameMenu::handleEvents(){
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
         handleEvent(event);
+
+        // If game finished
+        if (gameFinished_) {
+            finishBtn_->handleEvent(event);
+            continue;
+        }
+
+        // Handle event of overlay
         if (handleOverlay(event)) {
             updateShop();
             continue;
         }
         
+        // handle event of menu
         if (event.type == SDL_MOUSEBUTTONDOWN)
             onMouseButtonDown(event);
         else if (event.type == SDL_MOUSEMOTION)
@@ -190,6 +210,12 @@ void GameMenu::draw() {
     map_->display(window_);
     overlay_->display(window_);
 
+    if (gameFinished_) {
+        window_->darken();
+        window_->blit(finishTex_, (windowSize_ - finishTex_->getSize()) / 2);
+        finishBtn_->display(window_);
+    }
+
     window_->refresh();
     frameCount_++;
 
@@ -209,6 +235,7 @@ std::shared_ptr<MenuBase> GameMenu::run() {
     while (loop_) {
         // Handle events
         handleEvents();
+        gameFinished_ = map_->gameFinished();
 
         // Draw elements
         draw();

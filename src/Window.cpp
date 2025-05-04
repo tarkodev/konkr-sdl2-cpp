@@ -55,7 +55,13 @@ void Window::fill(const SDL_Color& color) const {
     RenderTargetGuard target(renderer_, std::shared_ptr<SDL_Texture>());
     SDL_Check(SDL_SetRenderDrawColor(renderer_.get(), color.r, color.g, color.b, color.a), "SDL_SetRenderDrawColor");
     SDL_Check(SDL_RenderClear(renderer_.get()), "SDL_RenderClear");
+}
 
+void Window::darken() const {
+    SDL_SetRenderDrawBlendMode(renderer_.get(), SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(renderer_.get(), 0, 0, 0, 128);
+    SDL_Rect dimRect{ 0, 0, size_.getWidth(), size_.getHeight()};
+    SDL_RenderFillRect(renderer_.get(), &dimRect);
 }
 
 void Window::blit(const std::weak_ptr<Texture>& src, const SDL_Rect* srcRect, const SDL_Rect* destRect) const {

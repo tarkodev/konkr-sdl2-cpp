@@ -30,6 +30,7 @@ public:
     SDL_Texture* get() const override { return nullptr; };
 
     void fill(const SDL_Color& color) const;
+    void darken() const;
 
     void blit(const std::weak_ptr<Texture>& src) const override;
     void blit(const std::weak_ptr<Texture>& src, const Point& destPos) const override;

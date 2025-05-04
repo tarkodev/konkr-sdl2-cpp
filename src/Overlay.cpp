@@ -15,11 +15,11 @@ Overlay::Overlay(const Point& pos) : Displayer(pos) {
     bgPos_ = pos_ - size_ / 2;
 
     // Back button
-    backBtn_ = std::make_unique<Button>(Point{0,0}, "../assets/img/back_btn.png", "../assets/img/back_btn_hover.png", "../assets/img/back_btn_pressed.png");
+    backBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/back_btn.png", "../assets/img/back_btn_hover.png", "../assets/img/back_btn_pressed.png");
     backBtn_->setCallback([this]() { backRequested_ = true; });
 
     // Trun button
-    turnBtn_ = std::make_unique<Button>(Point{0,0}, "../assets/img/turn_btn.png", "../assets/img/turn_btn_hover.png", "../assets/img/turn_btn_pressed.png");
+    turnBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/turn_btn.png", "../assets/img/turn_btn_hover.png", "../assets/img/turn_btn_pressed.png");
     turnBtn_->setCallback([this]() { turnRequested_ = true; });
 
     // Sprites of buyables troops
