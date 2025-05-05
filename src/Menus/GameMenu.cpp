@@ -173,6 +173,12 @@ void GameMenu::onKeyDown(SDL_Event& event) {
             updateShop();
         }
         return;
+    } else if (event.key.keysym.sym == SDLK_z) {
+        if (!map_->hasTroopSelected()) {
+            map_->undo();
+            updateShop();
+        }
+        return;
     }
 
     Point mapPos = map_->getPos();
