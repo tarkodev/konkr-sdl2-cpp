@@ -50,7 +50,7 @@ struct TroopOption {
 /**
  * @brief An overlay UI drawn above the game map.
  *
- * Displays buttons for navigating back, ending turn,
+ * Displays buttons for undo, ending turn,
  * and buying troops. Handles input events and purchase logic.
  */
 class Overlay : public Displayer {
@@ -92,10 +92,10 @@ public:
     void display(const std::weak_ptr<BlitTarget>& target) const override;
 
     /**
-     * @brief Query if the back button was pressed.
-     * @return true if user requested to go back.
+     * @brief Query if the undo button was pressed.
+     * @return true if user requested to undo.
      */
-    const bool backRequested();
+    const bool undoRequested();
 
     /**
      * @brief Query if the turn-end button was pressed.
@@ -124,12 +124,12 @@ public:
 
 private:
     std::shared_ptr<Texture>       bg_;           ///< Background texture for the overlay
-    std::unique_ptr<Button>        backBtn_;      ///< Button to go back to main menu
+    std::unique_ptr<Button>        undoBtn_;      ///< Button to undo
     std::vector<TroopOption>       options_;      ///< List of troop purchase options
     std::unique_ptr<Button>        turnBtn_;      ///< Button to end the current turn
     Point                          bgPos_;        ///< Top-left position of the background
 
-    bool backRequested_    = false;    ///< Flag set when backBtn_ is clicked
+    bool undoRequested_    = false;    ///< Flag set when undoBtn_ is clicked
     bool turnRequested_    = false;    ///< Flag set when turnBtn_ is clicked
     char buyTroopRequested_ = '\0';     ///< ID of troop requested for purchase (or '\0' if none)
 };

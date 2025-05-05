@@ -26,6 +26,14 @@ const bool PlayableGround::is(const std::weak_ptr<Cell>& obj) {
     return cast(obj) != nullptr;
 }
 
+std::shared_ptr<Cell> PlayableGround::deepCopy() const {
+    auto pg = std::make_shared<PlayableGround>(pos_, nullptr);
+    pg->setOwner(oldOwner_);
+    pg->setOwner(owner_);
+    pg->element = element ? element->deepCopy() : nullptr;
+    return pg;
+}
+
 void PlayableGround::init() {
     if (renderer_.expired())
         throw std::runtime_error("Displayer not initialized");

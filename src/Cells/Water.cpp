@@ -8,3 +8,7 @@ std::shared_ptr<Water> Water::cast(const std::weak_ptr<Cell>& obj) {
 const bool Water::is(const std::weak_ptr<Cell>& obj) {
     return cast(obj) != nullptr;
 }
+
+std::shared_ptr<Cell> Water::deepCopy() const {
+    return std::make_shared<Water>();
+}

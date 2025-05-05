@@ -97,3 +97,11 @@ void Town::display(const std::weak_ptr<BlitTarget>& target) const {
 void Town::displayTreasury(const std::weak_ptr<BlitTarget>& target) {
     treasuryDisplayer_.display(target);
 }
+
+std::shared_ptr<GameElement> Town::deepCopy() const {
+    auto town = std::make_shared<Town>(pos_, treasury_);
+    town->setIncome(income_);
+    town->setSelected(selected_);
+    town->lost_ = lost_;
+    return town;
+}

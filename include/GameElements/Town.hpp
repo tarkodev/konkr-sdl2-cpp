@@ -51,6 +51,12 @@ public:
     static const bool is(const std::weak_ptr<GameElement>& obj);
 
     /**
+     * @brief Make a deep copy of object.
+     * @return deep copy of this.
+     */
+    std::shared_ptr<GameElement> deepCopy() const override;
+
+    /**
      * @brief Construct a Town at a given position with an initial treasury.
      * @param pos Center point in pixel coordinates.
      * @param treasury Initial amount of coins stored.

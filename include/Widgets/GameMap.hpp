@@ -115,6 +115,9 @@ public:
 
     /** @brief Advance to the next player's turn. */
     void nextPlayer();
+    
+    /** @brief Undo one event. */
+    void undo();
 
     /** @brief Return the pixel width of the map area. */
     const int getWidth() const override;
@@ -127,10 +130,13 @@ private:
 
     double ratio_ = 0;                                            ///< Scale factor for drawing
 
+    std::vector<HexagonGrid<std::shared_ptr<Cell>>> saves_;       ///< Saves for undo
+    std::vector<std::weak_ptr<Troop>> movedTroopsSave_;           ///< Saves of moved troops for undo
+    int nbUndos_ = 0;
+
     std::weak_ptr<PlayableGround> selectedCell_;                  ///< Currently selected ground cell
     std::weak_ptr<Town> townToShowTreasury_;                      ///< Town whose treasury is visible
     std::weak_ptr<Camp> campToShowTreasury_;                      ///< Camp whose treasury is visible
-    bool hasSelection_ = false;                                   ///< Flag for any selection
 
     std::vector<std::weak_ptr<Player>> players_;                  ///< All players in the game
     std::weak_ptr<Player> currentPlayer_;                         ///< Player whose turn it is
@@ -222,6 +228,9 @@ private:
     /** @brief Update resource income for a player at end of turn. */
     void updateIncomes(std::weak_ptr<Player>& player);
     void updateIncomes(std::shared_ptr<Player>& player);
+
+    /** @brief Save copy of map to undo. */
+    void save();
 
     /** @brief Mark movable elements based on current state. */
     void updateMovables();

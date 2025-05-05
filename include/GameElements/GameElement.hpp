@@ -72,6 +72,12 @@ public:
      */
     virtual void lost() { lost_ = true; };
 
+    /**
+     * @brief Make a deep copy of object.
+     * @return deep copy of this.
+     */
+    virtual std::shared_ptr<GameElement> deepCopy() const = 0;
+
 protected:
     /**
      * @brief Protected constructor to enforce abstract usage.

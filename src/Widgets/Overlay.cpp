@@ -14,9 +14,9 @@ Overlay::Overlay(const Point& pos) : Displayer(pos) {
     size_ = bg_->getSize();
     bgPos_ = pos_ - size_ / 2;
 
-    // Back button
-    backBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/buttons/back_btn.png", "../assets/img/buttons/back_btn_hover.png", "../assets/img/buttons/back_btn_pressed.png");
-    backBtn_->setCallback([this]() { backRequested_ = true; });
+    // Undo button
+    undoBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/buttons/undo_btn.png", "../assets/img/buttons/undo_btn_hover.png", "../assets/img/buttons/undo_btn_pressed.png");
+    undoBtn_->setCallback([this]() { undoRequested_ = true; });
 
     // Trun button
     turnBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/buttons/turn_btn.png", "../assets/img/buttons/turn_btn_hover.png", "../assets/img/buttons/turn_btn_pressed.png");
@@ -45,8 +45,8 @@ const bool Overlay::isHover(const Point& mousePos) const {
     if (Rect{pos_, size_}.contains(mousePos + size_ / 2))
         return true;
 
-    // Hover of back/turn button
-    if (backBtn_->isHover(mousePos) || turnBtn_->isHover(mousePos))
+    // Hover of undo/turn button
+    if (undoBtn_->isHover(mousePos) || turnBtn_->isHover(mousePos))
         return true;
 
     // hover of troop btns
@@ -58,7 +58,7 @@ void Overlay::setPos(const Point& pos) {
     pos_ = pos;
 
     // Back button pos
-    backBtn_->setPos(Point{pos_.getX() - (bg_->getWidth() + backBtn_->getWidth()) / 2, pos_.getY() + 10});
+    undoBtn_->setPos(Point{pos_.getX() - (bg_->getWidth() + undoBtn_->getWidth()) / 2, pos_.getY() + 10});
 
     // Turn button pos
     turnBtn_->setPos(Point{pos_.getX() + (bg_->getWidth() + turnBtn_->getWidth()) / 2, pos_.getY() + 10});
@@ -85,10 +85,10 @@ std::shared_ptr<GameElement> Overlay::getTroopBought() {
     return std::shared_ptr<GameElement>(nullptr);
 }
 
-const bool Overlay::backRequested() {
-    auto backRequested = backRequested_;
-    backRequested_ = false;
-    return backRequested;
+const bool Overlay::undoRequested() {
+    auto undoRequested = undoRequested_;
+    undoRequested_ = false;
+    return undoRequested;
 };
 
 const bool Overlay::turnRequested() {
@@ -110,7 +110,7 @@ void Overlay::update(int treasury) {
 }
 
 void Overlay::handleEvent(const SDL_Event& e) {
-    backBtn_->handleEvent(e);
+    undoBtn_->handleEvent(e);
     turnBtn_->handleEvent(e);
     for (auto& opt : options_)
         if (opt.buyable)
@@ -131,7 +131,7 @@ void Overlay::display(const std::weak_ptr<BlitTarget>& target) const {
         }
 
         // Buttons
-        backBtn_->display(ltarget);
+        undoBtn_->display(ltarget);
         turnBtn_->display(ltarget);
     }
 }

@@ -33,3 +33,7 @@ void Forest::display(const std::weak_ptr<BlitTarget>& target) const {
     if (auto ltarget = target.lock())
         ltarget->blit(forest_, Point{pos_.getX() - forest_->getWidth() / 2, pos_.getY() - forest_->getHeight() / 2});
 }
+
+std::shared_ptr<Cell> Forest::deepCopy() const {
+    return std::make_shared<Forest>(pos_);
+}

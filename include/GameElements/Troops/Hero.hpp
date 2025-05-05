@@ -32,6 +32,12 @@ public:
      */
     static const bool is(const std::weak_ptr<GameElement>& obj);
 
+    /**
+     * @brief Make a deep copy of object.
+     * @return deep copy of this.
+     */
+    std::shared_ptr<GameElement> deepCopy() const override;
+
     /** 
      * @brief Load shared resources for all Hero instances (sprite image).
      * Must be called once before creating any Hero.

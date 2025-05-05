@@ -35,3 +35,9 @@ void Castle::display(const std::weak_ptr<BlitTarget>& target) const {
 
     ltarget->blit(sprite_, pos_ - sprite_->getSize() / 2);
 }
+
+std::shared_ptr<GameElement> Castle::deepCopy() const {
+    auto castle = std::make_shared<Castle>(pos_);
+    castle->lost_ = lost_;
+    return castle;
+}

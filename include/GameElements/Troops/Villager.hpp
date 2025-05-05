@@ -32,6 +32,12 @@ public:
      * @return true if obj wraps a Villager instance.
      */
     static const bool is(const std::weak_ptr<GameElement>& obj);
+
+    /**
+     * @brief Make a deep copy of object.
+     * @return deep copy of this.
+     */
+    std::shared_ptr<GameElement> deepCopy() const override;
     
     /**
      * @brief Load the shared villager sprite.

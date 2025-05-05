@@ -32,3 +32,11 @@ Villager::Villager(const Point& pos): Troop(pos, sprite_->getSize()) {}
 void Villager::display(const std::weak_ptr<BlitTarget>& target) const {
     Troop::displaySprite(target, sprite_);
 }
+
+std::shared_ptr<GameElement> Villager::deepCopy() const {
+    auto villager = std::make_shared<Villager>(pos_);
+    villager->free_ = free_;
+    villager->movable_ = movable_;
+    villager->lost_ = lost_;
+    return villager;
+}

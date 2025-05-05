@@ -75,6 +75,7 @@ private:
     // Widgets and textures
     std::unique_ptr<GameMap>      map_;         ///< Interactive hex map
     std::unique_ptr<Overlay>      overlay_;     ///< GUI overlay (e.g., stats panel)
+    std::unique_ptr<Button>       backBtn_;     ///< Button to go back to main menu
     std::unique_ptr<Button>       finishBtn_;   ///< "Finish Turn" button
     std::shared_ptr<Texture>      finishTex_;   ///< Texture for the finish button
 

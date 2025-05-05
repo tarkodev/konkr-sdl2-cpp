@@ -32,3 +32,11 @@ Hero::Hero(const Point& pos): Troop(pos, sprite_->getSize()) {}
 void Hero::display(const std::weak_ptr<BlitTarget>& target) const {
     Troop::displaySprite(target, sprite_);
 }
+
+std::shared_ptr<GameElement> Hero::deepCopy() const {
+    auto hero = std::make_shared<Hero>(pos_);
+    hero->free_ = free_;
+    hero->movable_ = movable_;
+    hero->lost_ = lost_;
+    return hero;
+}

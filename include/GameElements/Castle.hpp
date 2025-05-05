@@ -45,6 +45,12 @@ public:
     static const bool is(const std::weak_ptr<GameElement>& obj);
 
     /**
+     * @brief Make a deep copy of object.
+     * @return deep copy of this.
+     */
+    std::shared_ptr<GameElement> deepCopy() const override;
+
+    /**
      * @brief Construct a Castle at a given position.
      * @param pos Center point in pixel coordinates.
      */

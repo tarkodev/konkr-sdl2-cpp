@@ -48,6 +48,12 @@ public:
      * @return true if obj is a PlayableGround.
      */
     static const bool is(const std::weak_ptr<Cell>& obj);
+    
+    /**
+     * @brief Make a deep copy of object.
+     * @return deep copy of this.
+     */
+    std::shared_ptr<Cell> deepCopy() const override;
 
     /**
      * @brief Load static resources (textures, sprites, etc.).

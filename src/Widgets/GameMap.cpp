@@ -491,7 +491,11 @@ void GameMap::startTurn(std::weak_ptr<Player>& player) {
         checkDeficits(player);
         updateFreeTroops(player);
         updateIncomes(player);
+
+        nbUndos_ = 0;
+        saves_.clear();
         movedTroops_.clear();
+        movedTroopsSave_.clear();
         updateMovables();
     }
 }
@@ -643,6 +647,9 @@ const bool GameMap::placeCastle(const std::weak_ptr<Castle>& castle, const std::
     if (!lcastle || !lto || !cp || lto->getOwner() != cp || lto->getElement())
         return false;
 
+    // Save for undo
+    save();
+
     lto->setElement(lcastle);
     updateIncomes(cp);
     return true;
@@ -665,9 +672,14 @@ void GameMap::moveTroop(const std::weak_ptr<PlayableGround>& from, const std::we
 
     // Different owner
     if (fromOwner != toOwner || Bandit::cast(toTroop)) {
+        save();
+
+        // Check destroyed element
         auto destroyTown = Town::cast(lto->getElement());
         auto destroyCamp = Camp::cast(lto->getElement());
-        if (toTroop && lto->hasFences())
+
+        // Move back if troop is back of fences
+        if (toTroop && !Bandit::is(toTroop) && lto->hasFences())
             for (auto& nc : lto->getNeighbors())
                 if (auto ng = PlayableGround::cast(nc))
                     if (ng->getOwner() == toOwner && !ng->getElement() && ng->hasFences())
@@ -701,6 +713,7 @@ void GameMap::moveTroop(const std::weak_ptr<PlayableGround>& from, const std::we
     // Same Owner
     else {
         if (!lto->getElement()) {
+            save();
             lfrom->setElement(nullptr);
             lto->setElement(fromTroop);
             updateIncomes(fromOwner);
@@ -717,6 +730,8 @@ void GameMap::moveTroop(const std::weak_ptr<PlayableGround>& from, const std::we
                 troop = std::make_shared<Hero>(lto->getPos());
 
             if (troop) {
+                save();
+                
                 // Set merged troop
                 if (isMovedTroop(fromTroop) || isMovedTroop(toTroop)) {
                     movedTroops_.push_back(troop);
@@ -1085,6 +1100,63 @@ void GameMap::updateMovables() {
         if (auto pg = PlayableGround::cast(cell))
             if (auto troop = Troop::cast(pg->getElement()))
                 troop->setMovable(cp && cp == pg->getOwner() && !Bandit::is(troop) && !isMovedTroop(troop));
+}
+
+void GameMap::undo() {
+    if (nbUndos_ < 1) return;
+    std::pair<int, int> gridSize{getWidth(), getHeight()};
+    movedTroops_ = movedTroopsSave_;
+    auto oldGrid = saves_.back();
+    saves_.pop_back();
+    nbUndos_--;
+
+    // Place old cells
+    for (int x = 0; x < gridSize.first; x++) {
+        for (int y = 0; y < gridSize.second; y++) {
+            auto oldCell = oldGrid.get(x, y);
+
+            // Set copied town to players
+            if (auto oldPg = PlayableGround::cast(oldCell))
+                if (auto town = Town::cast(oldPg->getElement()))
+                    if (auto owner = oldPg->getOwner())
+                        owner->addTownCell(oldPg);
+
+            // Set the copied cell to the grid
+            set(x, y, oldCell);
+        }
+    }
+
+    // Update neighbors
+    updateNeighbors();
+    updateMovables();
+
+    // refresh towns of players
+    for (auto player : players_)
+        if (auto lplayer = player.lock())
+            lplayer->updateTowns();
+}
+
+void GameMap::save() {
+    std::pair<int, int> gridSize{getWidth(), getHeight()};
+    HexagonGrid<std::shared_ptr<Cell>> copiedGrid(gridSize, nullptr);
+
+    // Copy all cells
+    for (int x = 0; x < gridSize.first; x++) {
+        for (int y = 0; y < gridSize.second; y++) {
+            // Copy cell
+            auto cell = get(x, y);
+            auto cellCopy = cell->deepCopy();
+            auto pg = PlayableGround::cast(cell);
+            copiedGrid.set(x, y, cellCopy);
+
+            // copy moved troops
+            if (pg && isMovedTroop(Troop::cast(pg->getElement())))
+                movedTroopsSave_.push_back(Troop::cast(PlayableGround::cast(cellCopy)->getElement()));
+        }
+    }
+
+    saves_.push_back(copiedGrid);
+    nbUndos_++;
 }
 
 void GameMap::updateFreeTroops(const std::weak_ptr<Player>& player) {

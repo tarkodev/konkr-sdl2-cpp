@@ -58,3 +58,9 @@ void Camp::display(const std::weak_ptr<BlitTarget>& target) const {
 void Camp::displayTreasury(const std::weak_ptr<BlitTarget>& target) {
     treasuryDisplayer_.display(target);
 }
+
+std::shared_ptr<GameElement> Camp::deepCopy() const {
+    auto camp = std::make_shared<Camp>(pos_, treasury_);
+    camp->lost_ = lost_;
+    return camp;
+}

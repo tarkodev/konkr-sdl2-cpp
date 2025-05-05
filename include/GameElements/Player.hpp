@@ -131,6 +131,7 @@ private:
     HexagonDisplayer plate_;                       // Colored owned-plate instance
     HexagonDisplayer lostPlate_;                   // Colored available-plate instance
 
+    std::vector<std::weak_ptr<PlayableGround>> allTownCells_; // Cells containing this player's all towns
     std::vector<std::weak_ptr<PlayableGround>> townCells_; // Cells containing this player's towns
 
     bool selected_ = false;                        // True while it's this player's turn

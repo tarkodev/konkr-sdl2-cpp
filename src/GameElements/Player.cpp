@@ -47,11 +47,13 @@ HexagonDisplayer& Player::getLostPlate() {
 
 void Player::addTownCell(std::weak_ptr<PlayableGround> townCell) {
     if (!townCell.expired()) {
+        allTownCells_.push_back(townCell);
         townCells_.push_back(townCell);
     }
 }
 
 void Player::updateTowns() {
+    townCells_ = allTownCells_;
     std::erase_if(townCells_, [](const auto& townCell) {
         auto ltownCell = townCell.lock();
         return ltownCell ? !Town::is(ltownCell->getElement()) : true;
@@ -76,9 +78,9 @@ std::vector<std::weak_ptr<PlayableGround>> Player::getTownCells() {
 }
 
 void Player::onTurnStart() {
-    updateTowns();
     selected_ = true;
     
+    // Select towns
     for (auto& townCell : townCells_) {
         if (auto ltownCell = townCell.lock()) {
             auto town = Town::cast(ltownCell->getElement());
@@ -89,6 +91,8 @@ void Player::onTurnStart() {
 }
 
 void Player::onTurnEnd() {
+    updateTowns();
+
     // Unselect towns
     for (auto& townCell : townCells_)
         if (auto ltownCell = townCell.lock())

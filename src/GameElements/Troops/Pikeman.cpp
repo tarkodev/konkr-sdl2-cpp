@@ -33,3 +33,11 @@ Pikeman::Pikeman(const Point& pos): Troop(pos, sprite_->getSize()) {}
 void Pikeman::display(const std::weak_ptr<BlitTarget>& target) const {
     Troop::displaySprite(target, sprite_);
 }
+
+std::shared_ptr<GameElement> Pikeman::deepCopy() const {
+    auto pikeman = std::make_shared<Pikeman>(pos_);
+    pikeman->free_ = free_;
+    pikeman->movable_ = movable_;
+    pikeman->lost_ = lost_;
+    return pikeman;
+}

@@ -39,6 +39,12 @@ public:
      * @return true if obj wraps a Forest instance.
      */
     static const bool is(const std::weak_ptr<Cell>& obj);
+    
+    /**
+     * @brief Make a deep copy of object.
+     * @return deep copy of this.
+     */
+    std::shared_ptr<Cell> deepCopy() const override;
 
     /**
      * @brief Load the shared forest texture.

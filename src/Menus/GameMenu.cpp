@@ -24,6 +24,11 @@ GameMenu::GameMenu(const std::shared_ptr<Window>& window, const std::string& map
     overlay_ = std::make_unique<Overlay>(Point{0, 0});
     overlay_->setPos(Point{windowSize_.getWidth() / 2, windowSize_.getHeight() - overlay_->getHeight() / 2});
 
+    // Create Back button
+    backBtn_ = std::make_unique<Button>(Point{0, 0}, "../assets/img/buttons/back_btn.png", "../assets/img/buttons/back_btn_hover.png", "../assets/img/buttons/back_btn_pressed.png");
+    backBtn_->setPos(Point{backBtn_->getWidth() / 2, window_->getHeight() - backBtn_->getHeight() / 2});
+    backBtn_->setCallback([this]() { nextMenu_ = std::make_shared<MapsMenu>(window_); loop_ = false; });
+
     // Create win texture
     finishTex_ = std::make_shared<Texture>(window_->getRenderer(), "../assets/img/win.png");
 
@@ -87,17 +92,21 @@ void GameMenu::updateShop() {
 
 const bool GameMenu::handleOverlay(SDL_Event& event) {
     overlay_->handleEvent(event);
+    backBtn_->handleEvent(event);
 
     // If return to MapsMenu
-    if (overlay_->backRequested()) {
-        nextMenu_ = std::make_shared<MapsMenu>(window_);
-        loop_ = false;
+    if (overlay_->undoRequested()) {
+        if (!map_->hasTroopSelected()) {
+            map_->undo();
+            updateShop();
+        }
         return true;
     }
 
     // If next turn
     else if (overlay_->turnRequested()) {
-        map_->nextPlayer();
+        if (!map_->hasTroopSelected())
+            map_->nextPlayer();
         return true;
     }
 
@@ -112,10 +121,12 @@ const bool GameMenu::handleOverlay(SDL_Event& event) {
 
 void GameMenu::onMouseButtonDown(SDL_Event& event) {
     Point mp{event.motion.x, event.motion.y};
-    if (overlay_->isHover(mp)) return;
+    if (overlay_->isHover(mp) || backBtn_->isHover(mp))
+        return;
 
     map_->handleEvent(event);
-    if (map_->hasTroopSelected()) return;
+    if (map_->hasTroopSelected())
+        return;
     
     moveOrigin_ = mp;
     moved_ = false;
@@ -157,8 +168,10 @@ void GameMenu::onMouseWheel(SDL_Event& event) {
 
 void GameMenu::onKeyDown(SDL_Event& event) {
     if (event.key.keysym.sym == SDLK_RETURN) {
-        map_->nextPlayer();
-        updateShop();
+        if (!map_->hasTroopSelected()) {
+            map_->nextPlayer();
+            updateShop();
+        }
         return;
     }
 
@@ -213,6 +226,7 @@ void GameMenu::draw() {
     
     map_->display(window_);
     overlay_->display(window_);
+    backBtn_->display(window_);
 
     if (gameFinished_) {
         window_->darken();

@@ -38,6 +38,12 @@ public:
      */
     std::vector<std::weak_ptr<Cell>> getNeighbors() const;
 
+    /**
+     * @brief Make a deep copy of object.
+     * @return deep copy of this.
+     */
+    virtual std::shared_ptr<Cell> deepCopy() const = 0;
+
 protected:
     /**
      * @brief Protected default constructor to prevent direct instantiation.

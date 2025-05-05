@@ -32,3 +32,11 @@ Knight::Knight(const Point& pos): Troop(pos, sprite_->getSize()) {}
 void Knight::display(const std::weak_ptr<BlitTarget>& target) const {
     Troop::displaySprite(target, sprite_);
 }
+
+std::shared_ptr<GameElement> Knight::deepCopy() const {
+    auto knight = std::make_shared<Knight>(pos_);
+    knight->free_ = free_;
+    knight->movable_ = movable_;
+    knight->lost_ = lost_;
+    return knight;
+}
