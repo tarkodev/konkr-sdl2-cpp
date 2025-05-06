@@ -184,7 +184,54 @@ void GameMap::loadMap(const std::string& mapFile) {
 }
 
 void GameMap::saveMap() const {
-    
+    const std::string& filename = "../assets/map/Create map.ascii";
+    std::ofstream out{filename};
+    if (!out)
+        throw std::runtime_error("Impossible d'ouvrir le fichier en écriture: " + filename);
+
+    int w = getWidth();
+    int h = getHeight();
+    for (int y = 0; y < h; ++y) {
+        for (int x = 0; x < w; ++x) {
+            auto cell = get(x, y);
+            char cellChar = '.';
+
+            // Cells
+            if (Forest::is(cell))       cellChar = 'F';
+            else if (Water::is(cell))   cellChar = 'W';
+            else if (auto pg = PlayableGround::cast(cell)) {
+                if (auto owner = pg->getOwner()) {
+                    int id = owner->getNum();
+                    cellChar = char('0' + id);
+                } else {
+                    cellChar = '0';
+                }
+            }
+
+            // GameElements
+            char eltChar = '.';
+            if (auto pg = PlayableGround::cast(cell)) {
+                auto elt = pg->getElement();
+                if (Town::is(elt))          eltChar = 'T';
+                else if (Castle::is(elt))   eltChar = 'C';
+                else if (Camp::is(elt))     eltChar = 'A';
+                else if (Villager::is(elt)) eltChar = 'V';
+                else if (Pikeman::is(elt))  eltChar = 'P';
+                else if (Knight::is(elt))   eltChar = 'K';
+                else if (Hero::is(elt))     eltChar = 'H';
+                else if (Bandit::is(elt))   eltChar = 'B';
+            }
+
+            // Write tokens
+            out << cellChar << eltChar;
+
+            // Write space
+            if (x + 1 < w) out << ' ';
+        }
+        out << '\n';
+    }
+
+    // flush et close automatiques à la destruction de ofstream
 }
 
 void GameMap::defrayBandits(const std::weak_ptr<Player>& player) {

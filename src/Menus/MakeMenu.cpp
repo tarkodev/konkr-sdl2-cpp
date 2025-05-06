@@ -218,6 +218,7 @@ void MakeMenu::handleEvents(){
 
     while (SDL_PollEvent(&event)) {
         handleEvent(event);
+        backBtn_->handleEvent(event);
         
         // handle event of menu
         if (event.type == SDL_MOUSEBUTTONDOWN)
