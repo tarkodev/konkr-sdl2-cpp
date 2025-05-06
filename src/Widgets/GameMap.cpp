@@ -183,6 +183,10 @@ void GameMap::loadMap(const std::string& mapFile) {
     updateNeighbors();
 }
 
+void GameMap::saveMap() const {
+    
+}
+
 void GameMap::defrayBandits(const std::weak_ptr<Player>& player) {
     auto lplayer = player.lock();
     if (!lplayer) return;
@@ -258,11 +262,75 @@ const bool GameMap::hasTroopSelected() {
 }
 
 
+std::weak_ptr<Cell> GameMap::getSelectedCell() const {
+    return Rect{0, 0, getWidth(), getHeight()}.contains(selectedCellPos_) ? get(selectedCellPos_.getX(), selectedCellPos_.getY()) : nullptr;
+}
+
+void GameMap::setInSelectedCell(const std::shared_ptr<Cell>& cell) {
+    if (!(Rect{0, 0, getWidth(), getHeight()}.contains(selectedCellPos_)))
+        return;
+
+    if (auto pg = Ground::cast(cell)) {
+        // Calculate pos of cell
+        double islandInnerRadius = Ground::getInnerRadius();
+        double islandRadius = Ground::getRadius();
+        auto [posX, posY] = HexagonUtils::offsetToPixel(selectedCellPos_.getX(), selectedCellPos_.getY(), islandRadius);
+        Point pos{static_cast<int>(posX + islandInnerRadius), static_cast<int>(posY + islandRadius)};
+
+        pg->setPos(pos);
+    }
+
+    set(selectedCellPos_.getX(), selectedCellPos_.getY(), cell);
+    updateNeighbors();
+}
+
 const int GameMap::getWidth() const {
     return HexagonGrid::getWidth();
 }
 const int GameMap::getHeight() const {
     return HexagonGrid::getHeight();
+}
+
+void GameMap::addWidth(int delta) {
+    double islandInnerRadius = Ground::getInnerRadius();
+    double islandRadius = Ground::getRadius();
+    HexagonGrid::addWidth(delta);
+    if (delta > 0) {
+        auto w = getWidth();
+        auto h = getHeight();
+        for (int y = 0; y < h; y++) {
+            // Calculate pos of cell
+            auto [posX, posY] = HexagonUtils::offsetToPixel(w-1, y, islandRadius);
+            Point pos{static_cast<int>(posX + islandInnerRadius), static_cast<int>(posY + islandRadius)};
+            
+            set(w-1, y, std::make_shared<PlayableGround>(pos));
+        }
+    }
+
+    updateNeighbors();
+    createCalcs();
+}
+
+void GameMap::addHeight(int delta) {
+    double islandInnerRadius = Ground::getInnerRadius();
+    double islandRadius = Ground::getRadius();
+    HexagonGrid::addHeight(delta);
+
+    if (delta > 0) {
+        auto w = getWidth();
+        auto h = getHeight();
+
+        for (int x = 0; x < w; x++) {
+            // Calculate pos of cell
+            auto [posX, posY] = HexagonUtils::offsetToPixel(x, h-1, islandRadius);
+            Point pos{static_cast<int>(posX + islandInnerRadius), static_cast<int>(posY + islandRadius)};
+            
+            set(x, h-1, std::make_shared<PlayableGround>(pos));
+        }
+    }
+
+    updateNeighbors();
+    createCalcs();
 }
 
 
@@ -614,11 +682,14 @@ void GameMap::selectCell(const Point& pos) {
     Point coords{x, y};
 
     // Out of bounds
-    if (!bounds.contains(coords))
+    if (!bounds.contains(coords)) {
         selectedCell_.reset();
+        return;
+    }
     
     // Set selected cell
-    else if (auto pg = PlayableGround::cast(get(x, y)))
+    selectedCellPos_ = coords;
+    if (auto pg = PlayableGround::cast(get(x, y)))
         selectedCell_ = pg;
 
     // remove selected cell

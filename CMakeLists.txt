@@ -123,6 +123,7 @@ set(SRC_FILES
     "${CMAKE_SOURCE_DIR}/src/Menus/MainMenu.cpp"
     "${CMAKE_SOURCE_DIR}/src/Menus/MapsMenu.cpp"
     "${CMAKE_SOURCE_DIR}/src/Menus/GameMenu.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Menus/MakeMenu.cpp"
     
     "${CMAKE_SOURCE_DIR}/src/Game.cpp"
     "${CMAKE_SOURCE_DIR}/src/main.cpp"

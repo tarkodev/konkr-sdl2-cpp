@@ -53,6 +53,12 @@ public:
      */
     void set(int x, int y, const T& value);
 
+    /** @brief Set new width of map. */
+    virtual void addWidth(int delta);
+    
+    /** @brief Set new height of map. */
+    virtual void addHeight(int delta);
+
     // Iterators for range-based loops and STL compatibility
     auto begin()       { return grid_.begin(); }
     auto end()         { return grid_.end();   }

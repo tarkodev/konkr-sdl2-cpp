@@ -1,10 +1,10 @@
 {
     "files.associations": {
-        "*.html": "handlebars",
         "*.l": "c",
         "*.y": "c",
         "*.lex": "c",
         "*.php": "php",
+        "*.html": "handlebars",
         "iostream": "cpp",
         "vector": "cpp",
         "__bit_reference": "cpp",
@@ -85,6 +85,7 @@
         "text_encoding": "cpp",
         "cinttypes": "cpp",
         "unordered_set": "cpp",
-        "ranges": "cpp"
+        "ranges": "cpp",
+        "filesystem": "cpp"
     }
 }

@@ -2,6 +2,7 @@
 #include "Utils/ColorUtils.hpp"
 #include "Menus/MainMenu.hpp"
 #include "Menus/MapsMenu.hpp"
+#include "Menus/MakeMenu.hpp"
 #include "Utils/Checker.hpp"
 #include "SDLWrappers/Cursor.hpp"
 
@@ -47,6 +48,11 @@ void MainMenu::handleEvents(){
         expeditionBtn_->handleEvent(event);
         howToPlayBtn_->handleEvent(event);
         exitBtn_->handleEvent(event);
+
+        if (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_m) {
+            nextMenu_ =  std::make_shared<MakeMenu>(window_);;
+            loop_ = false;
+        }
 
         handleEvent(event);
     }

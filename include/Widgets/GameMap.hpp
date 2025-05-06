@@ -125,6 +125,24 @@ public:
     /** @brief Return the pixel height of the map area. */
     const int getHeight() const override;
 
+    /** @brief Set new width of map. */
+    void addWidth(int delta) override;
+    
+    /** @brief Set new height of map. */
+    void addHeight(int delta) override;
+
+    /** @brief Return selected cell */
+    std::weak_ptr<Cell> getSelectedCell() const;
+
+    /** @brief Set new cell in selected cell */
+    void setInSelectedCell(const std::shared_ptr<Cell>& cell);
+
+    /** @brief Update adjacency links between neighboring cells. */
+    void updateNeighbors();
+
+    /** @brief Save map data (cell types, elements) into a file. */
+    void saveMap() const;
+
 private:
     static std::mt19937 gen_;                                     ///< Random number generator
 
@@ -134,6 +152,7 @@ private:
     std::vector<std::weak_ptr<Troop>> movedTroopsSave_;           ///< Saves of moved troops for undo
     int nbUndos_ = 0;
 
+    Point selectedCellPos_;
     std::weak_ptr<PlayableGround> selectedCell_;                  ///< Currently selected ground cell
     std::weak_ptr<Town> townToShowTreasury_;                      ///< Town whose treasury is visible
     std::weak_ptr<Camp> campToShowTreasury_;                      ///< Camp whose treasury is visible
@@ -167,9 +186,6 @@ private:
 
     /** @brief Determine grid dimensions by reading the map file. */
     std::pair<int,int> getSizeOfMapFile(const std::string& mapFile);
-
-    /** @brief Update adjacency links between neighboring cells. */
-    void updateNeighbors();
 
     /** @brief Generate textures for calculation overlays. */
     void createCalcs();

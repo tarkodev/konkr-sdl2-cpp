@@ -116,6 +116,9 @@ public:
      */
     void onTurnEnd();
 
+    void setNum(int num) { num_ = num; };
+    int getNum() const { return num_; };
+
 private:
     //------------------------------
     // Shared Renderer & Plate
@@ -127,6 +130,7 @@ private:
     // Per-Player State
     //------------------------------
     GroundColor color_;                            // This player's color scheme
+    int num_ = 1;
 
     HexagonDisplayer plate_;                       // Colored owned-plate instance
     HexagonDisplayer lostPlate_;                   // Colored available-plate instance
